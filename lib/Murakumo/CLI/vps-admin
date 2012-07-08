@@ -12,13 +12,13 @@ use Data::Dumper;
 use URI::Escape;
 use URI ();
 use opts;
-use lib qw(/home/smc/Murakumo/lib);
-use Murakumo::CLI::DB;
-use Murakumo::CLI::Utils;
+use lib qw(/home/smc/murakumo/lib);
+# use Murakumo::CLI::DB;
 
 our $VERSION  = q(0.10);
-our $base_url = 'http://127.0.0.1:3000/';
-our $utils    = Murakumo::CLI::Utils->new;
+our $base_url = exists $ENV{VPS_API_URI}
+              ? $ENV{VPS_API_URI}
+              : 'http://127.0.0.1:3000/';
 
 opts my $name         => 'Str',
      my $org          => 'Str',
@@ -184,7 +184,6 @@ sub vps_list {
 
   $uri->query_form( %param_hash );
 
-  # warn $uri;
   my $response = _www_get( $uri );
   my $data = decode_json $response->content;
 
@@ -329,9 +328,12 @@ sub _vps_define_create_or_modify {
         $vlan_number = $1;
         $ip     = $2;
       }
+
+      my $uuid_created = `uuidgen`;
+      chomp $uuid_created;
       my $interface = +{ 
                           driver  => "virtio",
-                          mac     => $utils->create_random_mac,
+                          mac     => $uuid_created,
                           vlan_id => $vlan_number,
                        };
       if ($ip) {

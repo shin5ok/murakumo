@@ -16,7 +16,7 @@ use FindBin;
 
 our $VERSION = q(0.0.3);
 
-our $config_path   = qq{$FindBin::Bin/../Murakumo.conf};
+our $config_path   = qq{$FindBin::Bin/../murakumo.conf};
 our $root_itemname = q{root};
 
 sub import {
