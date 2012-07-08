@@ -5,7 +5,8 @@ package Murakumo::CLI::Job;
 use JSON;
 use Carp;
 use Data::Dumper;
-use lib qw( /home/smc/Murakumo/lib );
+use FindBin;
+use lib qq{$FindBin::Bin/../lib};
 use Murakumo::CLI::DB;
 use base q(Murakumo::CLI::DB);
 

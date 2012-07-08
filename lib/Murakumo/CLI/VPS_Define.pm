@@ -9,7 +9,8 @@ use DateTime;
 use Carp;
 use Path::Class;
 
-use lib qw( /home/smc/Murakumo/lib );
+use FindBin;
+use lib qq{$FindBin::Bin/../lib};
 use Murakumo::CLI::Utils;
 use Murakumo::CLI::DB;
 use base q(Murakumo::CLI::DB);

@@ -6,7 +6,8 @@ use JSON;
 use Data::Dumper;
 use Carp;
 
-use lib qw( /home/smc/Murakumo/lib );
+use FindBin;
+use lib qq{$FindBin::Bin/../lib};
 use Murakumo::CLI::DB;
 use base qw( Murakumo::CLI::DB );
 
