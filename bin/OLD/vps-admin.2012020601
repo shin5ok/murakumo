@@ -1,0 +1,135 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+package _mode_and_arg_;
+
+use Carp;
+use LWP::UserAgent ();
+use HTTP::Request::Common qw(POST GET);
+use JSON;
+use Text::ASCIITable;
+use DateTime;
+use Data::Dumper;
+use URI ();
+
+our $_table;
+our $base_url = 'http://192.168.232.29:3000/';
+
+sub wwwua {
+  my $wwwua = LWP::UserAgent->new;
+  $wwwua->timeout( 10 );
+  return $wwwua;
+}
+
+sub _create_uri {
+  our $base_url;
+  my $action = shift;
+  sprintf "%s/%s", $base_url, $action;
+}
+
+sub vps_list {
+  my $uri = _create_uri( '/vps/list/' );
+
+  my $response = wwwua->get( $uri );
+  my $data = decode_json $response->content;
+
+  my @rows;
+  for my $x ( @{$data->{root}} ) {
+    push @rows, 
+      [
+        $x->{name},
+        $x->{uuid},
+        $x->{node_uuid},
+        $x->{cpu},
+        $x->{memory},
+        $x->{regist_time},
+        $x->{state},
+      ];
+  }
+  __PACKAGE__->regist_table( \@rows );
+
+}
+
+sub vps_clone {
+  my $uri = _create_uri( '/vps/clone/' );
+  
+
+}
+
+sub vps_boot {
+
+}
+
+sub vps_shutdown {
+
+}
+
+sub vps_terminate {
+
+}
+
+sub vps_define {
+
+}
+
+sub regist_table {
+  if (@_ > 1) {
+    $_table = $_[1];
+  } else {
+    return $_table;
+  }
+}
+
+sub get_table {
+  if (! $_table or ref $_table ne 'ARRAY') {
+    croak "command failure";
+  }
+  my @rows = @$_table;
+  my $t = Text::ASCIITable->new;
+  $t->setCols('name','uuid','node uuid', 'cpu','memory', 'update time', 'state');
+  for (sort { $a->[0] cmp $b->[0] } @rows) {
+    $t->addRow($_);
+  }
+  return $t;
+}
+
+our $AUTOLOAD;
+sub AUTOLOAD {
+  warn $AUTOLOAD , " args error";
+  exit 255;
+}
+
+package main;
+use opts;
+
+opts my $debug => 'Int',
+     my $test  => 'Str',
+     my $test2 => 'Str';
+
+my ($mode, @args) = @ARGV;
+
+$mode = join "_", @ARGV;
+$mode =~ s/_+/_/g;
+
+_mode_and_arg_->$mode;
+my $content = _mode_and_arg_->get_table;
+print $content, "\n";
+
+
+
+__END__
+my @rows = (
+    [1,'foo','2011-03-16 11:22:33'],
+    [2,'hogehogehoge','2011-03-17 11:22:33'],
+    [3,'uwaaaaa','2011-03-18 11:22:33'],
+    [4,'dio','2011-03-19 11:22:33'],
+    [5,'jojo','2011-03-20 11:22:33'],
+);
+
+my $t = Text::ASCIITable->new();
+$t->setCols('id','name','created');
+$t->addRow($_) for @rows;
+
+1;
