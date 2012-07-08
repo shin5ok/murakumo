@@ -1,0 +1,570 @@
+#!/home/smc/bin/perl
+
+use strict;
+use warnings;
+use Carp;
+use LWP::UserAgent ();
+use HTTP::Request::Common qw(POST GET);
+use JSON;
+use Text::ASCIITable;
+use DateTime;
+use Data::Dumper;
+use URI::Escape;
+use URI ();
+use opts;
+use lib qw(/home/smc/Murakumo/lib);
+use Murakumo::CLI::DB;
+use Murakumo::CLI::Utils;
+
+our $VERSION  = q(0.10);
+our $base_url = 'http://127.0.0.1:3000/';
+our $utils    = Murakumo::CLI::Utils->new;
+
+opts my $name         => 'Str',
+     my $org          => 'Str',
+     my $uuid         => 'Str',
+     my $project_id   => 'Str',
+     my $cpu_number   => 'Int',
+     my $memory       => 'Int',
+     my $set_network  => 'Bool',
+     my $storage_uuid => 'Str',
+     my $assign_ip    => 'Bool',
+     my $clock        => 'Str',
+     my $verbose      => 'Bool',
+     my $ip           => 'Str',
+     my $disk         => 'Str',
+     my $vlan_id      => 'Str',
+     my $vnc_password => 'Str',
+     my $cdrom        => 'Str',
+     my $dst_node     => 'Str',
+     my $node         => 'Str';
+
+if (exists $ENV{VPS_PROJECT_ID}) {
+  # 環境変数を優先
+  # 環境変数をセットしていたら、いちいち指定しなくてもよい
+  $project_id = $ENV{VPS_PROJECT_ID};
+}
+
+if (exists $ENV{VPS_BASE_URL}) {
+  $base_url = $ENV{VPS_BASE_URL};
+}
+
+my @args   = @ARGV;
+my $method = shift @args || qq{};
+# - は _ に変換する
+$method =~ s/\-/_/g;
+
+my @results = __PACKAGE__->$method( @args );
+
+if (@results > 1) {
+  no strict 'refs';
+  my $t = Text::ASCIITable->new;
+  my @cols = map { local $1; /([^\|]+)/; $1 } @{$results[0]};
+  $t->setCols( @cols );
+  $t->alignCol($_, q{left}) for @cols;
+
+  for my $col ( @{$results[0]} ) {
+    if (my ($name, $size) = $col =~ /(.+)\|(\d+)/) {
+      $t->setColWidth( $name, $size, 1 );
+    }
+  }
+
+  # $t->setOptions('outputWidth',50);
+  $t->setColWidth('message', 30, 1);
+  for my $row (@{$results[1]}) {
+  # for (sort { $a->[0] cmp $b->[0] } @{$results[1]}) {
+    $t->addRow($row);
+  }
+  print $t;
+
+} else {
+  print $results[0], "\n";
+
+}
+
+sub _create_uri {
+  our $base_url;
+  my $action = shift;
+  my $uri = URI->new( sprintf "%s/%s", $base_url, $action );
+  return $uri;
+}
+
+sub vps_define_info {
+  defined $uuid
+    or croak "*** uuid parameter is not found";
+
+  my $uri = _create_uri( "/$project_id/vps/define/info/?uuid=$uuid" );
+
+  my $response    = _www_get( $uri );
+  my $content_ref = decode_json $response->content;
+  my $info        = $content_ref->{info};
+  local $Data::Dumper::Terse = 1;
+
+  no strict 'refs';
+  my @cols = qw( param_name value );
+
+  my @rows;
+  my @param_names = qw( project_id uuid name cpu_number memory clock cdrom_path vnc_password );
+  for my $param_name ( @param_names ) {
+
+    my $value = $info->{$param_name};
+
+    if ($param_name eq 'vnc_password' and ! $verbose) {
+      $value = '**********';
+    }
+
+    push @rows, [ $param_name, $value ];
+
+  }
+  
+  my $disk_number = 1;
+  for my $disk ( @{$info->{disks}} ) {
+    my $string = "";
+    for my $name ( qw( image_path driver size ) ) {
+      if (exists $disk->{$name}) {
+        $string .= sprintf "%-10s:%s\n", $name, $disk->{$name};
+      }
+    }
+    push @rows, [
+           "disk$disk_number",
+           $string,
+         ];
+    $disk_number++;
+  }
+
+  my $iface_number = 1;
+  for my $iface ( @{$info->{interfaces}} ) {
+    my $string = "";
+    for my $name ( qw( mac driver vlan_id ip ) ) {
+
+      if (exists $iface->{$name}) {
+        if ($name eq 'ip') {
+          for my $ip_param ( keys %{$iface->{ip}}) {
+            $string .= sprintf "%-10s:%s\n", $ip_param, $iface->{ip}->{$ip_param};
+          }
+        } else {
+          $string .= sprintf "%-10s:%s\n", $name, $iface->{$name};
+        }
+      }
+    }
+    push @rows, [
+           "interface$iface_number",
+           $string,
+         ];
+    $iface_number++;
+
+  }
+   
+  return (\@cols, \@rows); 
+
+}
+
+sub vps_cdrom {
+  my $uri = _create_uri( "/$project_id/node/run/vps/cdrom/" );
+
+  my %param = (
+    cdrom_path => $cdrom,
+    project_id => $project_id,
+    uuid       => $uuid,
+  );
+
+  my $response = _www_json_post( $uri, \%param );
+
+  return $response->content;
+
+}
+
+sub vps_list {
+
+  my $uri = _create_uri( "/$project_id/vps/list/" );
+
+  my %param_hash;
+  $verbose
+    and $param_hash{'verbose'} = 1;
+
+  $uri->query_form( %param_hash );
+
+  # warn $uri;
+  my $response = _www_get( $uri );
+  my $data = decode_json $response->content;
+
+  my @cols = ('name','uuid','node', 'cpu','memory', 'vnc_port', 'update_time', 'state', );
+  my @rows;
+  for my $x ( @{$data->{vps_list}} ) {
+    my @p;
+
+    push @p, $x->{$_} for ( @cols );
+    push @rows, \@p;
+
+  }
+  if ($node) {
+    @rows = grep { $_->[2] eq $node } @rows;
+  }
+
+  # 列名、行の配列リファレンス
+  return ( \@cols, \@rows );
+
+}
+
+sub vps_define_list {
+  my $uri = _create_uri( "/$project_id/vps/define/list/" );
+
+  my $response = _www_get( $uri );
+  my $data = decode_json $response->content;
+
+  my @cols = ('name','uuid', 'cpu_number','memory', 'update_time', 'regist_time');
+  my @rows;
+  for my $x ( @{$data->{list}} ) {
+    my @p;
+
+    push @p, $x->{$_} for ( @cols );
+    push @rows, \@p;
+  }
+  # 列名、行の配列リファレンス
+  return ( \@cols, [ sort { $a->[4] cmp $b->[4] } @rows ] );
+
+}
+
+sub vps_clone {
+  my $uri   = _create_uri( "/$project_id/vps/define/clone/$uuid/" );
+  # my $uri   = _create_uri( '/node/job/vps/clone/' );
+  my %param = (
+    # uuid       => $uuid,
+    vlan_id    => $vlan_id,
+  );
+
+  $assign_ip and
+    $param{assign_ip}   = 1;
+
+  $set_network and
+    $param{set_network} = 1;
+
+  $name and
+    $param{name}        = $name;
+   
+  my $response = _www_json_post( $uri, \%param );
+
+  return $response->content;
+}
+
+sub vps_boot {
+  goto &vps_boot_by_uuid;
+}
+
+sub vps_boot_by_uuid {
+  my $url  = sprintf "/%s/vps/boot/%s/", $project_id, $uuid;
+  # my $url  = sprintf "/%s/vps/boot", $project_id;
+  my $uri  = _create_uri( $url );
+  my $uuid = $uuid;
+  my $set_node = defined $node
+               ? $node
+               : "";
+  warn Dumper ( { node => $set_node, uuid => $uuid } );
+  my $response = _www_json_post( $uri, { node => $set_node, uuid => $uuid } );
+
+  return $response->content;
+}
+
+sub vps_shutdown {
+  my $uri = _create_uri( "/$project_id/vps/shutdown/$uuid/" );
+  my %param = (
+    project_id => $project_id,
+  );
+   
+  my $response = _www_json_post( $uri, \%param );
+
+  return $response->content;
+
+}
+
+sub vps_terminate {
+  my $uri = _create_uri( "/$project_id/vps/terminate/$uuid/" );
+  my %param = (
+    project_id => $project_id,
+  );
+   
+  my $response = _www_json_post( $uri, \%param );
+
+  return $response->content;
+
+}
+
+sub vps_define_create {
+  _vps_define_create_or_modify("create");
+}
+
+sub vps_define_modify {
+  if (! $uuid) {
+    croak "*** uuid is not specified...";
+  }
+
+  _vps_define_create_or_modify("modify");
+}
+
+sub _vps_define_create_or_modify {
+  my $mode = shift;
+
+  my $mode_uri;
+  if ($mode eq "create") {
+    $mode_uri = "create";
+  } else {
+    $mode_uri = "modify";
+  }
+
+  if (! $uuid) {
+    chomp ($uuid = `uuidgen`);
+  }
+
+  my @disks;
+  if ($disk) {
+    @disks = map { $_ * 1024000 } split /,/, $disk;
+  }
+
+  my @interfaces;
+  if ($vlan_id) {
+    my $number = 0;
+    for my $vlan_number (split /,/, $vlan_id) {
+      my $ip;
+      if ($vlan_number =~ /^([^:]):(.+)/) {
+        $vlan_number = $1;
+        $ip     = $2;
+      }
+      my $interface = +{ 
+                          driver  => "virtio",
+                          mac     => $utils->create_random_mac,
+                          vlan_id => $vlan_number,
+                       };
+      if ($ip) {
+        $interface->{ip} = $ip;
+      }
+      push @interfaces, $interface;
+      $number++;
+    }
+
+  }
+
+  my $vps = +{
+    uuid       => $uuid,
+    project_id => $project_id,
+  };
+
+  defined $name
+    and $vps->{name}         = $name;
+  defined $memory
+    and $vps->{memory}       = $memory;
+  defined $cpu_number
+    and $vps->{cpu_number}   = $cpu_number;
+  defined $clock
+    and $vps->{clock}        = $clock;
+  defined $cdrom
+    and $vps->{cdrom_path}   = $cdrom || "";
+  defined $vnc_password
+    and $vps->{vnc_password} = $vnc_password;
+
+  my $vps_params = {
+     uuid         => $uuid,
+     # project_id   => $project_id,
+     spec         => $vps,
+     disk         => \@disks,
+     interface    => \@interfaces,
+     storage_uuid => $storage_uuid,
+  };
+
+  my $uri = _create_uri( qq{/$project_id/vps/define/$mode_uri/} );
+
+  my $params_all = {
+                     vps        => $vps_params,
+                     project_id => $project_id,
+                     uuid       => $uuid,
+                     assign_ip  => $assign_ip,
+                     vlan_id    => $vlan_id,
+                   };
+  my $response = _www_json_post( $uri, $params_all );
+
+  return $response->content;
+
+}
+
+sub vps_define_remove {
+  my $uri = _create_uri( "/$project_id/vps/define/remove/$uuid/" );
+  my $response = _www_json_post( $uri );
+
+  return $response->content;
+  
+}
+
+sub vps_migration {
+  my $uri = _create_uri( "/$project_id/vps/migration/$uuid/" );
+  $dst_node
+    or croak "dst node is error";
+
+  warn "uri => $uri";
+  my $response = _www_json_post( $uri, { dst_node => $dst_node, } );
+  return $response->content;
+
+}
+
+sub node_list {
+  my $uri = _create_uri( '/node/list/' );
+
+  if ($verbose) {
+    $uri->query_form( verbose => 1 );
+  }
+
+  my $response = _www_get( $uri );
+
+  my @cols = qw( name cpu_total mem_total mem_free loadavg vps_number cpu_vps_used update_time );
+
+  my $data = decode_json $response->content;
+  my @rows;
+  for my $x ( @{$data->{node}} ) {
+    my @p;
+
+    push @p, $x->{$_} for ( @cols );
+    push @rows, \@p;
+
+  }
+
+  return (\@cols, \@rows);
+}
+
+
+sub job_list {
+  $project_id ||= '';
+  $uuid       ||= '';
+  my $uri = _create_uri( "/$project_id/job/list/$uuid" );
+  # $uri .= "?project_id=$project_id";
+  # $uuid and $uri .= "&job_uuid=$uuid";
+  # my %param = (
+  #   project_id => $project_id,
+  # );
+
+  # $uuid
+  #    and $param{job_uuid} = $uuid;
+   
+  my $response = _www_get( $uri );
+
+  my $data = decode_json $response->content;
+
+  my @cols = qw(job_uuid result message update_time request_job);
+
+  my @rows;
+  for my $x ( @{$data->{job_list}} ) {
+    my @p;
+
+    push @p, $x->{$_} for ( @cols );
+    push @rows, \@p;
+
+  }
+
+  # 最後の要素の request_job カラムには 幅に制限を付ける
+  $cols[$#cols] = q(request_job|30);
+
+  return (\@cols, \@rows);
+ 
+}
+
+sub storage_list {
+  my $uri = _create_uri( '/storage/list/' );
+
+  my $response = _www_get( $uri );
+
+  my $data = decode_json $response->content;
+
+  my @cols = qw( uuid type export_path host mount_path regist_time );
+
+  my @rows;
+  for my $x ( @{$data->{list}} ) {
+    my @p;
+
+    push @p, $x->{$_} for ( @cols );
+    push @rows, \@p;
+
+  }
+
+  return (\@cols, \@rows);
+
+}
+
+our $AUTOLOAD;
+sub AUTOLOAD {
+  warn $AUTOLOAD , " args error";
+  exit 255;
+}
+
+sub _www_get {
+  my $wwwua = LWP::UserAgent->new;
+  $wwwua->timeout( 10 );
+  my ($uri_string, %param) = @_;
+  my $uri = URI->new( $uri_string );
+  %param and $uri->query_form( \%param );
+
+  return $wwwua->get( $uri );
+}
+
+sub _www_post {
+  my $uri   = shift;
+  my $param = shift;
+
+  # POSTには、nodeの指定は強制的に
+  defined $node
+    and $param->{node} = $node;
+
+  my $wwwua = LWP::UserAgent->new;
+  $wwwua->timeout( 10 );
+  my $request = POST $uri, [ $param ];
+  warn Dumper $request;
+  return $wwwua->request( $request );
+}
+
+sub _www_json_post {
+  my $uri   = shift;
+  my $params = shift;
+
+# 139   my $ua  = LWP::UserAgent->new( timeout => $self->{config}->{http_timeout} );
+# 140   my $req = HTTP::Request->new( 'POST', $self->{url} );
+# 141   $req->authorization_basic( $self->{config}->{username}, $self->{config}->{password} );
+# 142   $req->header('Content-type' => 'text/xml');
+# 143
+# 144   my $hash_ref = _build_request( $mode, @accounts );
+# 145   $req->content( $self->{xml_tpp}->write( $hash_ref ) );
+# 146
+# 147   my $response;
+# 148   local $@;
+# 149   eval {
+# 150     local $SIG{ALRM} = sub { croak "response timeout"; };
+# 151     alarm $self->{timeout};
+# 152     $response = $ua->request( $req );
+
+  # POSTには、nodeの指定は強制的に
+  defined $node
+    and $params->{node} = $node;
+
+  my $wwwua = LWP::UserAgent->new;
+  $wwwua->timeout( 10 );
+
+  my $request = HTTP::Request->new( 'POST', $uri );
+  $request->header('Content-Type' => 'application/json');
+  $request->content( encode_json $params );
+
+  warn Dumper $request;
+  warn encode_json $params if exists $ENV{DEBUG};
+
+  return $wwwua->request( $request );
+}
+
+__END__
+my @rows = (
+    [1,'foo','2011-03-16 11:22:33'],
+    [2,'hogehogehoge','2011-03-17 11:22:33'],
+    [3,'uwaaaaa','2011-03-18 11:22:33'],
+    [4,'dio','2011-03-19 11:22:33'],
+    [5,'jojo','2011-03-20 11:22:33'],
+);
+
+my $t = Text::ASCIITable->new();
+$t->setCols('id','name','created');
+$t->addRow($_) for @rows;
+
+1;
+

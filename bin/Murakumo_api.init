@@ -1,0 +1,71 @@
+#!/home/smc/bin/perl
+# chkconfig: 35 99 10
+# description: Murakumo_api
+#
+
+use strict;
+use warnings;
+use Carp;
+
+$ENV{DAEMON} = 1;
+
+my $arg = shift || _usage();
+$> == 0
+  or croak "*** not root user";
+
+my $pid = "/var/tmp/Murakumo.pid";
+
+if ($arg eq 'start') {
+  printf "Murakumo_api api start...%s\n", _start() ? "ok" : "FAIL";
+}
+elsif ($arg eq 'stop') {
+  printf "Murakumo_api api stop...%s\n",  _stop()  ? "ok" : "FAIL";
+
+}
+elsif ($arg eq 'restart') {
+  _stop();
+  _start();
+
+}
+elsif ($arg eq 'reload') {
+  printf "Murakumo_api api reload...%s\n", _reload() ? "ok" : "FAIL";
+
+} else {
+  _usage();
+
+}
+
+sub _start {
+  chdir "/home/smc/Murakumo/script";
+  my $r = system "/home/smc/bin/perl Murakumo_server.pl --fork --background --pidfile $pid > /dev/null 2>&1";
+  return $r == 0;
+}
+
+sub _stop {
+  my $pid = _get_pid();
+  my $r = kill 15, $pid;
+  return $r;
+}
+
+sub _reload {
+  my $pid = _get_pid();
+  my $r = kill 1, $pid;
+  return $r;
+}
+
+
+sub _usage {
+  print "usage: $0 start | stop | restart\n";
+}
+
+sub _get_pid {
+  -f $pid or croak "*** error... daemon is stopped";
+  open my $fh, "<", $pid;
+  my $p = <$fh>;
+  close $fh;
+  my ($pid_number) = $p =~ /(\d+)/;
+  return $pid_number;
+}
+
+1;
+
