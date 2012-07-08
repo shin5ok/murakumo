@@ -115,8 +115,7 @@ sub job :Local {
 
   # ストレージ操作、スイッチ操作とか、並列に動作させない処理は固定のノードに
   my $fix_request_arg = $c->config->{'fix_request_arg'};
-  # Config::Generalで配列にするやり方がわからないので無理やり配列
-  if ( grep { /$request_arg/ } split /\,/, $fix_request_arg ) {
+  if ( grep { /$request_arg/ } @$fix_request_arg ) {
     warn "url /$request_arg/ fix request node => ", $c->config->{'fix_request_node'};
     $node = $c->config->{'fix_request_node'};
   }
