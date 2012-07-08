@@ -25,7 +25,6 @@ sub info_include_tmp {
 }
 
 sub info {
-warn Dumper \@_;
   my ($self, $uuid, $include_tmp) = @_;
 
   my $vps_define_rs   = $self->schema->resultset('VpsDefine');
@@ -425,12 +424,6 @@ sub create_or_modify {
     $vps_spec->{ready}       = $is_vps_exists
                              ? 1
                              : 0;
-{
-  open my $fh, ">","/tmp/vps_spec.txt";
-  flock $fh, 2;
-  print {$fh} Dumper($vps_spec);
-  close $fh;
-}
 
     $vps_define_rs->update_or_create( $vps_spec, { uuid => $uuid } );
 
@@ -474,12 +467,7 @@ sub list_from_db {
 
 sub record_cloning {
   my ( $self, $org_uuid, $args_ref, $opt_args_ref ) = @_;
-  # ※ $args_ref は参照渡しなので、破壊したら元の引数にも影響を与える
-  # delete $args_ref->{job_uuid}
-  # とかすると、元の引数からも、$x->{job_uuid} が消される
 
-  # TODO:
-  # この3つのテーブルに対してトランザクション化する
   my $vps_define_rs   = $self->schema->resultset('VpsDefine');
   my $disk_define_rs  = $self->schema->resultset('DiskDefine');
   my $iface_define_rs = $self->schema->resultset('InterfaceDefine');
@@ -499,35 +487,7 @@ warn Dumper $args_ref;
   my $txn = $self->schema->txn_scope_guard;
 
   {
-
     no strict 'refs';
-    # きちんとエラー処理をすること
-    # my ($vps_result) = $vps_define_rs->search( { uuid => $org_uuid } );
-
-    # mysql> desc vps_define;
-    # +--------------------+--------------+------+-----+-------------------+-----------------------------+
-    # | Field              | Type         | Null | Key | Default           | Extra                       |
-    # +--------------------+--------------+------+-----+-------------------+-----------------------------+
-    # | name               | varchar(64)  | YES  | UNI | NULL              |                             |
-    # | uuid               | varchar(48)  | NO   | PRI |                   |                             |
-    # | project_id         | varchar(8)   | YES  |     | NULL              |                             |
-    # | template_flag      | int(11)      | YES  |     | NULL              |                             |
-    # | xml_path           | varchar(32)  | YES  |     | NULL              |                             |
-    # | main_disk          | varchar(255) | YES  |     | NULL              |                             |
-    # | memory             | int(32)      | YES  |     | NULL              |                             |
-    # | cpu_number         | int(8)       | YES  |     | NULL              |                             |
-    # | mac                | varchar(17)  | YES  |     | NULL              |                             |
-    # | add_disk_number    | int(8)       | YES  |     | NULL              |                             |
-    # | user_switch_number | int(8)       | YES  |     | NULL              |                             |
-    # | clock              | varchar(8)   | YES  |     | NULL              |                             |
-    # | xml_text           | mediumtext   | YES  |     | NULL              |                             |
-    # | instance_status    | varchar(32)  | YES  |     | NULL              |                             |
-    # | global_ip          | varchar(15)  | YES  |     | NULL              |                             |
-    # | original           | varchar(255) | YES  |     | NULL              |                             |
-    # | run_cpu_number     | int(8)       | YES  |     | NULL              |                             |
-    # | ready              | tinyint(1)   | YES  |     | NULL              |                             |
-    # | regist_time        | timestamp    | NO   |     | CURRENT_TIMESTAMP | on update CURRENT_TIMESTAMP |
-    # +--------------------+--------------+------+-----+-------------------+-----------------------------+
 
     $project_id = $args_ref->{project_id} || $org_info->{project_id};
 
@@ -720,15 +680,5 @@ sub cancel_define {
   $@ or $txn->commit;
 
 }
-
-# sub get_define_json {
-#   my ($self, $project_id, $uuid) = @_;
-#   my $info = $self->info( $uuid );
-# 
-#   warn Dumper $info;
-#   my $json = encode_json { $config->{root_item_name} => $info };
-# 
-#   return $json;
-# }
 
 1;

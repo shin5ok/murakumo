@@ -248,7 +248,7 @@ sub create_or_modify: Private {
 
   no strict 'refs';
 
-  my $uuid       = $c->stash->{uuid} || $c->params->{uuid};
+  my $uuid       = $c->stash->{uuid} || $params->{uuid};
   my $vps_params = $params->{vps};
   my $project_id = $params->{project_id};
   if (! $project_id) {

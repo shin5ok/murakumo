@@ -35,7 +35,6 @@ sub run :Local {
 
   my ($self, $c, @args) = @_;
 
-  warn Dumper \@args;
   my $request_arg = @args >= 2
                   ? join '/', grep { warn $_;defined $_ } @args # なぜかundef が入っているので
                   : $args[0];
@@ -201,11 +200,12 @@ sub job :Local {
 
   $params->{callback_host} = $hostnames[1];
   my $response_json = $node_model->api_json_post($uri, $params);
-  my $response_hash = decode_json $response_json;
 
   if (! $response_json) {
     $c->detach('/stop_error', ["api request error($uri, $params)"]);
   }
+
+  my $response_hash = decode_json $response_json;
 
   for my $key_of_hash ( keys %$response_hash ) {
     $c->stash->{$key_of_hash} = $response_hash->{$key_of_hash};
