@@ -3,7 +3,8 @@ use strict;
 package Murakumo::CLI::IP;
 use Carp;
 use Data::Dumper;
-use lib qw(/home/smc/Murakumo/lib);
+use FindBin;
+use lib qq{$FindBin::Bin/../lib};
 use base q(Murakumo::CLI::DB);
 our $VERSION = q(0.0.1);
 

@@ -7,7 +7,8 @@ use Data::Dumper;
 use HTTP::Request::Common qw/ POST GET /;
 use LWP::UserAgent;
 
-use lib qw( /home/smc/Murakumo/lib );
+use FindBin;
+use lib qq{$FindBin::Bin/../lib};
 use Murakumo::CLI::Utils;
 use Murakumo::CLI::DB;
 use base qw( Murakumo::CLI::DB );

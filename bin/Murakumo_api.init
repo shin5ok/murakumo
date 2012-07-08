@@ -13,7 +13,7 @@ my $arg = shift || _usage();
 $> == 0
   or croak "*** not root user";
 
-my $pid = "/var/tmp/Murakumo.pid";
+my $pid = "/var/run/Murakumo_api.pid";
 
 if ($arg eq 'start') {
   printf "Murakumo_api api start...%s\n", _start() ? "ok" : "FAIL";
@@ -36,7 +36,7 @@ elsif ($arg eq 'reload') {
 }
 
 sub _start {
-  chdir "/home/smc/Murakumo/script";
+  chdir "/home/smc/murakumo/script";
   my $r = system "/home/smc/bin/perl Murakumo_server.pl --fork --background --pidfile $pid > /dev/null 2>&1";
   return $r == 0;
 }

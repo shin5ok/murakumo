@@ -5,7 +5,8 @@ use Data::Dumper;
 use Carp;
 use List::Util qw(shuffle);
 
-use lib qw( /home/smc/Murakumo/lib );
+use FindBin;
+use lib qq{$FindBin::Bin/../lib};
 use Murakumo::CLI::Utils;
 use Murakumo::CLI::DB;
 use base qw( Murakumo::CLI::DB );
