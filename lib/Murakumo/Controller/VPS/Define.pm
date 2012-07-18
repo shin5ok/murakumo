@@ -250,7 +250,7 @@ sub create_or_modify: Private {
 
   my $uuid       = $c->stash->{uuid} || $params->{uuid};
   my $vps_params = $params->{vps};
-  my $project_id = $params->{project_id};
+  my $project_id = $c->stash->{project_id};
   if (! $project_id) {
     $c->detach("/stop_error", ["project_id is empty"]);
   }
@@ -393,7 +393,8 @@ sub remove :Private {
   my $params = decode_json <$body>;
 
   my $uuid       = $c->stash->{uuid} || $params->{uuid};
-  my $project_id = $params->{project_id};
+  my $project_id = $c->stash->{project_id};
+
   if (! $project_id) {
     $c->detach("/stop_error", ["project_id is empty"]);
   }
