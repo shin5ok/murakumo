@@ -78,7 +78,6 @@ warn Dumper $c->config;
 # nodeコントローラに処理を委譲
 sub boot :Private {
   my ($self, $c) = @_;
-  # my ($self, $c, $uuid) = @_;
 
   no strict 'refs';
   my $body = $c->request->body;
