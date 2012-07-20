@@ -47,6 +47,9 @@ sub clone :Private {
   my $body = $c->request->body;
   my $params = decode_json <$body>;
 
+  dumper($c->stash);
+  dumper($params);
+
   no strict 'refs';
 
   my $project_id = $c->stash->{project_id};
@@ -58,7 +61,7 @@ sub clone :Private {
   my $vps_model    = $c->model('VPS');
   my $ip_model     = $c->model('IP');
 
-  my $org_uuid     = $c->stash->{uuid} || $params->{uuid};
+  my $org_uuid     = $params->{org_uuid} = $c->stash->{uuid};
 
   if ($vps_model->is_active_vps( $org_uuid )) {
     $c->stash->{message} = "vps($org_uuid) is already active";
@@ -249,11 +252,12 @@ sub create_or_modify: Private {
   no strict 'refs';
 
   my $uuid       = $c->stash->{uuid} || $params->{uuid};
-  my $vps_params = $params->{vps};
   my $project_id = $c->stash->{project_id};
   if (! $project_id) {
     $c->detach("/stop_error", ["project_id is empty"]);
   }
+
+  my $vps_params = $params->{vps};
 
   my $utils = Murakumo::CLI::Utils->new;
 

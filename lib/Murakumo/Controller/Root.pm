@@ -27,6 +27,7 @@ The root page (/)
 =cut
 
 use Data::Dumper;
+use Murakumo::CLI::Utils;
 
 sub stop_error :Private {
   my ( $self, $c ) = @_;
@@ -101,15 +102,16 @@ sub default :Path{
   $c->stash->{project_id} = $project_id;
 
   # 371ff666-c581-40a4-9bab-1260975464bd
-  my $like_uuid = qr/
+  my $like_uuid = qr{
     ^
       [0-9a-f]{8} \-
       [0-9a-f]{4} \-
       [0-9a-f]{4} \-
       [0-9a-f]{4} \-
       [0-9a-f]{12}
+      / *
     $
-  /xo;
+  }xo;
 
   if ($args[-1] =~ /$like_uuid/) {
     $c->stash->{uuid} = pop @args;

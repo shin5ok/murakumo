@@ -333,7 +333,7 @@ sub _vps_define_create_or_modify {
       chomp $uuid_created;
       my $interface = +{ 
                           driver  => "virtio",
-                          mac     => $uuid_created,
+                          # mac     => $uuid_created,
                           vlan_id => $vlan_number,
                        };
       if ($ip) {
@@ -521,7 +521,7 @@ sub _www_post {
 
 sub _www_json_post {
   my $uri   = shift;
-  my $params = shift;
+  my $params = shift || {};
 
 # 139   my $ua  = LWP::UserAgent->new( timeout => $self->{config}->{http_timeout} );
 # 140   my $req = HTTP::Request->new( 'POST', $self->{url} );

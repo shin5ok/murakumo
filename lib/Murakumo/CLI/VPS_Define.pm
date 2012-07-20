@@ -235,8 +235,11 @@ sub delete {
 
 sub create_disk_param_array {
   my ($self, $array_ref, $argv) = @_;
-  warn "--- _create_disk_param_array ---";
-  warn Dumper $argv;
+
+  if (exists $ENV{DEBUG}) {
+    warn "--- _create_disk_param_array ---";
+    warn Dumper $argv;
+  }
 
   # ドライバは、ディスクを複数指定しても全ディスクで共通
   # いまは virtio の対応のみ
@@ -269,7 +272,6 @@ sub create_disk_param_array {
 
   $storage_uuid
     or croak "*** storage uuid get error...";
-  warn "storage_uuid : $storage_uuid";
 
   my $vm_root = $config->{vm_root};
   $vm_root    =~ s{^/+}{};
@@ -300,9 +302,12 @@ sub create_disk_param_array {
 
 sub create_or_modify {
   my ($self, $project_id, $uuid, $vps_params) = @_;
-  warn "--- ", __FILE__ , "#create_or_modify -----------";
-  warn Dumper $vps_params;
-  warn "-----------------------------------------------";
+
+  if ($ENV{DEBUG}) {
+    warn "--- ", __FILE__ , "#create_or_modify -----------";
+    warn Dumper $vps_params;
+    warn "-----------------------------------------------";
+  }
 
   # 引数
   # create_or_modify( プロジェクトID(ex: 111),
@@ -402,8 +407,9 @@ sub create_or_modify {
         # interface は DBに入れることができれば、ready = 1;
         $iface_args_ref->{ready}       = 1;
         $iface_args_ref->{seq}         = ++$seq;
+
+        $iface_args_ref->{mac}       ||= $utils->create_random_mac;
         
-        warn Dumper $iface_args_ref;
         $iface_define_rs->create( $iface_args_ref );
 
       }
