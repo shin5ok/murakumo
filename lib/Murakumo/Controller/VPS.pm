@@ -43,8 +43,6 @@ sub list :Private {
   my $define_model = $c->model('VPS_Define');
   $c->log->info("vps list called");
 
-warn Dumper $c->config;
-
   my $time_until;
   {
     no strict 'refs';
