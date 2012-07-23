@@ -145,7 +145,30 @@ __PYTHON__
   return $mac;
 }
 
+sub get_api_key {
+  my ($self) = @_;
+  open my $fh, "<", $self->config->{api_key_file}
+    or croak "api key file open error";
+  my $api_key_text = <$fh>;
+  close $fh;
+  my ($api_key) = $api_key_text =~ /(\S+)/;
+
+  return $api_key;
+}
+
+sub is_valid_api_key {
+  my ($self, $api_key_of_node) = @_;
+  my $api_key = $self->get_api_key;
+
+  if ($api_key eq $api_key_of_node) {
+    return 1;
+  }
+  croak "*** api key error";
+
+}
+
 1;
 __END__
+
 
 
