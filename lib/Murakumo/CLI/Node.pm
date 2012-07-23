@@ -171,17 +171,6 @@ sub list {
 
 }
 
-sub is_valid_api_key {
-  my ($self, $api_key_of_node) = @_;
-  my $api_key = $utils->get_api_key;
-
-  if ($api_key eq $api_key_of_node) {
-    return 1;
-  }
-  croak "*** api key error";
-
-}
-
 1;
 __END__
 

@@ -64,10 +64,7 @@ sub clone :Private {
   my $org_uuid     = $params->{org_uuid} = $c->stash->{uuid};
 
   if ($vps_model->is_active_vps( $org_uuid )) {
-    $c->stash->{message} = "vps($org_uuid) is already active";
-    $c->stash->{result}  = 0;
-    return $c->forward( $c->view('JSON') );
-
+    $c->detach("/stop_error", ["vps($org_uuid) is already active"]);
   }
 
   my $utils        = Murakumo::CLI::Utils->new;
@@ -95,12 +92,13 @@ sub clone :Private {
     $params->{gw}   = $gw;
   }
 
+  my $dst_name = exists $params->{name}
+               ? $params->{name}
+               : $dst_uuid;
+
   my $r;
   local $@;
   eval {
-    my $dst_name = exists $params->{name}
-                 ? $params->{name}
-                 : $dst_uuid;
 
     # 指定されてないなら、undef で渡す
     my $vlan_id  = $params->{vlan_id};
@@ -117,12 +115,7 @@ sub clone :Private {
   if (! $r or $@) {
     my $error_message      = "record_cloning error";
     $@ and $error_message .= "($@)";
-
-    $c->stash->{result}  = 0;
-    $c->stash->{message} = $error_message;
-    warn $error_message;
-
-    return $c->forward('JSON');
+    $c->detach("/stop_error", [ $error_message ]);
 
   }
 
@@ -131,6 +124,7 @@ sub clone :Private {
   $params->{mac}            = $r->{mac};
   $params->{dst_image_path} = $r->{dst_image_path};
   $params->{src_image_path} = $r->{src_image_path};
+  $params->{dst_hostname}   = $dst_name;
 
   $c->stash->{to_job_params} = $params;
   $c->detach( '/node/job/vps/clone/' );
@@ -236,7 +230,7 @@ sub commit :Local {
     $c->stash->{error} = $@;
   }
 
-  return $c->forward( $c->view('JSON') );
+  $c->stash->{result} = 1;
 
 }
 
