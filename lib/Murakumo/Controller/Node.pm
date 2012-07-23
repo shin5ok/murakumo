@@ -221,6 +221,8 @@ sub register :Local {
   my $vps_model  = $c->model('VPS');
   my $node_model = $c->model('Node');
 
+  $node_model->is_valid_regist_node( $params->{node}->{name} );
+
   my $vps_r  = $vps_model->register(
                                      $params->{node}->{name},
                                      $params->{update_key},

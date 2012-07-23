@@ -1,8 +1,9 @@
 use strict;
 use warnings;
-package Murakumo::CLI::Node;
+package Murakumo::CLI::Node 0.03;
 use URI;
 use JSON;
+use Carp;
 use Data::Dumper;
 use HTTP::Request::Common qw/ POST GET /;
 use LWP::UserAgent;
@@ -13,9 +14,7 @@ use Murakumo::CLI::Utils;
 use Murakumo::CLI::DB;
 use base qw( Murakumo::CLI::DB );
 
-our $VERSION = q(0.0.1);
-
-our $root_itemname = q{root};
+my $utils = Murakumo::CLI::Utils->new; 
 
 sub new {
   my ($class) = @_;
@@ -89,19 +88,17 @@ sub api_json_post {
 
 }
 
-sub api_get {
+sub api_get { }
 
-}
-
-sub register_json {
-  my ($self, $json_data) = @_;
-  my $json;
-  eval {
-    my $decoded_json = decode_json $json_data;
-    $json = $decoded_json->{$root_itemname};
-  };
-  return $self->register( $json->{node}->{name}, $json->{node} );
-}
+# sub register_json {
+#   my ($self, $json_data) = @_;
+#   my $json;
+#   eval {
+#     my $decoded_json = decode_json $json_data;
+#     $json = $decoded_json->{$root_itemname};
+#   };
+#   return $self->register( $json->{node}->{name}, $json->{node} );
+# }
 
 sub register {
   my ($self, $node_name, $node_ref) = @_;
@@ -119,13 +116,6 @@ sub register {
   }
   return 1;
 }
-
-# sub should_be_status {
-#   my ($self) = @_;
-# 
-#   my $resultset = $self->schema->resultset('Node');
-# 
-# }
 
 sub list {
   my ($self, $until) = @_;
@@ -181,6 +171,17 @@ sub list {
 
 }
 
+sub is_valid_api_key {
+  my ($self, $api_key_of_node) = @_;
+  my $api_key = $utils->get_api_key;
+
+  if ($api_key eq $api_key_of_node) {
+    return 1;
+  }
+  croak "*** api key error";
+
+}
 
 1;
 __END__
+
