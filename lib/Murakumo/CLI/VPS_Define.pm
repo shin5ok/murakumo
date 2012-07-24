@@ -395,7 +395,12 @@ sub create_or_modify {
     my @vlan_ids;
     if ( @iface_args_refs > 0 ) {
       # vpsに関連付けられた既存のinterfaceのレコードを削除
-      $iface_define_rs->search({ vps_uuid => $uuid })->delete;
+      my $now_iface_rs = $iface_define_rs->search({ vps_uuid => $uuid });
+      my %now_vlan;
+      while (my $row = $now_iface_rs->next) {
+        $now_vlan{$row->vlan_id} = $row->mac;
+      }
+      $now_iface_rs->delete;
 
       # 新しくvpsに関連付けたinterfaceのレコードを追加
       my $seq = 0;
@@ -408,7 +413,11 @@ sub create_or_modify {
         $iface_args_ref->{ready}       = 1;
         $iface_args_ref->{seq}         = ++$seq;
 
-        $iface_args_ref->{mac}       ||= $utils->create_random_mac;
+        if ( my $now_mac = delete $now_vlan{$iface_args_ref->{vlan_id}} ) {
+          $iface_args_ref->{mac}   = $now_mac;
+        } else {
+          $iface_args_ref->{mac} ||= $utils->create_random_mac;
+        }
         
         $iface_define_rs->create( $iface_args_ref );
 
