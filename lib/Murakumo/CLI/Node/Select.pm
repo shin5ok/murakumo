@@ -80,7 +80,6 @@ sub select {
   $selected_node = shift @rses;
 
   for my $r (@rses) {
-#warn sprintf "selected: %s(loadavg %s), current: %s(loadavg %s)", $selected_node->name, $selected_node->loadavg, $r->name, $r->loadavg;
 
     # ロードアベレージが少ないノードを選択
     if ($selected_node->loadavg > $r->loadavg) {
