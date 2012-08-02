@@ -523,21 +523,6 @@ sub _www_json_post {
   my $uri   = shift;
   my $params = shift || {};
 
-# 139   my $ua  = LWP::UserAgent->new( timeout => $self->{config}->{http_timeout} );
-# 140   my $req = HTTP::Request->new( 'POST', $self->{url} );
-# 141   $req->authorization_basic( $self->{config}->{username}, $self->{config}->{password} );
-# 142   $req->header('Content-type' => 'text/xml');
-# 143
-# 144   my $hash_ref = _build_request( $mode, @accounts );
-# 145   $req->content( $self->{xml_tpp}->write( $hash_ref ) );
-# 146
-# 147   my $response;
-# 148   local $@;
-# 149   eval {
-# 150     local $SIG{ALRM} = sub { croak "response timeout"; };
-# 151     alarm $self->{timeout};
-# 152     $response = $ua->request( $req );
-
   # POSTには、nodeの指定は強制的に
   defined $node
     and $params->{node} = $node;

@@ -12,6 +12,4 @@ __PACKAGE__->loader_options(
 );
 
 
-# __PACKAGE__->load_components( qw( InflateColumn::DateTime ) );
-
 1;

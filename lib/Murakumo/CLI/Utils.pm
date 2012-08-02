@@ -39,7 +39,6 @@ sub dumper {
   my $file_path = sprintf "/tmp/%s,%s",
                            $package,
                            $line;
-  warn "file_path: ", $file_path;
   open my $fh, ">", $file_path;
   flock $fh, 2;
   print {$fh}     Dumper($ref);

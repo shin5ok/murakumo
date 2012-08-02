@@ -71,9 +71,4 @@ sub list {
 
 1;
 __END__
-# Field	Type	Null	Key	Default	Extra
-# uuid	varchar(48)	NO	PRI		
-# export_path	varchar(255)	YES		NULL	
-# host	varchar(64)	YES		NULL	
-# type	varchar(8)	YES		NULL	
-# available	int(128)	YES		NULL	
+
