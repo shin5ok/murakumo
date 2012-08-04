@@ -13,7 +13,6 @@ use URI::Escape;
 use URI ();
 use opts;
 use lib qw(/home/smc/murakumo/lib);
-# use Murakumo::CLI::DB;
 
 our $VERSION  = q(0.10);
 our $base_url = exists $ENV{VPS_API_URI}
@@ -38,6 +37,8 @@ opts my $name         => 'Str',
      my $cdrom        => 'Str',
      my $dst_node     => 'Str',
      my $node         => 'Str';
+
+our $debug = exists $ENV{DEBUG};
 
 if (exists $ENV{VPS_PROJECT_ID}) {
   # 環境変数を優先
@@ -69,10 +70,8 @@ if (@results > 1) {
     }
   }
 
-  # $t->setOptions('outputWidth',50);
   $t->setColWidth('message', 30, 1);
   for my $row (@{$results[1]}) {
-  # for (sort { $a->[0] cmp $b->[0] } @{$results[1]}) {
     $t->addRow($row);
   }
   print $t;
@@ -85,7 +84,10 @@ if (@results > 1) {
 sub _create_uri {
   our $base_url;
   my $action = shift;
-  my $uri = URI->new( sprintf "%s/%s", $base_url, $action );
+  $base_url or croak "*** base_url cannot get";
+
+  my $uri = URI->new( $base_url );
+  $uri->path( $action );
   return $uri;
 }
 
@@ -258,7 +260,6 @@ sub vps_boot_by_uuid {
   my $set_node = defined $node
                ? $node
                : "";
-  warn Dumper ( { node => $set_node, uuid => $uuid } );
   my $response = _www_json_post( $uri, { node => $set_node, uuid => $uuid } );
 
   return $response->content;
@@ -400,7 +401,7 @@ sub vps_migration {
   $dst_node
     or croak "dst node is error";
 
-  warn "uri => $uri";
+  # warn "uri => $uri";
   my $response = _www_json_post( $uri, { dst_node => $dst_node, } );
   return $response->content;
 
@@ -501,6 +502,14 @@ sub _www_get {
   my $uri = URI->new( $uri_string );
   %param and $uri->query_form( \%param );
 
+  if ($debug) {
+    local $Data::Dumper::Terse = 1;
+    printf "+--- request debug -----------------------------------------------------------------------------------------------+\n";
+    printf "method: GET" . "\n";
+    printf "uri:    %s\n", $uri;
+    printf "+-----------------------------------------------------------------------------------------------------------------+\n";
+  }
+
   return $wwwua->get( $uri );
 }
 
@@ -515,7 +524,7 @@ sub _www_post {
   my $wwwua = LWP::UserAgent->new;
   $wwwua->timeout( 10 );
   my $request = POST $uri, [ $param ];
-  warn Dumper $request;
+  # warn Dumper $request;
   return $wwwua->request( $request );
 }
 
@@ -534,8 +543,16 @@ sub _www_json_post {
   $request->header('Content-Type' => 'application/json');
   $request->content( encode_json $params );
 
-  warn Dumper $request;
-  warn encode_json $params if exists $ENV{DEBUG};
+  if ($debug) {
+    local $Data::Dumper::Terse = 1;
+    printf "+--- request debug -----------------------------------------------------------------------------------------------+\n";
+    printf "method      : POST" . "\n";
+    printf "uri         : %s\n", $uri; 
+    printf "params(json):\n";
+    printf "%s", Dumper $params;
+    printf "+-----------------------------------------------------------------------------------------------------------------+\n";
+  }
+  # warn encode_json $params if exists $ENV{DEBUG};
 
   return $wwwua->request( $request );
 }
