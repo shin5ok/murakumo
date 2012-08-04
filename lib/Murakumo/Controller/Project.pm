@@ -27,13 +27,13 @@ sub is_valid_project :Private {
   my ( $self, $c ) = @_;
   no strict 'refs';
 
-  # GET д╟дт POST д╟дт project_id дЄе╗е├е╚д╣ды
+  # GET уБзуВВ POST уБзуВВ project_id уВТуВ╗уГГуГИуБЩуВЛ
   my $project_id = $c->request->param('project_id');
 
   my $project_model = $c->model('Project');
   $project_model->is_exist( $project_id );
 
-  # д│д╬двд╚д╦еъе╜б╝е╣дфепекб╝е┐дЄе┴езе├еп
+  # уБУуБоуБВуБиуБлуГкуВ╜уГ╝уВ╣уВДуВпуВкуГ╝уВ┐уВТуГБуВзуГГуВп
 
 }
 
