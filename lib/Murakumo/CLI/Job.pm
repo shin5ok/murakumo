@@ -113,7 +113,7 @@ sub is_locked_by_uuid {
     warn $@;
     return 0; 
   }
-  # ¥í¥Ã¥¯¤µ¤ì¤Æ¤¤¤¿¤é
+  # ãƒ­ãƒƒã‚¯ã•ã‚Œã¦ã„ãŸã‚‰
   return @rs >= 1;
 }
 

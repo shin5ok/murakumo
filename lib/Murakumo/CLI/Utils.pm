@@ -123,7 +123,7 @@ sub config {
 
 sub create_random_mac {
   my ($self) = @_;
-  # python ¤Î virtinst¥â¥¸¥å¡¼¥ë¤¬Æş¤Ã¤Æ¤¤¤ëÉ¬Í×¤¬¤¢¤ê¤Ş¤¹
+  # python ã® virtinstãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ãŒå…¥ã£ã¦ã„ã‚‹å¿…è¦ãŒã‚ã‚Šã¾ã™
   my $pid = open2 my $r, my $w, "/usr/bin/python";
   my $python_code = << '__PYTHON__';
 import virtinst.util as u

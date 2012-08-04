@@ -16,7 +16,7 @@ use Murakumo::CLI::DB;
 use base q(Murakumo::CLI::DB);
 use Murakumo::CLI::VPS_Define::XML;
 
-# utils ¥ª¥Ö¥¸¥§¥¯¥È
+# utils ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
 our $utils  = Murakumo::CLI::Utils->new;
 our $config = $utils->config;
 
@@ -51,9 +51,9 @@ sub info {
     warn Dumper \%query if exists $ENV{DEBUG};
 
     my ($vps_r)  = $vps_define_rs  ->search( $query{vps}                                 ); 
-    # disk¤Ï regist_time¤Ç¥½¡¼¥È
+    # diskã¯ regist_timeã§ã‚½ãƒ¼ãƒˆ
     my @disk_rs  = $disk_define_rs ->search( $query{disk} , { order_by => 'regist_time' } );
-    # interfaces¤Ï seq¤¬ÅÐÏ¿½ç¤Ê¤Î¤Ç¡¢¤½¤ì¤Ç¥½¡¼¥È
+    # interfacesã¯ seqãŒç™»éŒ²é †ãªã®ã§ã€ãã‚Œã§ã‚½ãƒ¼ãƒˆ
     my @iface_rs = $iface_define_rs->search( $query{iface}, { order_by => 'seq' }        );
     my @ip_rs_rs = $ip_rs          ->search( { used_vps_uuid => $uuid }                  );
 
@@ -70,7 +70,7 @@ sub info {
 
     my %ips;
     for my $ip_r ( @ip_rs_rs ) {
-      # Æ±¤¸vlan¤ËÊ£¿ô¤¢¤ë¾ì¹ç¤Ï¾å½ñ¤­¤µ¤ì¤Æ¡¢¿·¤·¤¤¤â¤Î¤¬Í¥Àè¤µ¤ì¤ë
+      # åŒã˜vlanã«è¤‡æ•°ã‚ã‚‹å ´åˆã¯ä¸Šæ›¸ãã•ã‚Œã¦ã€æ–°ã—ã„ã‚‚ã®ãŒå„ªå…ˆã•ã‚Œã‚‹
       my $x = {
         ip      => $ip_r->ip,
         mask    => $ip_r->mask,
@@ -159,7 +159,7 @@ sub all_deleted {
       $iface_define_rs->search({ vps_uuid => $uuid, try_remove => 1, })->delete;
       $vps_define_rs  ->search({     uuid => $uuid, try_remove => 1, })->delete;
 
-      # ip¤Ï¾Ã¤µ¤º¤Ë²òÊü
+      # ipã¯æ¶ˆã•ãšã«è§£æ”¾
       $ip_rs->search({ used_vps_uuid => $uuid, try_release => 1, })
             ->update({ 
                        mac           => undef,
@@ -174,7 +174,7 @@ sub all_deleted {
       $iface_define_rs->search({ vps_uuid => $uuid, try_remove => 1, })->update({ try_remove => undef, });
       $vps_define_rs  ->search({     uuid => $uuid, try_remove => 1, })->update({ try_remove => undef, });
 
-      # ip¤Ï¾Ã¤µ¤º¤Ë²òÊü
+      # ipã¯æ¶ˆã•ãšã«è§£æ”¾
       $ip_rs->search({ used_vps_uuid => $uuid, try_release => 1, })
             ->update({ try_release   => undef } );
 
@@ -184,7 +184,7 @@ sub all_deleted {
   if ($@) {
     croak $@;
   } else {
-    # Îã³°¥¨¥é¡¼¤¬¤Ê¤±¤ì¤Ðcommit
+    # ä¾‹å¤–ã‚¨ãƒ©ãƒ¼ãŒãªã‘ã‚Œã°commit
     $txn->commit;
   }
 
@@ -216,7 +216,7 @@ sub delete {
     $delete{iface} = $iface_define_rs->search({ vps_uuid => $uuid })->update({ try_remove => 1 });
     $delete{vps}   = $vps_define_rs  ->search({     uuid => $uuid })->update({ try_remove => 1 });
 
-    # ip¤Ï¾Ã¤µ¤º¤Ë²òÊü
+    # ipã¯æ¶ˆã•ãšã«è§£æ”¾
     $ip_rs->search({ used_vps_uuid => $uuid })
           ->update({ try_release   => 1     });
   };
@@ -224,7 +224,7 @@ sub delete {
   if ($@) {
     warn $@;
   } else {
-    # Îã³°¥¨¥é¡¼¤¬¤Ê¤±¤ì¤Ðcommit
+    # ä¾‹å¤–ã‚¨ãƒ©ãƒ¼ãŒãªã‘ã‚Œã°commit
     $txn->commit;
     $ok = 1;
   }
@@ -241,8 +241,8 @@ sub create_disk_param_array {
     warn Dumper $argv;
   }
 
-  # ¥É¥é¥¤¥Ð¤Ï¡¢¥Ç¥£¥¹¥¯¤òÊ£¿ô»ØÄê¤·¤Æ¤âÁ´¥Ç¥£¥¹¥¯¤Ç¶¦ÄÌ
-  # ¤¤¤Þ¤Ï virtio ¤ÎÂÐ±þ¤Î¤ß
+  # ãƒ‰ãƒ©ã‚¤ãƒã¯ã€ãƒ‡ã‚£ã‚¹ã‚¯ã‚’è¤‡æ•°æŒ‡å®šã—ã¦ã‚‚å…¨ãƒ‡ã‚£ã‚¹ã‚¯ã§å…±é€š
+  # ã„ã¾ã¯ virtio ã®å¯¾å¿œã®ã¿
   my $driver = exists $argv->{driver}
              ? $argv->{driver}
              : "virtio";
@@ -309,14 +309,14 @@ sub create_or_modify {
     warn "-----------------------------------------------";
   }
 
-  # °ú¿ô
-  # create_or_modify( ¥×¥í¥¸¥§¥¯¥ÈID(ex: 111),
-  #                   vps¤Îuuid(ex: cd9b431b-a612-4685-bb97-c44a07072382),
+  # å¼•æ•°
+  # create_or_modify( ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ãƒˆID(ex: 111),
+  #                   vpsã®uuid(ex: cd9b431b-a612-4685-bb97-c44a07072382),
   #                   {
-  #                     project_id => project_id ¤Î int(scalar),
-  #                     vps        => vps       ¤Î hash ref,
-  #                     interface  => interface ¤Î array ref,
-  #                     disk       => disk      ¤Î array ref,
+  #                     project_id => project_id ã® int(scalar),
+  #                     vps        => vps       ã® hash ref,
+  #                     interface  => interface ã® array ref,
+  #                     disk       => disk      ã® array ref,
   #                   },
   #                  );
 
@@ -363,11 +363,11 @@ sub create_or_modify {
   my $reserve_uuid;
   my $ip_model;
 
-  # ¥È¥é¥ó¥¶¥¯¥·¥ç¥ó³«»Ï
+  # ãƒˆãƒ©ãƒ³ã‚¶ã‚¯ã‚·ãƒ§ãƒ³é–‹å§‹
   my $txn = $self->schema->txn_scope_guard;
   local $@;
   eval {
-    # ¤Ç¤­¤ì¤Ð mysql¤ÎÆüÉÕ·¿¤Ë¼«Æ°ÊÑ´¹
+    # ã§ãã‚Œã° mysqlã®æ—¥ä»˜åž‹ã«è‡ªå‹•å¤‰æ›
     # my $now = $utils->now_string;
     my $now = DateTime->now(time_zone => 'Asia/Tokyo');
 
@@ -376,12 +376,12 @@ sub create_or_modify {
     no strict 'refs';
     my $seq = 0;
     if ( @disk_args_refs > 0) {
-      # vps¤Ë´ØÏ¢ÉÕ¤±¤é¤ì¤¿´ûÂ¸¤Îdisk¤Î¥ì¥³¡¼¥É¤òºï½ü
+      # vpsã«é–¢é€£ä»˜ã‘ã‚‰ã‚ŒãŸæ—¢å­˜ã®diskã®ãƒ¬ã‚³ãƒ¼ãƒ‰ã‚’å‰Šé™¤
       # my $delete_count = $disk_define_rs->search({ vps_uuid => $uuid })->delete;
       # warn "delete_count : $delete_count";
-      # => ºï½ü¤Ï¤·¤Ê¤¤ ÄÉ²Ã¤Î¤ß
+      # => å‰Šé™¤ã¯ã—ãªã„ è¿½åŠ ã®ã¿
 
-      # ¿·¤·¤¯vps¤Ë´ØÏ¢ÉÕ¤±¤¿disk¤Î¥ì¥³¡¼¥É¤òÄÉ²Ã
+      # æ–°ã—ãvpsã«é–¢é€£ä»˜ã‘ãŸdiskã®ãƒ¬ã‚³ãƒ¼ãƒ‰ã‚’è¿½åŠ 
       for my $disk_args_ref ( @disk_args_refs ) {
 
         $disk_args_ref->{regist_time} = $now;
@@ -394,7 +394,7 @@ sub create_or_modify {
 
     my @vlan_ids;
     if ( @iface_args_refs > 0 ) {
-      # vps¤Ë´ØÏ¢ÉÕ¤±¤é¤ì¤¿´ûÂ¸¤Îinterface¤Î¥ì¥³¡¼¥É¤òºï½ü
+      # vpsã«é–¢é€£ä»˜ã‘ã‚‰ã‚ŒãŸæ—¢å­˜ã®interfaceã®ãƒ¬ã‚³ãƒ¼ãƒ‰ã‚’å‰Šé™¤
       my $now_iface_rs = $iface_define_rs->search({ vps_uuid => $uuid });
       my %now_vlan;
       while (my $row = $now_iface_rs->next) {
@@ -402,14 +402,14 @@ sub create_or_modify {
       }
       $now_iface_rs->delete;
 
-      # ¿·¤·¤¯vps¤Ë´ØÏ¢ÉÕ¤±¤¿interface¤Î¥ì¥³¡¼¥É¤òÄÉ²Ã
+      # æ–°ã—ãvpsã«é–¢é€£ä»˜ã‘ãŸinterfaceã®ãƒ¬ã‚³ãƒ¼ãƒ‰ã‚’è¿½åŠ 
       my $seq = 0;
       for my $iface_args_ref ( @iface_args_refs ) {
         $iface_args_ref->{project_id}  = $project_id;
         $iface_args_ref->{vps_uuid}    = $uuid;
         $iface_args_ref->{regist_time} = $now;
 
-        # interface ¤Ï DB¤ËÆþ¤ì¤ë¤³¤È¤¬¤Ç¤­¤ì¤Ð¡¢ready = 1;
+        # interface ã¯ DBã«å…¥ã‚Œã‚‹ã“ã¨ãŒã§ãã‚Œã°ã€ready = 1;
         $iface_args_ref->{ready}       = 1;
         $iface_args_ref->{seq}         = ++$seq;
 
@@ -424,7 +424,7 @@ sub create_or_modify {
       }
     }
    
-    # »È¤ï¤ì¤Æ¤Ê¤¤ ip ¤Î²òÊü
+    # ä½¿ã‚ã‚Œã¦ãªã„ ip ã®è§£æ”¾
     # $ip_rs->search({ vps_uuid => $uuid })
     #       ->search(\@vlan_ids)
     #       ->update( {
@@ -447,7 +447,7 @@ sub create_or_modify {
 
   my $defined_error = $@;
 
-  # ¥È¥é¥ó¥¶¥¯¥·¥ç¥ó³ÎÄê
+  # ãƒˆãƒ©ãƒ³ã‚¶ã‚¯ã‚·ãƒ§ãƒ³ç¢ºå®š
   $txn->commit;
 
   if ($defined_error) {
@@ -458,14 +458,14 @@ sub create_or_modify {
   return 1;
 }
 
-# vps°ìÍ÷ => list()
+# vpsä¸€è¦§ => list()
 sub list_from_db {
   my ($self, $project_id) = @_;
   if (! defined $project_id) {
     croak "project_id parameter must be specified...";
   }
   my $resultset = $self->schema->resultset('VpsDefine');
-  # ¤­¤Á¤ó¤È¥¨¥é¡¼½èÍý¤ò¤¹¤ë¤³¤È
+  # ãã¡ã‚“ã¨ã‚¨ãƒ©ãƒ¼å‡¦ç†ã‚’ã™ã‚‹ã“ã¨
   my $rs = $resultset->search( { project_id => $project_id, ready => 1, }, { order_by => 'regist_time' } );
   my @vpses;
   while (my $x = $rs->next) {
@@ -523,7 +523,7 @@ sub record_cloning {
     warn "record cloning vps";
     warn Dumper \%param;
 
-    # ¸µ¤È¤Ê¤ëvps¤Îname
+    # å…ƒã¨ãªã‚‹vpsã®name
     $param{'original'} = $org_uuid;
 
     local $@;
@@ -550,9 +550,9 @@ sub record_cloning {
 
     my @disks = @{$org_info->{disks}};
     if (@disks > 0) {
-      for my $disk ( $disks[0] ) { # ¤È¤ê¤¢¤¨¤º¡¢ºÇ½é¤Î1¤Ä¤À¤±ºîÀ®¤¹¤ë
+      for my $disk ( $disks[0] ) { # ã¨ã‚Šã‚ãˆãšã€æœ€åˆã®1ã¤ã ã‘ä½œæˆã™ã‚‹
 
-        my $dst_image = $self->create_disk_param_array( 0,  # Ì¾Á°¤À¤±¤¬¤Û¤·¤¤¤Î¤Ç¡¢¥µ¥¤¥º¤Ï 0
+        my $dst_image = $self->create_disk_param_array( 0,  # åå‰ã ã‘ãŒã»ã—ã„ã®ã§ã€ã‚µã‚¤ã‚ºã¯ 0
                                                        {
                                                          number     => $number,
                                                          project_id => $project_id,
@@ -560,9 +560,9 @@ sub record_cloning {
                                                        },
                                                       );
 
-        # clone ¤ò¤¹¤ë¥Î¡¼¥É¤ËÅÁ¤¨¤ë dst_disk¥Ñ¥¹Ì¾
+        # clone ã‚’ã™ã‚‹ãƒŽãƒ¼ãƒ‰ã«ä¼ãˆã‚‹ dst_diskãƒ‘ã‚¹å
         $param_ref->{dst_image_path} = $dst_image->{image_path};
-        # clone ¤ò¤¹¤ë¥Î¡¼¥É¤ËÅÁ¤¨¤ë src_disk¥Ñ¥¹Ì¾
+        # clone ã‚’ã™ã‚‹ãƒŽãƒ¼ãƒ‰ã«ä¼ãˆã‚‹ src_diskãƒ‘ã‚¹å
         $param_ref->{src_image_path} = $disk->{image_path};
 
         my %param = (
@@ -646,7 +646,7 @@ sub record_cloning {
    
   }
 
-  # ºÇ½é¤Îmac¥¢¥É¥ì¥¹¤òÀßÄê
+  # æœ€åˆã®macã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’è¨­å®š
   $param_ref->{mac} = $mac_of_first;
   $txn->commit;
 

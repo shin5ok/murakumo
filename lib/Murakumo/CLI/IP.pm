@@ -8,7 +8,7 @@ use lib qq{$FindBin::Bin/../lib};
 use base q(Murakumo::CLI::DB);
 our $VERSION = q(0.0.1);
 
-# ¥Õ¥ê¡¼¤Îip¤ò³ä¤êÅö¤Æ¤Î¤¿¤áÍ½Ìó
+# ãƒ•ãƒªãƒ¼ã®ipã‚’å‰²ã‚Šå½“ã¦ã®ãŸã‚äºˆç´„
 sub reserve_ip {
   my ($self, $param_ref) = @_;
 
@@ -17,13 +17,13 @@ sub reserve_ip {
 
   my $resultset = $self->schema->resultset('Ip');
 
-  # vlan ¤È¡¢ip¤¬´ÉÍı¤µ¤ì¤Æ¤¤¤ë¤«
+  # vlan ã¨ã€ipãŒç®¡ç†ã•ã‚Œã¦ã„ã‚‹ã‹
   my $is_manage_vlan = $resultset->search( { vlan_id => $param_ref->{vlan_id} } )->count;
   if ( $is_manage_vlan == 0 ) {
     return undef;
   }
 
-  # ¤¹¤Ç¤Ë¤³¤Îvlan¤Îip¤¬³ä¤êÅö¤Æ¤é¤ì¤Æ¤¤¤ì¤Ğ
+  # ã™ã§ã«ã“ã®vlanã®ipãŒå‰²ã‚Šå½“ã¦ã‚‰ã‚Œã¦ã„ã‚Œã°
   if (defined $param_ref->{used_vps_uuid}) {
     my ($x) = $resultset->search({
                                    vlan_id       => $param_ref->{vlan_id},
@@ -40,7 +40,7 @@ sub reserve_ip {
   }
   my $reserve_uuid = $param_ref->{reserve_uuid};
 
-  # ¥È¥é¥ó¥¶¥¯¥·¥ç¥ó ³«»Ï
+  # ãƒˆãƒ©ãƒ³ã‚¶ã‚¯ã‚·ãƒ§ãƒ³ é–‹å§‹
   my $txn = $self->schema->txn_scope_guard;
   local $@;
   eval {
@@ -64,7 +64,7 @@ sub reserve_ip {
     croak "get_assign_ip is failure(eval error: $@)";
   }
 
-  # ¥È¥é¥ó¥¶¥¯¥·¥ç¥ó ´°Î»
+  # ãƒˆãƒ©ãƒ³ã‚¶ã‚¯ã‚·ãƒ§ãƒ³ å®Œäº†
   $txn->commit;
 
   my ($x) = $resultset->search({ reserve_uuid => $reserve_uuid });
@@ -73,7 +73,7 @@ sub reserve_ip {
 
 }
 
-# »ØÄê¤·¤¿vlan¤Ç¡¢¶õ¤¤¤Æ¤¤¤ëip ¤Î ResultSet ¥ª¥Ö¥¸¥§¥¯¥È¤òÊÖ¤¹
+# æŒ‡å®šã—ãŸvlanã§ã€ç©ºã„ã¦ã„ã‚‹ip ã® ResultSet ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’è¿”ã™
 sub get_free_ip_object {
   my ($self, $params) = @_;
   no strict 'refs';
@@ -114,7 +114,7 @@ sub get_free_ip_object {
 
 }
 
-# Í½Ìó¤·¤¿ ip ¤ò vps¤Ë³ä¤êÅö¤Æ¤Æ¡¢³ÎÄê¤·¤Ş¤¹
+# äºˆç´„ã—ãŸ ip ã‚’ vpsã«å‰²ã‚Šå½“ã¦ã¦ã€ç¢ºå®šã—ã¾ã™
 sub commit_assign_ip {
   my ($self, $param_ref) = @_;
   no strict 'refs';
@@ -150,7 +150,7 @@ sub commit_assign_ip {
 
 }
 
-# Í½Ìó¤·¤¿ip ¤ò¥¸¥ç¥Ö¼ºÇÔÅù¤Î¤¿¤á¤Ë ¥­¥ã¥ó¥»¥ë¤·¤Ş¤¹
+# äºˆç´„ã—ãŸip ã‚’ã‚¸ãƒ§ãƒ–å¤±æ•—ç­‰ã®ãŸã‚ã« ã‚­ãƒ£ãƒ³ã‚»ãƒ«ã—ã¾ã™
 sub cancel_reserve_ip {
   my ($self, $param_ref) = @_;
 
