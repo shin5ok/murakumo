@@ -16,7 +16,6 @@ sub info {
   $uuid or croak "*** uuid is empty";
 
   my $resultset = $self->schema->resultset('Storage');
-  # my ($info) = $resultset->find( $uuid );
   my ($info) = $resultset->search({ uuid => $uuid });
 
   my %result;
@@ -31,26 +30,14 @@ sub info {
 sub select {
   my ($self) = @_;
   my $resultset = $self->schema->resultset('Storage');
-  my @storage_objs = $resultset->search({}, { order_by => { -desc => [ 'priority' ] } });
-  return $storage_objs[0]->uuid;
+  my ($storage_obj) = $resultset->search({}, { order_by => { -desc => [ 'priority' ] } });
+  return $storage_obj->uuid;
 }
 
 sub list {
   my ($self) = @_;
   my $resultset = $self->schema->resultset('Storage');
   my @storages = $resultset->search( { available => 1 } );
-
-  # +-------------+--------------+------+-----+---------+-------+
-  # | Field       | Type         | Null | Key | Default | Extra |
-  # +-------------+--------------+------+-----+---------+-------+
-  # | uuid        | varchar(48)  | NO   | PRI |         |       |
-  # | export_path | varchar(255) | YES  |     | NULL    |       |
-  # | mount_path  | varchar(255) | YES  |     | NULL    |       |
-  # | host        | varchar(64)  | YES  |     | NULL    |       |
-  # | type        | varchar(8)   | YES  |     | NULL    |       |
-  # | available   | int(128)     | YES  |     | NULL    |       |
-  # | priority    | int(8)       | YES  |     | 0       |       |
-  # +-------------+--------------+------+-----+---------+-------+
 
   my @lists;
   for my $storage ( @storages ) {

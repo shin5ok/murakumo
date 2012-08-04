@@ -15,8 +15,7 @@ sub is_exist {
 
   if (! defined $project_id ) {
     # project_id の指定がなければ( これは ダミー )
-    warn "project_id is none.";
-    return 1;
+    croak "project_id is none.";
 
   }
 

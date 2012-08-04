@@ -1,41 +1,39 @@
 use strict;
 use warnings;
-package Murakumo::CLI::VPS;
-
 use JSON;
 use Carp;
 use Data::Dumper;
 use FindBin;
 use lib qq{$FindBin::Bin/../lib};
-use Murakumo::CLI::Utils;
+# use Murakumo::CLI::Utils;
 use Murakumo::CLI::DB;
 use base q(Murakumo::CLI::DB);
 
 our $VERSION = q(0.0.1);
 
-sub vps_register {
-  my ($self, $node, $update_key, $vpses_ref) = @_;
-  my $resultset = $self->schema->resultset('Vps');
+my $resultset = Murakumo::CLI::DB->new->schema->resultset('Test');
+eval {
+  # my ($row) = $resultset->search({ id => 913, bar => 237 });
 
-  my $update_ok = 0;
-  my @vpses     = @$vpses_ref;
-  for my $vps (@vpses) {
-    $vps->{update_key} = $update_key;
-    local $@;
-    eval {
-      no strict 'refs';
-      $vps->{node} = $node;
-      $resultset->update_or_create($vps, { uuid => $vps->{uuid} });
-    };
-    if ($@) {
-      warn $@;
-    } else {
-      $update_ok++;
-    }
-  }
-  $resultset->search_literal(q{node = ? and update_key != ? and state != 0}, $node, $update_key)->delete;
-  return $update_ok == @vpses;
+  my $row = $resultset->update_or_create({ id => 91, bar => "###" }, { id => 10 });
+
+  # warn Dumper $row;
+  warn $row->id;
+  # warn $row->count;
+  # warn $row->next->id;
+  # warn $row->delete;
+  # my $row = $resultset->create({ id => 913, bar => 23 });
+};
+
+if ($@) {
+  warn << "V";
+******************************
+$@
+******************************
+V
 }
+
+__END__
 
 # エイリアス
 sub register {
@@ -47,7 +45,7 @@ sub list {
   my $self  = shift;
   my $until = shift;
   my $resultset = $self->schema->resultset('Vps');
-
+  # きちんとエラー処理をすること
   my $query_hash_ref = { state => 1 };
   $until and
     $query_hash_ref->{update_time} = { '>' => $until };
@@ -105,7 +103,8 @@ sub set_tmp_active_vps {
   my $vps_rs = $self->schema->resultset('Vps');
   local $@;
   eval {
-    $vps_rs->create({ uuid => $uuid, state => 0, });
+    my $vps = $vps_rs->create({ uuid => $uuid, state => 0, });
+    $vps->uuid;
   };
   if ($@) {
     return 0;
@@ -143,8 +142,8 @@ sub is_active_vps {
   local $@;
   my $uuid_from_vps = "";
   eval {
-    my ($vps) = $vps_rs->search({ uuid => $uuid });
-    $uuid_from_vps = $vps->uuid;
+    my $vps = $vps_rs->search({ uuid => $uuid });
+    $uuid_from_vps = $vps->next->uuid;
   };
   if (! $uuid_from_vps or $@) {
     # 例外が出たら起動していない

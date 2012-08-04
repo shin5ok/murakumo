@@ -13,7 +13,7 @@ use URI::Escape;
 use URI ();
 use opts;
 
-our $VERSION  = q(0.10);
+our $VERSION  = q(0.11);
 our $base_url = exists $ENV{MURAKUMO_API_URI}
               ? $ENV{MURAKUMO_API_URI}
               : 'http://127.0.0.1:3000/';

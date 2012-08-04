@@ -11,12 +11,7 @@ our $VERSION = q(0.0.1);
 # フリーのipを割り当てのため予約
 sub reserve_ip {
   my ($self, $param_ref) = @_;
-  # $param_ref = {
-  #   reserve_uuid  => String,
-  #   vlan_id       => Int,
-  #   ip            => String,
-  #   used_vps_uuid => String,
-  # };
+
   warn "--- ", __PACKAGE__, " ---";
   warn Dumper $param_ref;
 
@@ -35,7 +30,6 @@ sub reserve_ip {
                                    used_vps_uuid => $param_ref->{used_vps_uuid},
                                  });
     if (defined $x and $x->can("ip")) {
-    warn $x->ip;
       return ($x->ip, $x->mask, $x->gw);
     }
   } 
@@ -67,15 +61,13 @@ sub reserve_ip {
   };
 
   if ($@) {
-    warn "get_assign_ip is failure(eval error: $@)";
-    return undef;
+    croak "get_assign_ip is failure(eval error: $@)";
   }
 
   # トランザクション 完了
   $txn->commit;
 
   my ($x) = $resultset->search({ reserve_uuid => $reserve_uuid });
-  # my $x = $rses[0];
 
   return ($x->ip, $x->mask, $x->gw);
 
@@ -118,24 +110,20 @@ sub get_free_ip_object {
     croak "*** error";
 
   }
-
-  # warn $r->next->ip if exists $ENV{DEBUG};
   return $rs;
+
 }
 
 # 予約した ip を vpsに割り当てて、確定します
 sub commit_assign_ip {
   my ($self, $param_ref) = @_;
   no strict 'refs';
-  warn "----- commit_assign_ip -----";
-  warn Dumper $param_ref;
-  warn "----------------------------";
+
   my ($reserve_uuid, $vps_uuid)
     = ($param_ref->{reserve_uuid}, $param_ref->{vps_uuid});
 
   if (! $reserve_uuid or ! $vps_uuid) {
-     warn "reserve_uuid: $reserve_uuid | vps_uuid:$vps_uuid is not found";
-     return 0;
+     croak "reserve_uuid: $reserve_uuid | vps_uuid:$vps_uuid is not found";
   }
 
   my $update_param_ref = {
@@ -169,13 +157,13 @@ sub cancel_reserve_ip {
   no strict 'refs';
   my $reserve_uuid = $param_ref->{reserve_uuid};
 
-  warn "cancel_reserve_ip: ", Dumper $param_ref;
-
   if (! $reserve_uuid) {
      croak "reserve_uuid not found";
   }
 
   my $resultset = $self->schema->resultset('Ip');
+  my $txn = $self->schema->txn_scope_guard;
+
   local $@;
   eval {
     $resultset->search( { reserve_uuid => $reserve_uuid, } )
@@ -187,13 +175,15 @@ sub cancel_reserve_ip {
     croak "update failure...$@($dump)";
   }
 
-  return 1;
+  $txn->commit;
 }
 
 sub release_ip {
   my ($self, $vlan_id, $used_vps_uuid) = @_;
 
   my $resultset = $self->schema->resultset('Ip');
+  my $txn = $self->schema->txn_scope_guard;
+
   local $@;
   eval {
     $resultset->search( {
@@ -210,12 +200,9 @@ sub release_ip {
 
   if ($@) {
     croak "*** release ip error vlan:${vlan_id}, used_vps_uuid:${used_vps_uuid}";
-
   }
 
-  return 1;
-
-
+  $txn->commit;
 }
 
 1;

@@ -216,7 +216,8 @@ sub commit :Local {
                            reserve_uuid => $reserve_uuid,
                            vps_uuid     => $vps_uuid,
                          };
-      $ip_model->commit_assign_ip( $return_param );
+      $reserve_uuid and
+         $ip_model->commit_assign_ip( $return_param );
 
       $define_model->commit_define( $project_id, $vps_uuid );
 
