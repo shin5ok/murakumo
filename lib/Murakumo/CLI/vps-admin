@@ -99,7 +99,7 @@ sub vps_define_info {
   defined $uuid
     or croak "*** uuid parameter is not found";
 
-  my $uri = _create_uri( "/$project_id/vps/define/info/?uuid=$uuid" );
+  my $uri = _create_uri( "/$project_id/vps/define/info/$uuid/" );
 
   my $response    = _www_get( $uri );
   my $content_ref = decode_json $response->content;
