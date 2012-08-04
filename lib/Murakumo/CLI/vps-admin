@@ -1,4 +1,4 @@
-#!/home/smc/bin/perl
+#!/usr/bin/env perl
 
 use strict;
 use warnings;
@@ -12,11 +12,10 @@ use Data::Dumper;
 use URI::Escape;
 use URI ();
 use opts;
-use lib qw(/home/smc/murakumo/lib);
 
 our $VERSION  = q(0.10);
-our $base_url = exists $ENV{VPS_API_URI}
-              ? $ENV{VPS_API_URI}
+our $base_url = exists $ENV{MURAKUMO_API_URI}
+              ? $ENV{MURAKUMO_API_URI}
               : 'http://127.0.0.1:3000/';
 
 opts my $name         => 'Str',
@@ -41,13 +40,18 @@ opts my $name         => 'Str',
 our $debug = exists $ENV{DEBUG};
 
 if (exists $ENV{VPS_PROJECT_ID}) {
-  # 環境変数を優先
-  # 環境変数をセットしていたら、いちいち指定しなくてもよい
+  # 以前の互換性のため
   $project_id = $ENV{VPS_PROJECT_ID};
 }
 
-if (exists $ENV{VPS_BASE_URL}) {
-  $base_url = $ENV{VPS_BASE_URL};
+if (exists $ENV{MURAKUMO_PROJECT_ID}) {
+  # 環境変数を優先
+  # 環境変数をセットしていたら、いちいち指定しなくてもよい
+  $project_id = $ENV{MURAKUMO_PROJECT_ID};
+}
+
+if (exists $ENV{MURAKUMO_BASE_URL}) {
+  $base_url = $ENV{MURAKUMO_BASE_URL};
 }
 
 my @args   = @ARGV;
@@ -401,7 +405,6 @@ sub vps_migration {
   $dst_node
     or croak "dst node is error";
 
-  # warn "uri => $uri";
   my $response = _www_json_post( $uri, { dst_node => $dst_node, } );
   return $response->content;
 
@@ -524,7 +527,6 @@ sub _www_post {
   my $wwwua = LWP::UserAgent->new;
   $wwwua->timeout( 10 );
   my $request = POST $uri, [ $param ];
-  # warn Dumper $request;
   return $wwwua->request( $request );
 }
 
@@ -552,23 +554,9 @@ sub _www_json_post {
     printf "%s", Dumper $params;
     printf "+-----------------------------------------------------------------------------------------------------------------+\n";
   }
-  # warn encode_json $params if exists $ENV{DEBUG};
 
   return $wwwua->request( $request );
 }
 
 __END__
-my @rows = (
-    [1,'foo','2011-03-16 11:22:33'],
-    [2,'hogehogehoge','2011-03-17 11:22:33'],
-    [3,'uwaaaaa','2011-03-18 11:22:33'],
-    [4,'dio','2011-03-19 11:22:33'],
-    [5,'jojo','2011-03-20 11:22:33'],
-);
-
-my $t = Text::ASCIITable->new();
-$t->setCols('id','name','created');
-$t->addRow($_) for @rows;
-
-1;
 
