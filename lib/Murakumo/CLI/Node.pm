@@ -53,14 +53,13 @@ sub api_post {
   my $wwwua = $self->wwwua;
 
   my $request = POST $uri, [ $params ];
-  warn Dumper $request;
   
   my $response = $wwwua->request( $request );
   if ($response->is_success) {
     return $response->content;
 
   } else {
-    return undef;
+    croak "*** api_post $uri error";
  
   }
 
@@ -80,25 +79,13 @@ sub api_json_post {
     return $response->content;
 
   } else {
-    warn "*** http request error for $uri";
-    warn $response->content;
-    return undef;
+    croak sprintf "*** http request error for %s (content: %s)",
+                  $uri,
+                  $response->content;
  
   }
 
 }
-
-sub api_get { }
-
-# sub register_json {
-#   my ($self, $json_data) = @_;
-#   my $json;
-#   eval {
-#     my $decoded_json = decode_json $json_data;
-#     $json = $decoded_json->{$root_itemname};
-#   };
-#   return $self->register( $json->{node}->{name}, $json->{node} );
-# }
 
 sub register {
   my ($self, $node_name, $node_ref) = @_;
@@ -127,29 +114,16 @@ sub list {
     my @nodes;
 
     if ($until) {
-    warn "not verbose mode";
+      warn "normal mode";
       my $query = { update_time => { '>' => $until } };
       @nodes = $resultset->search( $query, { order_by => 'name' });
 
     } else {
-    warn "verbose mode";
+      warn "verbose mode";
       @nodes = $resultset->search( undef, { order_by => 'name' } );
 
     }
 
-    # +--------------+--------------+------+-----+-------------------+-----------------------------+
-    # | Field        | Type         | Null | Key | Default           | Extra                       |
-    # +--------------+--------------+------+-----+-------------------+-----------------------------+
-    # | name         | varchar(255) | NO   | PRI |                   |                             |
-    # | uuid         | varchar(48)  | YES  |     | NULL              |                             |
-    # | cpu_total    | int(8)       | YES  |     | NULL              |                             |
-    # | mem_total    | int(64)      | YES  |     | NULL              |                             |
-    # | mem_free     | int(64)      | YES  |     | NULL              |                             |
-    # | vps_number   | int(8)       | YES  |     | NULL              |                             |
-    # | cpu_vps_used | int(8)       | YES  |     | NULL              |                             |
-    # | regist_time  | timestamp    | NO   |     | CURRENT_TIMESTAMP | on update CURRENT_TIMESTAMP |
-    # | disable      | tinyint(4)   | YES  |     | 0                 |                             |
-    # +--------------+--------------+------+-----+-------------------+-----------------------------+
     @node_results = map {
                            +{
                               name         => $_->name,

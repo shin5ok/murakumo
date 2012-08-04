@@ -63,7 +63,6 @@ sub select {
 
   my @rses = $resultset->search($query);
 
-  # my @rses = $rs->search;
   # コア数 を vpsで使っているcpu数を超えていないノードのみ対象
   # 使っているコア数が少ない順に並び替え
   @rses = sort { $a->cpu_vps_used <=> $b->cpu_vps_used }

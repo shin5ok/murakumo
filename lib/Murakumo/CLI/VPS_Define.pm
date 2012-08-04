@@ -488,9 +488,9 @@ sub record_cloning {
   my $disk_define_rs  = $self->schema->resultset('DiskDefine');
   my $iface_define_rs = $self->schema->resultset('InterfaceDefine');
 
-warn "record_cloning...";
-warn Dumper $org_uuid;
-warn Dumper $args_ref;
+  warn "record_cloning...";
+  warn Dumper $org_uuid;
+  warn Dumper $args_ref;
 
   my $uuid = $args_ref->{uuid};
   my $project_id;
@@ -696,5 +696,4 @@ sub cancel_define {
   $@ or $txn->commit;
 
 }
-
 1;

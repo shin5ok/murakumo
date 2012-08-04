@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Murakumo::CLI::Job;
+package Murakumo::CLI::Job 0.01;
 
 use JSON;
 use Carp;
@@ -10,18 +10,15 @@ use lib qq{$FindBin::Bin/../lib};
 use Murakumo::CLI::DB;
 use base q(Murakumo::CLI::DB);
 
-our $VERSION = q(0.0.1);
-
 sub update {
   my ($self, $job_uuid, $param_ref) = @_;
+  $job_uuid or croak "*** update uuid is empty...?";
+
   my $r;
+  my $txn = $self->schema->txn_scope_guard;
   local $@;
   eval {
     my $resultset = $self->schema->resultset('Job');
-    # my $job_uuid = delete $param_ref->{job_uuid};
-
-    $job_uuid or croak "*** update uuid is empty...?";
-
     $r = $resultset->search( { job_uuid => $job_uuid } )->update( $param_ref );
 
   };
@@ -31,6 +28,7 @@ sub update {
     return 0;
 
   } else {
+    $txn->commit;
     return 1;
   }
 
@@ -82,6 +80,8 @@ sub delete {
   }
 
   my $r;
+  my $txn = $self->schema->txn_scope_guard;
+
   local $@;
   eval {
     my $resultset = $self->schema->resultset('Job');
@@ -93,6 +93,8 @@ sub delete {
     warn "$param_ref->{job_uuid} delete error";
     return 0;
   }
+  $txn->commit;
+
   return 1;
 
 }
@@ -100,6 +102,7 @@ sub delete {
 sub is_locked_by_uuid {
   my ($self, $uuid) = @_;
   my @rs;
+
   local $@;
   eval {
     my $resultset = $self->schema->resultset('Job');
@@ -117,9 +120,7 @@ sub is_locked_by_uuid {
 sub create {
   # { request_job => '', job_uuid => '', }
   my ($self, $param_ref) = @_;
-  warn "### Job ##############";
-  warn Dumper $param_ref;
-  warn "######################";
+
   no strict 'refs';
   my $uuid = $param_ref->{job_uuid} || "";
   $uuid ||= Murakumo::CLI::Utils->create_uuid;
@@ -130,9 +131,8 @@ sub create {
   $param_ref ||= { result => 0, };
   (exists $param_ref->{job_uuid} and $param_ref->{job_uuid})
     or $param_ref->{job_uuid} = $uuid;
-  warn "### Job ##############";
-  warn Dumper $param_ref;
-  warn "######################";
+
+  my $txn = $self->schema->txn_scope_guard;
 
   my @created;
   local $@;
@@ -141,7 +141,8 @@ sub create {
     @created = $resultset->create( $param_ref );
 
   };
-  warn Dumper $param_ref;
+
+  $txn->commit;
 
   if ($@ and @created == 0) {
     warn Dumper $param_ref;
