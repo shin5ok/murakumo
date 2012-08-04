@@ -37,12 +37,12 @@ sub vps_register {
   return $update_ok == @vpses;
 }
 
-# ¥¨¥¤¥ê¥¢¥¹
+# ã‚¨ã‚¤ãƒªã‚¢ã‚¹
 sub register {
   goto &vps_register;
 }
 
-# vps°ìÍ÷
+# vpsä¸€è¦§
 sub list {
   my $self  = shift;
   my $until = shift;
@@ -95,7 +95,7 @@ sub get_node {
 }
 
 
-# Æó½Åµ¯Æ°¤òËÉ¤°¤¿¤á¡¢µ¯Æ°Á°¤Ë¼Â»Ü¤·¤Ş¤¹
+# äºŒé‡èµ·å‹•ã‚’é˜²ããŸã‚ã€èµ·å‹•å‰ã«å®Ÿæ–½ã—ã¾ã™
 sub set_tmp_active_vps {
   my ($self, $uuid) = @_;
   if (! $uuid) {
@@ -115,7 +115,7 @@ sub set_tmp_active_vps {
   
 }
 
-# µ¯Æ°Á°¤¬¼ºÇÔ¤·¤¿¤é
+# èµ·å‹•å‰ãŒå¤±æ•—ã—ãŸã‚‰
 sub unset_tmp_active_vps {
   my ($self, $uuid) = @_;
   if (! $uuid) {
@@ -128,7 +128,7 @@ sub unset_tmp_active_vps {
     $vps_rs->search({ uuid => $uuid, state => 0, })->delete;
   };
   if ($@) {
-    # Îã³°¤¬½Ğ¤¿¤éºï½ü¤¬¤Ç¤­¤Ê¤¤
+    # ä¾‹å¤–ãŒå‡ºãŸã‚‰å‰Šé™¤ãŒã§ããªã„
     croak "unset error : $@";
   } else {
     return 1;
@@ -136,7 +136,7 @@ sub unset_tmp_active_vps {
   
 }
 
-# vps¤¬active¤«
+# vpsãŒactiveã‹
 sub is_active_vps {
   my ($self, $uuid) = @_;
   my $vps_rs = $self->schema->resultset('Vps');
@@ -147,7 +147,7 @@ sub is_active_vps {
     $uuid_from_vps = $vps->uuid;
   };
   if (! $uuid_from_vps or $@) {
-    # Îã³°¤¬½Ğ¤¿¤éµ¯Æ°¤·¤Æ¤¤¤Ê¤¤
+    # ä¾‹å¤–ãŒå‡ºãŸã‚‰èµ·å‹•ã—ã¦ã„ãªã„
     return 0;
   } else {
     return 1;

@@ -29,9 +29,9 @@ sub select {
   {
     no strict 'refs';
 
-    # ¥Î¡¼¥É¤ÎOS¤ËÉ¬Í×¤Êcpu
+    # ãƒŽãƒ¼ãƒ‰ã®OSã«å¿…è¦ãªcpu
     my $require_cpu_for_node    = $config->{require_cpu_for_node};
-    # ¥Î¡¼¥É¤ÎOS¤ËÉ¬Í×¤Ê¥á¥â¥ê
+    # ãƒŽãƒ¼ãƒ‰ã®OSã«å¿…è¦ãªãƒ¡ãƒ¢ãƒª
     my $require_memory_for_node = $config->{require_memory_for_node};
 
     $require_cpu_number = $require_params{cpu_number};
@@ -54,7 +54,7 @@ sub select {
 
   my $query = {
                  disable     => { '!=' => 1      },
-                 update_time => { '>'  => $until }, # ´ü¸ÂÀÚ¤ì¤ÏÂÐ¾Ý³°
+                 update_time => { '>'  => $until }, # æœŸé™åˆ‡ã‚Œã¯å¯¾è±¡å¤–
               };
   $require_cpu_number
     and $query->{cpu_available} = { '>' => $require_cpu_number };
@@ -63,8 +63,8 @@ sub select {
 
   my @rses = $resultset->search($query);
 
-  # ¥³¥¢¿ô ¤ò vps¤Ç»È¤Ã¤Æ¤¤¤ëcpu¿ô¤òÄ¶¤¨¤Æ¤¤¤Ê¤¤¥Î¡¼¥É¤Î¤ßÂÐ¾Ý
-  # »È¤Ã¤Æ¤¤¤ë¥³¥¢¿ô¤¬¾¯¤Ê¤¤½ç¤ËÊÂ¤ÓÂØ¤¨
+  # ã‚³ã‚¢æ•° ã‚’ vpsã§ä½¿ã£ã¦ã„ã‚‹cpuæ•°ã‚’è¶…ãˆã¦ã„ãªã„ãƒŽãƒ¼ãƒ‰ã®ã¿å¯¾è±¡
+  # ä½¿ã£ã¦ã„ã‚‹ã‚³ã‚¢æ•°ãŒå°‘ãªã„é †ã«ä¸¦ã³æ›¿ãˆ
   @rses = sort { $a->cpu_vps_used <=> $b->cpu_vps_used }
           grep { $_->cpu_vps_used <= $_->cpu_total }
           @rses;
@@ -73,18 +73,18 @@ sub select {
     croak "*** available node is not found";
   }
 
-  # ¥·¥ã¥Ã¥Õ¥ë
+  # ã‚·ãƒ£ãƒƒãƒ•ãƒ«
   @rses = shuffle @rses;
-  # ²¾¤Ë1Âæ¤á¤Î¥Î¡¼¥É¤Î¥ª¥Ö¥¸¥§¥¯¥È¤ò¥»¥Ã¥È
+  # ä»®ã«1å°ã‚ã®ãƒŽãƒ¼ãƒ‰ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ã‚»ãƒƒãƒˆ
   $selected_node = shift @rses;
 
   for my $r (@rses) {
 
-    # ¥í¡¼¥É¥¢¥Ù¥ì¡¼¥¸¤¬¾¯¤Ê¤¤¥Î¡¼¥É¤òÁªÂò
+    # ãƒ­ãƒ¼ãƒ‰ã‚¢ãƒ™ãƒ¬ãƒ¼ã‚¸ãŒå°‘ãªã„ãƒŽãƒ¼ãƒ‰ã‚’é¸æŠž
     if ($selected_node->loadavg > $r->loadavg) {
       $selected_node = $r;
     }
-    # ¥á¥â¥ê¶õÍÆÎÌ¤¬Â¿¤¤¥Î¡¼¥É¤òÁªÂò
+    # ãƒ¡ãƒ¢ãƒªç©ºå®¹é‡ãŒå¤šã„ãƒŽãƒ¼ãƒ‰ã‚’é¸æŠž
     # if ($selected_node->mem_free < $r->mem_free) {
     #   $selected_node = $r;
     # }

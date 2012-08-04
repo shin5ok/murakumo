@@ -9,7 +9,7 @@ use Carp;
 use Path::Class;
 
 our $VERSION = q(0.0.1);
-# ¤³¤ìÀßÄê¥Õ¥¡¥¤¥ë¤«¤é¼è¤ë
+# ã“ã‚Œè¨­å®šãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰å–ã‚‹
 our $base_path = q{/vm/config};
 
 sub sync {
@@ -18,7 +18,7 @@ sub sync {
 
   $d_obj or croak "*** $user_id dir cannot open";
 
-  # force_array ¥ª¥×¥·¥ç¥ó¤¬É¬Í×¥¥¥ disk ¤È interface ¤ÏÉ¬¤º array
+  # force_array ã‚ªãƒ—ã‚·ãƒ§ãƒ³ãŒå¿…è¦ãƒ»ãƒ»ãƒ» disk ã¨ interface ã¯å¿…ãš array
   my @xmls;
   my $xml_tpp = XML::TreePP->new( force_array => ["disk", "interface"] );
   for my $file ( $d_obj->children ) {

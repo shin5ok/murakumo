@@ -39,7 +39,7 @@ sub make_uri {
 
 sub select {
   # my ($self, @keys) = @_;
-  # ÁªÄê´ð½à¤È¤·¤¿¤¤¥­¡¼¤¬¤¢¤ì¤Ð¡¢¤½¤ì¤ò½çÈÖ¤Ë»ØÄê
+  # é¸å®šåŸºæº–ã¨ã—ãŸã„ã‚­ãƒ¼ãŒã‚ã‚Œã°ã€ãã‚Œã‚’é †ç•ªã«æŒ‡å®š
   # my $resultset = $self->schema->resultset('Node');
 
   require Murakumo::CLI::Node::Select;
@@ -93,7 +93,7 @@ sub register {
 
   local $@;
   eval {
-    # ¥¨¥é¡¼½èÍý¤Ï¤É¤¦¤¹¤ë¤«¡¦¡¦¡¦¤½¤â¤½¤â¢­¤ÏÎã³°¤ò½Ð¤¹¤Î¤«
+    # ã‚¨ãƒ©ãƒ¼å‡¦ç†ã¯ã©ã†ã™ã‚‹ã‹ãƒ»ãƒ»ãƒ»ãã‚‚ãã‚‚â†“ã¯ä¾‹å¤–ã‚’å‡ºã™ã®ã‹
     no strict 'refs';
     $resultset->update_or_create($node_ref, { node => $node_name });
   };

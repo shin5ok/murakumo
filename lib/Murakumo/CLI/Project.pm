@@ -14,7 +14,7 @@ sub is_exist {
   my ($self, $project_id) = @_;
 
   if (! defined $project_id ) {
-    # project_id ¤Î»ØÄê¤¬¤Ê¤±¤ì¤Ğ( ¤³¤ì¤Ï ¥À¥ß¡¼ )
+    # project_id ã®æŒ‡å®šãŒãªã‘ã‚Œã°( ã“ã‚Œã¯ ãƒ€ãƒŸãƒ¼ )
     croak "project_id is none.";
 
   }
