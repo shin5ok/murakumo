@@ -47,7 +47,7 @@ sub stop_error :Private {
 sub auto :Private {
   my ( $self, $c ) = @_;
 
-  # defaultÃÍ¤ÎÀßÄê
+  # defaultå€¤ã®è¨­å®š
   $c->stash->{message} = qq{};
   $c->stash->{result}  = 0;
 

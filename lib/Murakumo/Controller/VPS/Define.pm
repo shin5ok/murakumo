@@ -73,7 +73,7 @@ sub clone :Private {
 
   $params->{dst_uuid} = $dst_uuid;
 
-  # ip¤òÍ½Ìó
+  # ipã‚’äºˆç´„
   if (exists $params->{'assign_ip'}
          and $params->{'assign_ip'}
            and exists $params->{vlan_id}) {
@@ -85,7 +85,7 @@ sub clone :Private {
     if (! $ip) {
       croak "ip reserve error";
     }
-    # ¼èÆÀ¤·¤¿ ipÂ¾¤Î¥Ñ¥é¥á¡¼¥¿¤ò¥¯¥¨¥ê¤Ë¥»¥Ã¥È
+    # å–å¾—ã—ãŸ ipä»–ã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’ã‚¯ã‚¨ãƒªã«ã‚»ãƒƒãƒˆ
     $params->{reserve_uuid} = $reserve_uuid;
     $params->{ip}   = $ip;
     $params->{mask} = $mask;
@@ -100,7 +100,7 @@ sub clone :Private {
   local $@;
   eval {
 
-    # »ØÄê¤µ¤ì¤Æ¤Ê¤¤¤Ê¤é¡¢undef ¤ÇÅÏ¤¹
+    # æŒ‡å®šã•ã‚Œã¦ãªã„ãªã‚‰ã€undef ã§æ¸¡ã™
     my $vlan_id  = $params->{vlan_id};
 
     $r = $define_model->record_cloning( $org_uuid, {
@@ -168,7 +168,7 @@ sub remove_commit :Local {
 }
 
 
-# Node ¤«¤é ¥³¡¼¥ë¥Ğ¥Ã¥¯¤µ¤ì¤ëÍÑ¤Îapi
+# Node ã‹ã‚‰ ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ã•ã‚Œã‚‹ç”¨ã®api
 sub commit :Local {
   my ($self, $c) = @_;
 
@@ -201,17 +201,17 @@ sub commit :Local {
       $c->stash->{message} = sprintf "vps define clone() miss (%s)", Dumper $params;
       $@ and $c->stash->{message} .= " eval error $@";
 
-      # ËÜÅö¤Ï¡¢IP¤Îmodel¤ËÀÚ¤ê½Ğ¤·¤Æ¡¢forward¤·¤¿Êı¤¬¤­¤ì¤¤¤«¤â
+      # æœ¬å½“ã¯ã€IPã®modelã«åˆ‡ã‚Šå‡ºã—ã¦ã€forwardã—ãŸæ–¹ãŒãã‚Œã„ã‹ã‚‚
 
-      # Í½Ìó¤·¤¿ip¤ò¥­¥ã¥ó¥»¥ë
+      # äºˆç´„ã—ãŸipã‚’ã‚­ãƒ£ãƒ³ã‚»ãƒ«
       $ip_model->cancel_reserve_ip( { reserve_uuid => $reserve_uuid } );
 
       $define_model->cancel_define( $project_id, $vps_uuid );
 
     } else {
 
-      # ËÜÅö¤Ï¡¢IP¤Îmodel¤ËÀÚ¤ê½Ğ¤·¤Æ¡¢forward¤·¤¿Êı¤¬¤­¤ì¤¤¤«¤â
-      # ip¤ò³ÎÄê
+      # æœ¬å½“ã¯ã€IPã®modelã«åˆ‡ã‚Šå‡ºã—ã¦ã€forwardã—ãŸæ–¹ãŒãã‚Œã„ã‹ã‚‚
+      # ipã‚’ç¢ºå®š
       my $return_param = {
                            reserve_uuid => $reserve_uuid,
                            vps_uuid     => $vps_uuid,
@@ -265,13 +265,13 @@ sub create_or_modify: Private {
 
   } else {
 
-    # create ¤Ç uuid¤¬»ØÄê¤µ¤ì¤Ê¤«¤Ã¤¿¤é¼«Æ°À¸À®
+    # create ã§ uuidãŒæŒ‡å®šã•ã‚Œãªã‹ã£ãŸã‚‰è‡ªå‹•ç”Ÿæˆ
     if (! $uuid) {
       $uuid = $utils->create_uuid;
       warn "controller /vps/define/create/ create uuid: $uuid";
     }
 
-    # create ¤Î¾ì¹ç¡¢name ¤¬»ØÄê¤µ¤ì¤Æ¤¤¤Ê¤«¤Ã¤¿¤é¡¢uuid¤òÆş¤ì¤ë
+    # create ã®å ´åˆã€name ãŒæŒ‡å®šã•ã‚Œã¦ã„ãªã‹ã£ãŸã‚‰ã€uuidã‚’å…¥ã‚Œã‚‹
     defined $vps_params->{spec}->{name}
       or $vps_params->{spec}->{name} = $uuid;
 
@@ -294,10 +294,10 @@ sub create_or_modify: Private {
       warn "----- ", __PACKAGE__ , "#create_or_modify -----";
       warn $uuid;
 
-      # disk ¤Î¥Ï¥Ã¥·¥å¤ò JSON²½ ¼ºÇÔ¤·¤¿¤éÎã³°
+      # disk ã®ãƒãƒƒã‚·ãƒ¥ã‚’ JSONåŒ– å¤±æ•—ã—ãŸã‚‰ä¾‹å¤–
       $to_params->{disks} = $disks_ref;
 
-      # ip¤òÍ½Ìó
+      # ipã‚’äºˆç´„
       if (exists $params->{'assign_ip'}
              and $params->{'assign_ip'}
                and exists $params->{vlan_id}) {
@@ -317,7 +317,7 @@ sub create_or_modify: Private {
             warn "ip of vlan $vlan_id reserve none";
             # croak "ip of vlan $vlan_id reserve none";
           } else {
-            # ¼èÆÀ¤·¤¿ reserve_uuid ¤ò¥¯¥¨¥ê¤Ë¥»¥Ã¥È
+            # å–å¾—ã—ãŸ reserve_uuid ã‚’ã‚¯ã‚¨ãƒªã«ã‚»ãƒƒãƒˆ
             $to_params->{reserve_uuid} = $reserve_uuid;
           }
         }
@@ -335,10 +335,10 @@ sub create_or_modify: Private {
 
       $to_params->{vps_uuid} = $uuid;
 
-      # disk ¤ÎºîÀ®½èÍı¤¬Æş¤Ã¤Æ¤¤¤¿¤é
-      # ip ¤Î ¥³¥ß¥Ã¥È¡¢¥­¥ã¥ó¥»¥ë¤Ï¡¢callback ¤ËÇ¤¤»¤ë
+      # disk ã®ä½œæˆå‡¦ç†ãŒå…¥ã£ã¦ã„ãŸã‚‰
+      # ip ã® ã‚³ãƒŸãƒƒãƒˆã€ã‚­ãƒ£ãƒ³ã‚»ãƒ«ã¯ã€callback ã«ä»»ã›ã‚‹
       if (exists $vps_params->{disk} and @{$vps_params->{disk}} > 0) {
-        # ['create'] ¤ò¤¤¤Ã¤¿¤ó¶õ¤Ë
+        # ['create'] ã‚’ã„ã£ãŸã‚“ç©ºã«
         $c->request->args([]); 
         $c->stash->{to_job_params} = $to_params;
 
@@ -364,7 +364,7 @@ sub create_or_modify: Private {
 
     }
 
-    # ip ¤ò¥­¥ã¥ó¥»¥ë
+    # ip ã‚’ã‚­ãƒ£ãƒ³ã‚»ãƒ«
     if ($reserve_uuid) {
       $ip_model->cancel_reserve_ip( { reserve_uuid => $reserve_uuid } );
     }
@@ -403,7 +403,7 @@ sub remove :Private {
 
   $c->{stash}->{result} = 0;
 
-  # µ¯Æ°¤·¤Æ¤¤¤ë¤«¥Á¥§¥Ã¥¯
+  # èµ·å‹•ã—ã¦ã„ã‚‹ã‹ãƒã‚§ãƒƒã‚¯
   if ($vps_model->is_active_vps( $uuid )) {
     $c->{stash}->{message} = "vps $uuid is already active... delete error.";
     return $c->forward( $c->view('JSON') );
@@ -414,7 +414,7 @@ sub remove :Private {
   for my $disk_info ( @{$info->{disks}} ) {
     push @paths, $disk_info->{image_path};
   }
-  # ºï½ü¤¹¤Ù¤­¥Ç¥£¥¹¥¯¤Î¥Ñ¥¹¤ò¥»¥Ã¥È
+  # å‰Šé™¤ã™ã¹ããƒ‡ã‚£ã‚¹ã‚¯ã®ãƒ‘ã‚¹ã‚’ã‚»ãƒƒãƒˆ
   $c->stash->{to_job_params} = {
                                   disks      => \@paths,
                                   uuid       => $uuid,

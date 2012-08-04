@@ -36,7 +36,7 @@ sub run :Local {
   my ($self, $c, @args) = @_;
 
   my $request_arg = @args >= 2
-                  ? join '/', grep { warn $_;defined $_ } @args # ¤Ê¤¼¤«undef ¤¬Æþ¤Ã¤Æ¤¤¤ë¤Î¤Ç
+                  ? join '/', grep { warn $_;defined $_ } @args # ãªãœã‹undef ãŒå…¥ã£ã¦ã„ã‚‹ã®ã§
                   : $args[0];
 
   my $body   = $c->request->body;
@@ -45,15 +45,15 @@ sub run :Local {
   my $vps_model  = $c->model('VPS');
   my $node_model = $c->model('Node');
 
-  # ¤É¤Î¥Î¡¼¥É¤Ë½èÍý¤ò¤µ¤»¤ë¤«
+  # ã©ã®ãƒŽãƒ¼ãƒ‰ã«å‡¦ç†ã‚’ã•ã›ã‚‹ã‹
   my $node;
 
-  # uuid»ØÄê¤Ç¡¢µ¯Æ°Ãæ¤Îvps ¤Ëshutdown¤ä¡¢Áàºî¤ò¤¹¤ë¾ì¹ç
+  # uuidæŒ‡å®šã§ã€èµ·å‹•ä¸­ã®vps ã«shutdownã‚„ã€æ“ä½œã‚’ã™ã‚‹å ´åˆ
   if (exists $params->{uuid} and $params->{uuid}) {
     $node = $vps_model->get_node( $params->{uuid} );
   }
 
-  # ¥Î¡¼¥É¤Ë¥Ý¡¼¥ÈÈÖ¹æ¤¬¤Ä¤¤¤Æ¤¤¤Ê¤«¤Ã¤¿¤é¡¢ÉÕ¤±¤ë
+  # ãƒŽãƒ¼ãƒ‰ã«ãƒãƒ¼ãƒˆç•ªå·ãŒã¤ã„ã¦ã„ãªã‹ã£ãŸã‚‰ã€ä»˜ã‘ã‚‹
   $node =~ /:\d+$/
      or $node .= ":" . $c->config->{api_port};
 
@@ -61,7 +61,7 @@ sub run :Local {
                               $node,
                               $request_arg,
                             );
-  # ¥Ç¥Õ¥©¥ë¥È¼ºÇÔ
+  # ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå¤±æ•—
   # $c->stash->{result} = 0;
 
   my $response_json = $node_model->api_json_post($uri, $params);
@@ -80,14 +80,14 @@ sub run :Local {
 
 sub job :Local {
   my ($self, $c, @args) = @_;
-  # node¤Ë¥ê¥¯¥¨¥¹¥È¤òÁ÷¤ë¤«¤é model Node
+  # nodeã«ãƒªã‚¯ã‚¨ã‚¹ãƒˆã‚’é€ã‚‹ã‹ã‚‰ model Node
   my $node_model = $c->model('Node');
   my $ip_model   = $c->model('IP');
   my $job_model  = $c->model('Job');
   my $vps_model  = $c->model('VPS');
 
   my $request_arg = @args >= 2
-                  ? join '/', grep { defined $_ } @args # ¤Ê¤¼¤«undef ¤¬Æþ¤Ã¤Æ¤¤¤ë¤Î¤Ç
+                  ? join '/', grep { defined $_ } @args # ãªãœã‹undef ãŒå…¥ã£ã¦ã„ã‚‹ã®ã§
                   : $args[0];
 
   my $params     = delete $c->stash->{to_job_params};
@@ -101,30 +101,30 @@ sub job :Local {
                  : "";
 
   my $callback_func;
-  # ¥¨¥é¡¼½èÍýÍÑ¤Î¥µ¥Ö¥ë¡¼¥Á¥ó
+  # ã‚¨ãƒ©ãƒ¼å‡¦ç†ç”¨ã®ã‚µãƒ–ãƒ«ãƒ¼ãƒãƒ³
   if (exists $c->stash->{__callback_for_error}) {
     $callback_func = $c->stash->{__callback_for_error};
     delete $c->stash->{__callback_for_error};
   }
 
-  # # ¥Ç¥Õ¥©¥ë¥È¼ºÇÔ
+  # # ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå¤±æ•—
   # $c->stash->{result} = 0;
 
-  # ¤É¤Î¥Î¡¼¥É¤Ë½èÍý¤ò¤µ¤»¤ë¤«
+  # ã©ã®ãƒŽãƒ¼ãƒ‰ã«å‡¦ç†ã‚’ã•ã›ã‚‹ã‹
   my $node;
 
-  # ¥¹¥È¥ì¡¼¥¸Áàºî¡¢¥¹¥¤¥Ã¥ÁÁàºî¤È¤«¡¢ÊÂÎó¤ËÆ°ºî¤µ¤»¤Ê¤¤½èÍý¤Ï¸ÇÄê¤Î¥Î¡¼¥É¤Ë
+  # ã‚¹ãƒˆãƒ¬ãƒ¼ã‚¸æ“ä½œã€ã‚¹ã‚¤ãƒƒãƒæ“ä½œã¨ã‹ã€ä¸¦åˆ—ã«å‹•ä½œã•ã›ãªã„å‡¦ç†ã¯å›ºå®šã®ãƒŽãƒ¼ãƒ‰ã«
   my $fix_request_arg = $c->config->{'fix_request_arg'};
   if ( grep { /$request_arg/ } @$fix_request_arg ) {
     warn "url /$request_arg/ fix request node => ", $c->config->{'fix_request_node'};
     $node = $c->config->{'fix_request_node'};
   }
 
-  # ¤Ç¤â¡¢Ä¾¤Ë»ØÄê¤·¤¿¤é¡¢¤½¤Ã¤ÁÍ¥Àè¢­¤Ç
+  # ã§ã‚‚ã€ç›´ã«æŒ‡å®šã—ãŸã‚‰ã€ãã£ã¡å„ªå…ˆâ†“ã§
   if (exists $params->{node} and $params->{node}) {
     $node = $params->{node};
   }
-  # uuid»ØÄê¤Ç¡¢µ¯Æ°Ãæ¤Îvps ¤Ëshutdown¤ä¡¢Áàºî¤ò¤¹¤ë¾ì¹ç
+  # uuidæŒ‡å®šã§ã€èµ·å‹•ä¸­ã®vps ã«shutdownã‚„ã€æ“ä½œã‚’ã™ã‚‹å ´åˆ
   elsif (exists $params->{uuid} and $params->{uuid}) {
     my $vps_node;
     local $@;
@@ -133,15 +133,15 @@ sub job :Local {
     };
     $@ and warn $@;
 
-    # uuid¤¬µ¯Æ°¤·¤Æ¤¤¤ënode¤¬¼èÆÀ¤Ç¤­¤¿¤é
+    # uuidãŒèµ·å‹•ã—ã¦ã„ã‚‹nodeãŒå–å¾—ã§ããŸã‚‰
     $vps_node and $node = $vps_node;
 
     warn "================== node: $node";
   }
 
-  # uuid¤¬»ØÄê¤Ç¤­¤Ê¤¤¡¢¤Ä¤Þ¤ê¡¢µ¯Æ°¤·¤Æ¤¤¤Ê¤¤vps¤Ë¤Ä¤¤¤Æ
-  # ¤äµ¯Æ°¤ò¤¹¤ë¾ì¹ç
-  # ¥Î¡¼¥É¤òÁªÂò¤¹¤ë
+  # uuidãŒæŒ‡å®šã§ããªã„ã€ã¤ã¾ã‚Šã€èµ·å‹•ã—ã¦ã„ãªã„vpsã«ã¤ã„ã¦
+  # ã‚„èµ·å‹•ã‚’ã™ã‚‹å ´åˆ
+  # ãƒŽãƒ¼ãƒ‰ã‚’é¸æŠžã™ã‚‹
   if (! $node) {
 
     my %require_params = ();
@@ -161,13 +161,13 @@ sub job :Local {
       warn $@;
       $c->stash->{message} = "available node is none";
       $@ and $c->stash->{message} .= "($@)";
-      # ¥³¡¼¥ë¥Ð¥Ã¥¯´Ø¿ô¤ò¸Æ¤Ö... revert
+      # ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°ã‚’å‘¼ã¶... revert
       ref $callback_func eq 'CODE' and $callback_func->();
       return $c->forward( $c->view('JSON') );
     }
   }
 
-  # ¥Î¡¼¥É¤Ë¥Ý¡¼¥ÈÈÖ¹æ¤¬¤Ä¤¤¤Æ¤¤¤Ê¤«¤Ã¤¿¤é¡¢ÉÕ¤±¤ë
+  # ãƒŽãƒ¼ãƒ‰ã«ãƒãƒ¼ãƒˆç•ªå·ãŒã¤ã„ã¦ã„ãªã‹ã£ãŸã‚‰ã€ä»˜ã‘ã‚‹
   $node =~ /:\d+$/
      or $node .= ":" . $c->config->{api_port};
 
@@ -178,7 +178,7 @@ sub job :Local {
                               $request_arg,
                             );
 
-  # request_job ¤Ï¶õ¤ÇÅÐÏ¿¤·¡¢¤¤¤Ã¤¿¤ó¡¢job_uuid ¤ò¼èÆÀ
+  # request_job ã¯ç©ºã§ç™»éŒ²ã—ã€ã„ã£ãŸã‚“ã€job_uuid ã‚’å–å¾—
   $job_uuid = $job_model->create( { request_job => "", project_id => $project_id, job_uuid => $job_uuid, } );
   $params->{job_uuid} = $c->stash->{job_uuid} = $job_uuid;
 
@@ -193,7 +193,7 @@ sub job :Local {
 
   $job_model->update( $job_uuid, { request_job => $request_job } );
 
-  # node ¤ËproxyÅª¤ËÁ÷¤ê¤Þ¤¹
+  # node ã«proxyçš„ã«é€ã‚Šã¾ã™
   my $config = Murakumo::CLI::Utils->new;
   my @hostnames = $config->my_hostname;
 

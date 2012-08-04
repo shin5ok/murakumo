@@ -73,7 +73,7 @@ sub list :Private {
 
 }
 
-# nodeコントロ〖ラに借妄を把均
+# node銈炽兂銉堛儹銉笺儵銇嚘鐞嗐倰濮旇
 sub boot :Private {
   my ($self, $c) = @_;
 
@@ -128,7 +128,7 @@ sub boot_tmp_cleanup :Local {
 
 }
 
-# nodeコントロ〖ラに借妄を把均
+# node銈炽兂銉堛儹銉笺儵銇嚘鐞嗐倰濮旇
 sub shutdown :Private {
   my ($self, $c, @args) = @_;
 
@@ -153,7 +153,7 @@ sub shutdown :Private {
   $c->detach( '/node/job/vps/shutdown/', \@args );
 }
 
-# nodeコントロ〖ラに借妄を把均
+# node銈炽兂銉堛儹銉笺儵銇嚘鐞嗐倰濮旇
 sub terminate :Private {
   my ($self, $c, @args) = @_;
 
