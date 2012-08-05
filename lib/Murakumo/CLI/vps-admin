@@ -315,10 +315,6 @@ sub _vps_define_create_or_modify {
     $mode_uri = "modify";
   }
 
-  if (! $uuid) {
-    chomp ($uuid = `uuidgen`);
-  }
-
   my @disks;
   if ($disk) {
     @disks = map { $_ * 1024000 } split /,/, $disk;
@@ -334,11 +330,8 @@ sub _vps_define_create_or_modify {
         $ip     = $2;
       }
 
-      my $uuid_created = `uuidgen`;
-      chomp $uuid_created;
       my $interface = +{ 
                           driver  => "virtio",
-                          # mac     => $uuid_created,
                           vlan_id => $vlan_number,
                        };
       if ($ip) {
@@ -351,7 +344,7 @@ sub _vps_define_create_or_modify {
   }
 
   my $vps = +{
-    uuid       => $uuid,
+    # uuid       => $uuid,
     project_id => $project_id,
   };
 
@@ -369,7 +362,7 @@ sub _vps_define_create_or_modify {
     and $vps->{vnc_password} = $vnc_password;
 
   my $vps_params = {
-     uuid         => $uuid,
+     # uuid         => $uuid,
      # project_id   => $project_id,
      spec         => $vps,
      disk         => \@disks,
@@ -377,12 +370,15 @@ sub _vps_define_create_or_modify {
      storage_uuid => $storage_uuid,
   };
 
-  my $uri = _create_uri( qq{/$project_id/vps/define/$mode_uri/} );
+  my $request_uri = qq{/$project_id/vps/define/$mode_uri/};
+  $uuid and $request_uri .= "$uuid/";
+
+  my $uri = _create_uri( $request_uri );
 
   my $params_all = {
                      vps        => $vps_params,
                      project_id => $project_id,
-                     uuid       => $uuid,
+                     # uuid       => $uuid,
                      assign_ip  => $assign_ip,
                      vlan_id    => $vlan_id,
                    };
