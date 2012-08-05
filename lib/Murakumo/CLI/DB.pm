@@ -25,9 +25,9 @@ sub new {
   our $conn;
   eval {
     $conn ||= $class->connect( $dsn, $user, $pass );
-    warn "conn: ", ref $conn;
+    # warn "conn: ", ref $conn;
     $obj->schema( $conn );
-    warn qq(connect( $dsn, $user ));
+    # warn qq(connect( $dsn, $user ));
   };
   if ($@) {
     croak "*** $dsn connection error($@)";
@@ -38,7 +38,7 @@ sub new {
 
 sub schema {
   my ($self, $schema) = @_;
-  warn "schema: ", ref $schema;
+  # warn "schema: ", ref $schema;
   if ($schema) {
     $self->{schema} = $schema;
   }
