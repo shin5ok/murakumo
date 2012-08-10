@@ -22,7 +22,7 @@ sub select {
 
   warn "--- select require_params ---";
   warn Dumper \%require_params;
-  warn "-------------------";
+  warn "-----------------------------";
 
   my $require_cpu_number;
   my $require_memory    ;
