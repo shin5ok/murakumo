@@ -93,7 +93,6 @@ sub register {
 
   local $@;
   eval {
-    # エラー処理はどうするか・・・そもそも↓は例外を出すのか
     no strict 'refs';
     $resultset->update_or_create($node_ref, { node => $node_name });
   };

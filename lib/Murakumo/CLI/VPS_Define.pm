@@ -134,11 +134,11 @@ sub get_define_json2 {
 
 sub list { goto \&list_from_db; }
 
-sub xml_sync {
-  my ($self, @args) = @_;
-  my $xml_obj = Murakumo::CLI::DB::VPS_Define::XML->new;
-  $xml_obj->sync( @args );
-}
+# sub xml_sync {
+#   my ($self, @args) = @_;
+#   my $xml_obj = Murakumo::CLI::DB::VPS_Define::XML->new;
+#   $xml_obj->sync( @args );
+# }
 
 sub all_deleted {
   my ($self, $uuid, $cancel) = @_;
