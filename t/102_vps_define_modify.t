@@ -17,7 +17,6 @@ is(ref $vps_define, 'Murakumo::CLI::VPS_Define', "object ref valid type");
 my @methods = qw(
   info
   list
-  xml_sync
   delete
   create_or_modify
   list_from_db
