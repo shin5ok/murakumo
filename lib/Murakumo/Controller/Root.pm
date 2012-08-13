@@ -45,26 +45,36 @@ sub stop_error :Private {
 }
 
 sub auto :Private {
-  my ( $self, $c ) = @_;
+  my ( $self, $c, @args ) = @_;
+
+  my $project_model = $c->model('Project');
+  my $node_model    = $c->model('Node');
+
+  my $api_key = $c->request->param('key');
+
+  if (! $node_model->is_valid_node( $api_key ) ) {
+
+    my $project_id = shift @args;
+    if (! $project_model->auth( $project_id, $api_key ) ) {
+      $c->response->body( 'forbidden' );
+      $c->response->status( 403 );
+      return 0;
+
+    } else {
+      $c->stash->{project_id} = $project_id;
+    }
+
+  }
+
 
   # default値の設定
   $c->stash->{message} = qq{};
   $c->stash->{result}  = 0;
 
+
   # stub for now
   return 1;
 
-  # # project is exists? and resource check  validation
-  # $c->forward( '/project/is_valid_project/' );
-  my $project_model = $c->model('Project');
-  {
-    no strict 'refs';
-    my $project_id = $c->request->param('project_id');
-    $project_model->is_exist( $project_id );
-  }
-
-  return 1;
-  
 }
 
 # default view
@@ -99,7 +109,7 @@ Standard 404 error page
 sub default :Path{
   my ( $self, $c, $project_id, @args ) = @_;
 
-  $c->stash->{project_id} = $project_id;
+  # $c->stash->{project_id} = $project_id;
 
   # 371ff666-c581-40a4-9bab-1260975464bd
   my $like_uuid = qr{

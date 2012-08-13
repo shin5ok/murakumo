@@ -56,8 +56,6 @@ sub list :Private {
   my $vpses_ref   = $vps_model->list( $time_until );
   my $defines_ref = $define_model->list( $project_id );
 
-  warn Dumper $defines_ref;
-
   my %uuids;
   for my $defined_vps (@{$defines_ref}) {
     $uuids{$defined_vps->{uuid}} = 1;

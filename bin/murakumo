@@ -31,6 +31,7 @@ opts my $name         => 'Str',
      my $verbose      => 'Bool',
      my $ip           => 'Str',
      my $disk         => 'Str',
+     my $api_key      => 'Str',
      my $vlan_id      => 'Str',
      my $vnc_password => 'Str',
      my $cdrom        => 'Str',
@@ -52,6 +53,10 @@ if (exists $ENV{MURAKUMO_PROJECT_ID}) {
 
 if (exists $ENV{MURAKUMO_BASE_URL}) {
   $base_url = $ENV{MURAKUMO_BASE_URL};
+}
+
+if (exists $ENV{MURAKUMO_API_KEY}) {
+  $api_key = $ENV{MURAKUMO_API_KEY};
 }
 
 my @args   = @ARGV;
@@ -92,6 +97,15 @@ sub _create_uri {
 
   my $uri = URI->new( $base_url );
   $uri->path( $action );
+  my %param_key = ();
+
+  $verbose
+    and $param_key{verbose} = 1;
+
+  $api_key
+    and $param_key{key}     = $api_key;
+
+  $uri->query_form( %param_key );
   return $uri;
 }
 
@@ -185,10 +199,10 @@ sub vps_list {
   my $uri = _create_uri( "/$project_id/vps/list/" );
 
   my %param_hash;
-  $verbose
-    and $param_hash{'verbose'} = 1;
+  # $verbose
+  #   and $param_hash{'verbose'} = 1;
 
-  $uri->query_form( %param_hash );
+  # $uri->query_form( %param_hash );
 
   my $response = _www_get( $uri );
   my $data = decode_json $response->content;
@@ -407,11 +421,7 @@ sub vps_migration {
 }
 
 sub node_list {
-  my $uri = _create_uri( '/node/list/' );
-
-  if ($verbose) {
-    $uri->query_form( verbose => 1 );
-  }
+  my $uri = _create_uri( "/$project_id/node/list/" );
 
   my $response = _www_get( $uri );
 
@@ -435,15 +445,6 @@ sub job_list {
   $project_id ||= '';
   $uuid       ||= '';
   my $uri = _create_uri( "/$project_id/job/list/$uuid" );
-  # $uri .= "?project_id=$project_id";
-  # $uuid and $uri .= "&job_uuid=$uuid";
-  # my %param = (
-  #   project_id => $project_id,
-  # );
-
-  # $uuid
-  #    and $param{job_uuid} = $uuid;
-   
   my $response = _www_get( $uri );
 
   my $data = decode_json $response->content;
@@ -467,7 +468,7 @@ sub job_list {
 }
 
 sub storage_list {
-  my $uri = _create_uri( '/storage/list/' );
+  my $uri = _create_uri( "/$project_id/storage/list/" );
 
   my $response = _www_get( $uri );
 
