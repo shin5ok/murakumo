@@ -78,7 +78,6 @@ sub get_node {
   my $resultset = $self->schema->resultset('Vps');
   local $@;
   {
-    warn $uuid , " is search";
     my ($rs) = $resultset->search({ uuid => $uuid });
     $rs or croak "$uuid is not found";
 

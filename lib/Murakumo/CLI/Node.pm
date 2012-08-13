@@ -14,7 +14,8 @@ use Murakumo::CLI::Utils;
 use Murakumo::CLI::DB;
 use base qw( Murakumo::CLI::DB );
 
-my $utils = Murakumo::CLI::Utils->new; 
+my $utils  = Murakumo::CLI::Utils->new; 
+my $config = $utils->config;
 
 sub new {
   my ($class) = @_;
@@ -85,6 +86,14 @@ sub api_json_post {
  
   }
 
+}
+
+sub is_valid_node {
+  my ($self, $uri, $api_key) = @_;
+  # if ($uri eq $config->{update_api_uri}) {
+    return $api_key eq $config->{update_api_key_for_node};
+  # }
+  # return 1;
 }
 
 sub register {
