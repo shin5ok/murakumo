@@ -1,4 +1,4 @@
-#!/home/smc/bin/perl
+#!/usr/bin/env murakumo-perl
 # chkconfig: 35 99 10
 # description: Murakumo_api
 #
