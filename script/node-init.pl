@@ -37,7 +37,7 @@ sub make_key_file_over_ssh {
   local $?;
   if (-e $tmpfile) {
     system "chmod 600 $tmpfile";
-    system "scp $tmpfile $node:/root/murakumo.key";
+    system "scp $tmpfile $node:/root/murakumo_node.key";
     return $? == 0;
   }
   return 0;
