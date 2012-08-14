@@ -50,11 +50,22 @@ sub auto :Private {
   my $project_model = $c->model('Project');
   my $node_model    = $c->model('Node');
 
-  my $api_key = $c->request->param('key');
+  my $api_key   = $c->request->param('key');
+  my $node_uuid = $c->request->param('uuid');
+  my $node_name = $c->request->param('name');
 
-  if (! $node_model->is_valid_node( $api_key ) ) {
+  if ($node_uuid and $node_name and $api_key) {
+    if (! $node_model->is_valid_node( $node_name, $node_uuid, $api_key ) ) {
+      $c->response->body( 'forbidden' );
+      $c->response->status( 403 );
+      warn "error forbidden";
+      return 0;
+    }
+
+  } else {
 
     my $project_id = shift @args;
+
     if (! $project_model->auth( $project_id, $api_key ) ) {
       $c->response->body( 'forbidden' );
       $c->response->status( 403 );
@@ -65,7 +76,6 @@ sub auto :Private {
     }
 
   }
-
 
   # default値の設定
   $c->stash->{message} = qq{};

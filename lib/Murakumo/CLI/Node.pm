@@ -89,11 +89,11 @@ sub api_json_post {
 }
 
 sub is_valid_node {
-  my ($self, $uri, $api_key) = @_;
-  # if ($uri eq $config->{update_api_uri}) {
-    return $api_key eq $config->{update_api_key_for_node};
-  # }
-  # return 1;
+  my ($self, $node, $uuid, $api_key) = @_;
+  my $resultset     = $self->schema->resultset('NodeDefine');
+  my ($node_define) = $resultset->search({ name => $node, uuid => $uuid });
+  # warn sprintf "%s eq %s", $node_define->api_key, $api_key;
+  return $node_define->api_key eq $api_key;
 }
 
 sub register {
