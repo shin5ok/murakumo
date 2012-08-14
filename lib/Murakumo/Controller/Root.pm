@@ -50,9 +50,9 @@ sub auto :Private {
   my $project_model = $c->model('Project');
   my $node_model    = $c->model('Node');
 
-  my $api_key   = $c->request->param('key');
-  my $node_uuid = $c->request->param('uuid');
-  my $node_name = $c->request->param('name');
+  my $api_key   = $c->request->query_params->{'key'};
+  my $node_uuid = $c->request->query_params->{'uuid'};
+  my $node_name = $c->request->query_params->{'name'};
 
   if ($node_uuid and $node_name and $api_key) {
     if (! $node_model->is_valid_node( $node_name, $node_uuid, $api_key ) ) {
