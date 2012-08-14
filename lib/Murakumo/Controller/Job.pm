@@ -39,7 +39,6 @@ sub update :Local {
   my $body      = $c->request->body;
   my $params    = decode_json <$body>;
   my $job_uuid  = $params->{job_uuid};
-  warn Dumper $params;
 
   $job_uuid
     or croak "*** $job_uuid uuid is not found parameter";
