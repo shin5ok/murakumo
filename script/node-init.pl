@@ -11,7 +11,7 @@ our $tmpfile;
 my $node = shift;
 my $api_key = make_api_key();
 chomp ( my $uuid = `uuidgen` );
-if (make_key_file_over_ssh( $node, { uuid => $uuid, api_key => $api_key, } )) {
+if (make_key_file_over_ssh( $node, { node_uuid => $uuid, api_key => $api_key, } )) {
 
   my $db = Murakumo::CLI::DB->new->schema; 
   my $rs = $db->resultset('NodeDefine');

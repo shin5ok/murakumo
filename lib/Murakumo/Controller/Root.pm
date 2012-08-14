@@ -51,7 +51,7 @@ sub auto :Private {
   my $node_model    = $c->model('Node');
 
   my $api_key   = $c->request->query_params->{'key'};
-  my $node_uuid = $c->request->query_params->{'uuid'};
+  my $node_uuid = $c->request->query_params->{'node_uuid'};
   my $node_name = $c->request->query_params->{'name'};
 
   if ($node_uuid and $node_name and $api_key) {
