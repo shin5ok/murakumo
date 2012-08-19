@@ -92,7 +92,6 @@ sub is_valid_node {
   my ($self, $node, $uuid, $api_key) = @_;
   my $resultset     = $self->schema->resultset('NodeDefine');
   my ($node_define) = $resultset->search({ name => $node, uuid => $uuid });
-  # warn sprintf "%s eq %s", $node_define->api_key, $api_key;
   return $node_define->api_key eq $api_key;
 }
 

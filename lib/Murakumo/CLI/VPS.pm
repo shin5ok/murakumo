@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Murakumo::CLI::VPS;
+package Murakumo::CLI::VPS 0.02;
 
 use JSON;
 use Carp;
@@ -10,8 +10,6 @@ use lib qq{$FindBin::Bin/../lib};
 use Murakumo::CLI::Utils;
 use Murakumo::CLI::DB;
 use base q(Murakumo::CLI::DB);
-
-our $VERSION = q(0.0.1);
 
 sub vps_register {
   my ($self, $node, $update_key, $vpses_ref) = @_;
