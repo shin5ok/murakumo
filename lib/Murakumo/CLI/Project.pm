@@ -32,9 +32,13 @@ sub auth {
   my ($self, $project_id, $api_key) = @_;
   my $resultset = $self->schema->resultset('Project');
   my ($x) = $resultset->search({ project_id => $project_id } );
-  warn "project_id: $project_id" if $project_id;
-  warn "################### ", $x->api_key, " eq $api_key";
   return $x->api_key eq $api_key;
+}
+
+sub is_admin_access {
+  my ($self, $admin_api_key, $request_object) = @_;
+  # キーに加え、ipアドレスとかでも認証する
+  1;
 }
 
 1;

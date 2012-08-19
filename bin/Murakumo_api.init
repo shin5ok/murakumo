@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use Carp;
 
-$ENV{DAEMON} = 1;
+$ENV{BACKGROUND_DAEMON} = 1;
 
 my $arg = shift || _usage();
 $> == 0

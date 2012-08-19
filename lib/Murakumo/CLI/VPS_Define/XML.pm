@@ -8,8 +8,6 @@ use XML::TreePP;
 use Carp;
 use Path::Class;
 
-our $VERSION = q(0.0.1);
-# これ設定ファイルから取る
 our $base_path = q{/vm/config};
 
 sub sync {

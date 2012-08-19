@@ -37,6 +37,7 @@ sub stop_error :Private {
   $c->stash->{result} = "0";
 
   if (defined $error_message) {
+    $c->log->debug($error_message);
     $c->stash->{message} = $error_message;
   }
 
@@ -47,18 +48,31 @@ sub stop_error :Private {
 sub auto :Private {
   my ( $self, $c, @args ) = @_;
 
+  $c->log->debug($c->request->uri);
+
   my $project_model = $c->model('Project');
   my $node_model    = $c->model('Node');
 
-  my $api_key   = $c->request->query_params->{'key'};
-  my $node_uuid = $c->request->query_params->{'node_uuid'};
-  my $node_name = $c->request->query_params->{'name'};
+  my $api_key       = $c->request->query_params->{'key'};
+  my $node_uuid     = $c->request->query_params->{'node_uuid'};
+  my $node_name     = $c->request->query_params->{'name'};
+  my $admin_api_key = $c->request->query_params->{'admin_api_key'};
 
-  if ($node_uuid and $node_name and $api_key) {
+  if ( $admin_api_key ) {
+    if (! $project_model->is_admin_access( $admin_api_key, $c->request ) ) {
+      $c->response->body( 'forbidden' );
+      $c->response->status( 403 );
+      $c->log->debug( "error forbidden" );
+      return 0;
+    }
+
+  }
+  elsif ($node_uuid and $node_name and $api_key) {
+
     if (! $node_model->is_valid_node( $node_name, $node_uuid, $api_key ) ) {
       $c->response->body( 'forbidden' );
       $c->response->status( 403 );
-      warn "error forbidden";
+      $c->log->debug( "error forbidden" );
       return 0;
     }
 
@@ -143,6 +157,8 @@ sub default :Path{
   warn Dumper \@args;
   warn "------------------";
   warn "url /$url";
+
+  $c->log->info("/ => detach to $url");
 
   $c->request->args([]);
   $c->detach( "/$url" );

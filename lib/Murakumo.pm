@@ -18,7 +18,6 @@ use Moose;
 #                 directory
 
 use Catalyst qw/
-    -Debug
     ConfigLoader
     Static::Simple
 /;
@@ -45,7 +44,7 @@ __PACKAGE__->config(
 );
 
 use Log::Log4perl::Catalyst;
-exists $ENV{DAEMON} and
+exists $ENV{BACKGROUND_DAEMON} and
   __PACKAGE__->log(Log::Log4perl::Catalyst->new("$FindBin::Bin/../log4perl.conf"));
 
 # Start the application
