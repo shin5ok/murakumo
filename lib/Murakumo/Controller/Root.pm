@@ -37,7 +37,7 @@ sub stop_error :Private {
   $c->stash->{result} = "0";
 
   if (defined $error_message) {
-    $c->log->debug($error_message);
+    $c->log->warn($error_message);
     $c->stash->{message} = $error_message;
   }
 
@@ -48,7 +48,7 @@ sub stop_error :Private {
 sub auto :Private {
   my ( $self, $c, @args ) = @_;
 
-  $c->log->debug($c->request->uri);
+  $c->log->info($c->request->uri);
 
   my $project_model = $c->model('Project');
   my $node_model    = $c->model('Node');
@@ -62,7 +62,7 @@ sub auto :Private {
     if (! $project_model->is_admin_access( $admin_api_key, $c->request ) ) {
       $c->response->body( 'forbidden' );
       $c->response->status( 403 );
-      $c->log->debug( "error forbidden" );
+      $c->log->warn( "error forbidden" );
       return 0;
     }
 
@@ -72,7 +72,7 @@ sub auto :Private {
     if (! $node_model->is_valid_node( $node_name, $node_uuid, $api_key ) ) {
       $c->response->body( 'forbidden' );
       $c->response->status( 403 );
-      $c->log->debug( "error forbidden" );
+      $c->log->warn( "error forbidden" );
       return 0;
     }
 
