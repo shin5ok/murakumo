@@ -4,19 +4,21 @@ use warnings;
 use JSON;
 use Carp;
 use FindBin;
-use lib qq($FindBin::Bin/../lib);
+use lib qq($FindBin::Bin/../../lib);
 use Murakumo::CLI::DB;
+
+if ($> != 0) {
+  croak "*** $0 must be run by super user";
+}
 
 our $tmpfile;
 my $node = shift;
 my $api_key = make_api_key();
 chomp ( my $uuid = `uuidgen` );
+my $db = Murakumo::CLI::DB->new->schema; 
+my $rs = $db->resultset('NodeDefine');
 if (make_key_file_over_ssh( $node, { node_uuid => $uuid, api_key => $api_key, } )) {
-
-  my $db = Murakumo::CLI::DB->new->schema; 
-  my $rs = $db->resultset('NodeDefine');
   $rs->create({ name => $node, uuid => $uuid, api_key => $api_key });
-
 }
 
 sub make_key_file_over_ssh {
