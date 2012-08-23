@@ -36,7 +36,7 @@ sub new {
 
 sub schema {
   my ($self, $schema) = @_;
-  # warn "schema: ", ref $schema;
+
   if ($schema) {
     $self->{schema} = $schema;
   }

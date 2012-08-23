@@ -32,6 +32,7 @@ use Murakumo::CLI::Utils;
 sub stop_error :Private {
   my ( $self, $c ) = @_;
   my $error_message = $c->request->args->[0];
+  warn Dumper $c->stash;
 
   # error set
   $c->stash->{result} = "0";
@@ -103,7 +104,6 @@ sub auto :Private {
   $c->stash->{result}  = 0;
   $c->stash->{authed}  = 1;
 
-
   # stub for now
   return 1;
 
@@ -140,8 +140,7 @@ Standard 404 error page
 
 sub default :Path{
   my ( $self, $c, $project_id, @args ) = @_;
-
-  # $c->stash->{project_id} = $project_id;
+  warn Dumper \@args;
 
   # 371ff666-c581-40a4-9bab-1260975464bd
   my $like_uuid = qr{
@@ -170,7 +169,7 @@ sub default :Path{
 
   $c->request->args([]);
   $c->go( "/$url" );
-  $c->detach( "/$url" );
+  # $c->detach( "/$url" );
 
 }
 

@@ -119,8 +119,6 @@ sub clone :Private {
 
   }
 
-  warn "clone $org_uuid => $dst_uuid";
-
   $params->{mac}            = $r->{mac};
   $params->{dst_image_path} = $r->{dst_image_path};
   $params->{src_image_path} = $r->{src_image_path};
@@ -144,7 +142,6 @@ sub remove_commit :Local {
   my $iface_define_model = $c->model('InterfaceDefine');
   my $ip_model           = $c->model('IP');
 
-  my $project_id   = $params->{project_id};
   my $vps_uuid     = $c->stash->{uuid} || $params->{uuid};
 
   my $result       = $params->{result} || 0;
@@ -246,7 +243,7 @@ sub create_or_modify: Private {
 
   no strict 'refs';
 
-  my $uuid       = $c->stash->{uuid} || $params->{uuid};
+  my $uuid       = $c->stash->{uuid};
   my $project_id = $c->stash->{project_id};
   if (! $project_id) {
     $c->detach("/stop_error", ["project_id is empty"]);
@@ -391,7 +388,7 @@ sub remove :Private {
   my $body = $c->request->body;
   my $params = decode_json <$body>;
 
-  my $uuid       = $c->stash->{uuid} || $params->{uuid};
+  my $uuid       = $c->stash->{uuid};
   my $project_id = $c->stash->{project_id};
 
   if (! $project_id) {
@@ -450,7 +447,7 @@ sub info :Private {
   }
 
   my $params     = $c->request->query_params;
-  my $uuid   = $c->stash->{uuid} || $params->{uuid};
+  my $uuid   = $c->stash->{uuid};
 
   my $define_model = $c->model('VPS_Define');
   my $info = $define_model->info( $uuid );
@@ -463,6 +460,21 @@ sub info :Private {
     $c->stash->{result}  = 1;
     $c->stash->{info}    = $info;
   }
+
+}
+
+sub auto :Private {
+  my ($self, $c) = @_;
+
+  if (exists $c->stash->{uuid}) {
+    my $vps_define_model = $c->model('VPS_Define');
+
+    # だめなら例外
+    $vps_define_model->is_valid_vps_for_project( $c->stash->{project_id}, $c->stash->{uuid} );
+
+  }
+
+  return 1;
 
 }
 
