@@ -116,19 +116,21 @@ sub set_tmp_active_vps {
 sub unset_tmp_active_vps {
   my ($self, $uuid) = @_;
   if (! $uuid) {
-    warn "uuid is not found parameter";
-    return 0;
+    croak "uuid is not found parameter";
   }
+
   my $vps_rs = $self->schema->resultset('Vps');
-  local $@;
-  eval {
-    $vps_rs->search({ uuid => $uuid, state => 0, })->delete;
-  };
-  if ($@) {
-    # 例外が出たら削除ができない
-    croak "unset error : $@";
+
+  my $delete_count = $vps_rs->search({ uuid => $uuid, state => 0, })
+                             ->delete;
+
+  # 削除する対象がなかったら
+  if ($delete_count == 0) {
+    return 0;
+
   } else {
     return 1;
+
   }
   
 }

@@ -410,12 +410,23 @@ sub vps_define_remove {
   
 }
 
+sub vps_define_clone {
+  goto &vps_clone;
+}
+
 sub vps_migration {
   my $uri = _create_uri( "/$project_id/vps/migration/$uuid/" );
   $dst_node
     or croak "dst node is error";
 
   my $response = _www_json_post( $uri, { dst_node => $dst_node, } );
+  return $response->content;
+
+}
+
+sub vps_boot_cleanup {
+  my $uri = _create_uri( "/$project_id/vps/boot_tmp_cleanup/$uuid/" );
+  my $response = _www_json_post( $uri, {} );
   return $response->content;
 
 }

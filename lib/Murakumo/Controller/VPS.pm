@@ -113,16 +113,15 @@ sub boot_tmp_cleanup :Local {
   my $params = decode_json <$body>;
   my $uuid   = $c->stash->{uuid} || $params->{uuid};
   my $node   = $params->{node};
-  my $r = $vps_model->unset_tmp_active_vps( $uuid );
+  my $r      = $vps_model->unset_tmp_active_vps( $uuid );
 
   $c->stash->{result} = 0;
   if ($r) {
-    $c->stash->{result}  = 1;
-    $c->stash->{message} = "boot up failed $uuid";
-    $c->stash->{message}.= "on $node";
+    $c->stash->{result}   = 1;
+    $c->stash->{message}  = "cleanup for boot temporary record for $uuid";
+    $node and
+      $c->stash->{message} .= " on $node";
   }
-
-  # return $c->forward( $c->view('JSON') );
 
 }
 
