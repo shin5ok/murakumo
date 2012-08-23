@@ -112,7 +112,7 @@ sub set_tmp_active_vps {
   
 }
 
-# 起動前が失敗したら
+# 起動が失敗したら
 sub unset_tmp_active_vps {
   my ($self, $uuid) = @_;
   if (! $uuid) {

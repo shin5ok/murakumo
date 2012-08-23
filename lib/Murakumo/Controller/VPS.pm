@@ -79,10 +79,10 @@ sub boot :Private {
   no strict 'refs';
   my $body = $c->request->body;
   my $params = decode_json <$body>;
-  my $uuid   = $c->stash->{uuid} || $params->{uuid};
+  my $uuid   = $c->stash->{uuid};
 
   my $project_id = $c->stash->{project_id};
-  if (! $project_id or ! $params->{uuid} ) {
+  if (! $project_id or ! $uuid ) {
     $c->detach( "/stop_error", ["project_id or uuid is empty"]);
   }
 
@@ -112,7 +112,7 @@ sub boot_tmp_cleanup :Local {
   no strict 'refs';
   my $body   = $c->request->body;
   my $params = decode_json <$body>;
-  my $uuid   = $c->stash->{uuid} || $params->{uuid};
+  my $uuid   = $c->stash->{uuid};
   my $node   = $params->{node};
   my $r      = $vps_model->unset_tmp_active_vps( $uuid );
 
@@ -138,7 +138,7 @@ sub shutdown :Private {
   my $body = $c->request->body;
   my $params = decode_json <$body>;
 
-  my $uuid   = $c->stash->{uuid} || $params->{uuid};
+  my $uuid   = $c->stash->{uuid};
 
   my $to_params = {
                      uuid       => $uuid,
@@ -163,7 +163,7 @@ sub terminate :Private {
   my $body = $c->request->body;
   my $params = decode_json <$body>;
 
-  my $uuid   = $c->stash->{uuid} || $params->{uuid};
+  my $uuid   = $c->stash->{uuid};
 
   my $to_params = {
                      uuid       => $uuid,
@@ -186,7 +186,7 @@ sub migration :Private {
   my $body = $c->request->body;
   my $params = decode_json <$body>;
 
-  my $uuid   = $c->stash->{uuid} || $params->{uuid};
+  my $uuid   = $c->stash->{uuid};
 
   if (! $project_id) {
     $c->detach("/stop_error", ["project_id is empty"]);
@@ -209,6 +209,17 @@ sub migration :Private {
 
 sub auto :Private {
   my ($self, $c) = @_;
+
+  if (exists $c->stash->{uuid}) {
+    my $vps_define_model = $c->model('VPS_Define');
+
+    # だめなら例外
+    $vps_define_model->is_valid_vps_for_project( $c->stash->{project_id}, $c->stash->{uuid} );
+
+  }
+
+  return 1;
+
 }
 
 

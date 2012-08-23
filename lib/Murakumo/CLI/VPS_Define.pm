@@ -696,4 +696,24 @@ sub cancel_define {
   $@ or $txn->commit;
 
 }
+
+sub is_valid_vps_for_project {
+  my ($self, $project_id, $uuid) = @_;
+
+  if (! $project_id or ! $uuid) {
+    croak "project_id or uuid is empty";
+  }
+  my $vps_define_rs = $self->schema->resultset('VpsDefine');
+  my @vpses = $vps_define_rs->search({
+                                     project_id => $project_id,
+                                     uuid       => $uuid,
+                                   });
+
+  if ( @vpses != 1 ){
+    croak "*** vps $uuid is invalid for project $project_id";
+  }
+
+  return 1;
+}
+
 1;
