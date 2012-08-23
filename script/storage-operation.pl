@@ -8,21 +8,24 @@ use lib qq($FindBin::Bin/../../lib);
 use Murakumo::CLI::DB;
 use opts;
 
-if ($> != 0) {
-  croak "*** $0 must be run by super user";
-}
-
-my $mode = shift || "";
 opts my $export_path => 'Str',
      my $host        => 'Str',
      my $type        => 'Str',
      my $priority    => 'Int';
 
+if ($> != 0) {
+  croak "*** $0 must be run by super user";
+}
+
+my $mode = shift || "";
+
 $priority ||= 100;
 $type     ||= "nfs";
-if ($mode eq 'add' and ( ! $host or ! $export_path ) ) {
-  usage();
-  exit 255;
+if ($mode eq 'add') { 
+  if ( ! $host or ! $export_path ) {
+    usage();
+    exit 255;
+  }
 } else {
   usage();
   exit 0;

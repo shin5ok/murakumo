@@ -8,16 +8,18 @@ use lib qq($FindBin::Bin/../../lib);
 use Murakumo::CLI::DB;
 use opts;
 
+opts my $project_id => 'Str';
+
 my $mode = shift || "";
 if ($> != 0) {
   croak "*** $0 must be run by super user";
 }
 
-opts my $project_id => 'Str';
-
-if ($mode eq 'add' and ! $project_id) {
-  usage();
-  exit 255;
+if ($mode eq 'add') { 
+  if (! $project_id) {
+    usage();
+    exit 255;
+  }
 } else {
   usage();
   exit 0;
@@ -26,7 +28,7 @@ if ($mode eq 'add' and ! $project_id) {
 my $db = Murakumo::CLI::DB->new->schema; 
 my $rs = $db->resultset('Project');
 
-my $api_key = `uuidgen`;
+chomp( my $api_key = `uuidgen` );
 $api_key =~ s/\-//g;
 
 $rs->create({
