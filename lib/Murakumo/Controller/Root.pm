@@ -50,6 +50,12 @@ sub auto :Private {
 
   $c->log->info($c->request->uri);
 
+  # すでに認証されていれば
+  {
+    no strict 'refs';
+    $c->stash->{authed} and return 1;
+  }
+
   my $project_model = $c->model('Project');
   my $node_model    = $c->model('Node');
 
@@ -59,6 +65,7 @@ sub auto :Private {
   my $admin_api_key = $c->request->query_params->{'admin_api_key'};
 
   if ( $admin_api_key ) {
+
     if (! $project_model->is_admin_access( $admin_api_key, $c->request ) ) {
       $c->response->body( 'forbidden' );
       $c->response->status( 403 );
@@ -94,6 +101,7 @@ sub auto :Private {
   # default値の設定
   $c->stash->{message} = qq{};
   $c->stash->{result}  = 0;
+  $c->stash->{authed}  = 1;
 
 
   # stub for now
@@ -161,6 +169,7 @@ sub default :Path{
   $c->log->info("/ => detach to $url");
 
   $c->request->args([]);
+  $c->go( "/$url" );
   $c->detach( "/$url" );
 
 }

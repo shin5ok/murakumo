@@ -33,6 +33,7 @@ sub index :Path :Args(0) {
 
 sub list :Private {
   my ($self, $c) = @_;
+  warn Dumper $c->stash;
   my $params     = $c->request->query_params;
   my $project_id = $c->stash->{project_id};
   if (! $project_id) {
@@ -204,6 +205,10 @@ sub migration :Private {
 
   $c->detach( '/node/job/vps/migration/', \@args );
 
+}
+
+sub auto :Private {
+  my ($self, $c) = @_;
 }
 
 
