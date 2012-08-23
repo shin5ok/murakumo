@@ -30,6 +30,9 @@ sub is_exist {
 
 sub auth {
   my ($self, $project_id, $api_key) = @_;
+  $project_id and $api_key
+    or return 0;
+
   my $resultset = $self->schema->resultset('Project');
   my ($x) = $resultset->search({ project_id => $project_id } );
   return $x->api_key eq $api_key;
