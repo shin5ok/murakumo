@@ -140,9 +140,8 @@ Standard 404 error page
 
 sub default :Path{
   my ( $self, $c, $project_id, @args ) = @_;
-  warn Dumper \@args;
 
-  # 371ff666-c581-40a4-9bab-1260975464bd
+  # # 371ff666-c581-40a4-9bab-1260975464bd
   my $like_uuid = qr{
     ^
       [0-9a-f]{8} \-

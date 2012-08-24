@@ -134,6 +134,7 @@ sub remove_commit :Local {
   my $body = $c->request->body;
   my $params = decode_json <$body>;
   dumper( $params );
+  dumper( $c->stash );
 
   no strict 'refs';
 
@@ -466,7 +467,7 @@ sub info :Private {
 sub auto :Private {
   my ($self, $c) = @_;
 
-  if (exists $c->stash->{uuid}) {
+  if (exists $c->stash->{uuid} and exists $c->stash->{project_id}) {
     my $vps_define_model = $c->model('VPS_Define');
 
     # だめなら例外
