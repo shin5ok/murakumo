@@ -32,7 +32,6 @@ use Murakumo::CLI::Utils;
 sub stop_error :Private {
   my ( $self, $c ) = @_;
   my $error_message = $c->request->args->[0];
-  warn Dumper $c->stash;
 
   # error set
   $c->stash->{result} = "0";
@@ -120,7 +119,7 @@ sub end : ActionClass('RenderView') {
         warn "--- default error -------------";
         $c->stash->{message} = $@;
       }
-      return;
+
     }
 
     if ((my @errors = @{$c->error}) > 0) {
@@ -129,6 +128,12 @@ sub end : ActionClass('RenderView') {
 
       $c->clear_errors;
     }
+
+warn "----------";
+warn Dumper ($c->stash);
+warn "----------";
+
+    return $c->forward( $c->view( 'JSON' ) );
 
 }
 
@@ -167,8 +172,15 @@ sub default :Path{
   $c->log->info("/ => detach to $url");
 
   $c->request->args([]);
-  $c->go( "/$url" );
-  # $c->detach( "/$url" );
+
+  # detach や go では、
+  # 戻ってこない動きの実現のため
+  # die $Catalyst::DETACH;
+  # してるみたいなので $@ がセットされる
+  # なので、$@ はエラーではないので評価しない
+  eval {
+    $c->go( "/$url" );
+  };
 
 }
 
