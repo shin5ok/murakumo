@@ -44,7 +44,7 @@ sub list :Private {
 sub clone :Private {
   my ($self, $c) = @_;
   $c->log->info("clone start");
-  my $body = $c->request->body;
+  my $body   = $c->request->body;
   my $params = decode_json <$body>;
 
   dumper($c->stash);
@@ -131,7 +131,7 @@ sub clone :Private {
 
 sub remove_commit :Local {
   my ($self, $c) = @_;
-  my $body = $c->request->body;
+  my $body   = $c->request->body;
   my $params = decode_json <$body>;
   dumper( $params );
   dumper( $c->stash );
@@ -170,7 +170,7 @@ sub remove_commit :Local {
 sub commit :Local {
   my ($self, $c) = @_;
 
-  my $body = $c->request->body;
+  my $body   = $c->request->body;
   my $params = decode_json <$body>;
   dumper($params);
 
@@ -386,7 +386,7 @@ sub modify :Private {
 
 sub remove :Private {
   my ($self, $c) = @_;
-  my $body = $c->request->body;
+  my $body   = $c->request->body;
   my $params = decode_json <$body>;
 
   my $uuid       = $c->stash->{uuid};

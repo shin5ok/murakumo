@@ -76,7 +76,7 @@ sub boot :Private {
   my ($self, $c) = @_;
 
   no strict 'refs';
-  my $body = $c->request->body;
+  my $body   = $c->request->body;
   my $params = decode_json <$body>;
   my $uuid   = $c->stash->{uuid};
 
@@ -134,7 +134,7 @@ sub shutdown :Private {
     $c->detach("/stop_error", ["project_id is empty"]);
   }
 
-  my $body = $c->request->body;
+  my $body   = $c->request->body;
   my $params = decode_json <$body>;
 
   my $uuid   = $c->stash->{uuid};
@@ -159,7 +159,7 @@ sub terminate :Private {
     $c->detach("/stop_error", ["project_id is empty"]);
   }
 
-  my $body = $c->request->body;
+  my $body   = $c->request->body;
   my $params = decode_json <$body>;
 
   my $uuid   = $c->stash->{uuid};
@@ -182,7 +182,7 @@ sub migration :Private {
     $c->detach("/stop_error", ["project_id is empty"]);
   }
 
-  my $body = $c->request->body;
+  my $body   = $c->request->body;
   my $params = decode_json <$body>;
 
   my $uuid   = $c->stash->{uuid};
