@@ -33,7 +33,6 @@ sub index :Path :Args(0) {
 
 sub list :Private {
   my ($self, $c) = @_;
-  warn Dumper $c->stash;
   my $params     = $c->request->query_params;
   my $project_id = $c->stash->{project_id};
   if (! $project_id) {
@@ -210,7 +209,7 @@ sub migration :Private {
 sub auto :Private {
   my ($self, $c) = @_;
 
-  if (exists $c->stash->{uuid}) {
+  if (exists $c->stash->{uuid} and exists $c->stash->{project_id}) {
     my $vps_define_model = $c->model('VPS_Define');
 
     # だめなら例外
