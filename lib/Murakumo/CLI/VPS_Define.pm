@@ -14,7 +14,6 @@ use lib qq{$FindBin::Bin/../lib};
 use Murakumo::CLI::Utils;
 use Murakumo::CLI::DB;
 use base q(Murakumo::CLI::DB);
-use Murakumo::CLI::VPS_Define::XML;
 
 # utils オブジェクト
 our $utils  = Murakumo::CLI::Utils->new;
@@ -133,12 +132,6 @@ sub get_define_json2 {
 }
 
 sub list { goto \&list_from_db; }
-
-# sub xml_sync {
-#   my ($self, @args) = @_;
-#   my $xml_obj = Murakumo::CLI::DB::VPS_Define::XML->new;
-#   $xml_obj->sync( @args );
-# }
 
 sub all_deleted {
   my ($self, $uuid, $cancel) = @_;
