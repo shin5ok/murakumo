@@ -111,7 +111,7 @@ sub boot_tmp_cleanup :Local {
   no strict 'refs';
   my $body   = $c->request->body;
   my $params = decode_json <$body>;
-  my $uuid   = $c->stash->{uuid};
+  my $uuid   = $c->stash->{uuid} || $params->{uuid};
   my $node   = $params->{node};
   my $r      = $vps_model->unset_tmp_active_vps( $uuid );
 

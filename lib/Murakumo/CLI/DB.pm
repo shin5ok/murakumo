@@ -28,7 +28,7 @@ sub new {
     $obj->schema( $conn );
   };
   if ($@) {
-    croak "*** $dsn connection error($@)";
+    croak "*** $dsn connect error($@)";
   }
 
   return $obj;
