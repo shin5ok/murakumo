@@ -204,7 +204,7 @@ sub commit :Local {
       # 予約したipをキャンセル
       $ip_model->cancel_reserve_ip( { reserve_uuid => $reserve_uuid } );
 
-      $define_model->cancel_define( $project_id, $vps_uuid );
+      $define_model->cancel_define( $vps_uuid );
 
     } else {
 
@@ -217,7 +217,7 @@ sub commit :Local {
       $reserve_uuid and
          $ip_model->commit_assign_ip( $return_param );
 
-      $define_model->commit_define( $project_id, $vps_uuid );
+      $define_model->commit_define( $vps_uuid );
 
       $c->stash->{param}= $return_param;
     }
