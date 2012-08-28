@@ -648,7 +648,7 @@ sub record_cloning {
 }
 
 sub commit_define {
-  my ($self, $project_id, $uuid) = @_;
+  my ($self, $uuid) = @_;
 
   my $vps_define_rs   = $self->schema->resultset('VpsDefine');
   my $disk_define_rs  = $self->schema->resultset('DiskDefine');
@@ -657,9 +657,9 @@ sub commit_define {
   my $txn = $self->schema->txn_scope_guard;
   local $@;
   eval {
-    $vps_define_rs  ->search({ uuid     => $uuid, project_id => $project_id, })->update({ ready => 1 }); 
-    $disk_define_rs ->search({ vps_uuid => $uuid, project_id => $project_id, })->update({ ready => 1 });  
-    $iface_define_rs->search({ vps_uuid => $uuid, project_id => $project_id, })->update({ ready => 1 });
+    $vps_define_rs  ->search({ uuid     => $uuid })->update({ ready => 1 }); 
+    $disk_define_rs ->search({ vps_uuid => $uuid })->update({ ready => 1 });  
+    $iface_define_rs->search({ vps_uuid => $uuid })->update({ ready => 1 });
   };
   if ($@) {
     warn __FILE__, ": ", $@;
@@ -673,7 +673,7 @@ sub commit_define {
 }
 
 sub cancel_define {
-  my ($self, $project_id, $uuid) = @_;
+  my ($self, $uuid) = @_;
 
   my $vps_define_rs   = $self->schema->resultset('VpsDefine');
   my $disk_define_rs  = $self->schema->resultset('DiskDefine');
@@ -682,9 +682,9 @@ sub cancel_define {
   my $txn = $self->schema->txn_scope_guard;
   local $@;
   eval {
-    $vps_define_rs  ->search({ uuid     => $uuid, project_id => $project_id, ready => 0 })->delete;
-    $disk_define_rs ->search({ vps_uuid => $uuid, project_id => $project_id, ready => 0 })->delete;  
-    $iface_define_rs->search({ vps_uuid => $uuid, project_id => $project_id, ready => 0 })->delete;
+    $vps_define_rs  ->search({ uuid     => $uuid, ready => 0 })->delete;
+    $disk_define_rs ->search({ vps_uuid => $uuid, ready => 0 })->delete;  
+    $iface_define_rs->search({ vps_uuid => $uuid, ready => 0 })->delete;
   };
   $@ or $txn->commit;
 
