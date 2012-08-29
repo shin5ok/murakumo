@@ -475,21 +475,21 @@ sub list_from_db {
 }
 
 sub record_cloning {
-  my ( $self, $org_uuid, $args_ref, $opt_args_ref ) = @_;
+  my ( $self, $src_uuid, $args_ref, $opt_args_ref ) = @_;
 
   my $vps_define_rs   = $self->schema->resultset('VpsDefine');
   my $disk_define_rs  = $self->schema->resultset('DiskDefine');
   my $iface_define_rs = $self->schema->resultset('InterfaceDefine');
 
   warn "record_cloning...";
-  warn Dumper $org_uuid;
+  warn Dumper $src_uuid;
   warn Dumper $args_ref;
 
   my $uuid = $args_ref->{uuid};
   my $project_id;
   my $param_ref;
 
-  my $org_info = $self->info( $org_uuid );
+  my $org_info = $self->info( $src_uuid );
 
   # my $now = $utils->now_string;
   my $now = $utils->now;
@@ -517,7 +517,7 @@ sub record_cloning {
     warn Dumper \%param;
 
     # 元となるvpsのname
-    $param{'original'} = $org_uuid;
+    $param{'original'} = $src_uuid;
 
     local $@;
     eval {
