@@ -1,19 +1,18 @@
 use warnings;
 use strict;
-package Murakumo::CLI::IP;
+
+package Murakumo::CLI::IP 0.01;
 use Carp;
 use Data::Dumper;
 use FindBin;
 use lib qq{$FindBin::Bin/../lib};
 use base q(Murakumo::CLI::DB);
-our $VERSION = q(0.0.1);
 
 # フリーのipを割り当てのため予約
 sub reserve_ip {
   my ($self, $param_ref) = @_;
 
-  warn "--- ", __PACKAGE__, " ---";
-  warn Dumper $param_ref;
+  no strict 'refs';
 
   my $resultset = $self->schema->resultset('Ip');
 
@@ -25,28 +24,26 @@ sub reserve_ip {
 
   # すでにこのvlanのipが割り当てられていれば
   if (defined $param_ref->{used_vps_uuid}) {
-    my ($x) = $resultset->search({
+    my @ips = $resultset->search({
                                    vlan_id       => $param_ref->{vlan_id},
                                    used_vps_uuid => $param_ref->{used_vps_uuid},
                                  });
-    if (defined $x and $x->can("ip")) {
-      return ($x->ip, $x->mask, $x->gw);
+    if ( @ips > 0 ) {
+      return [ map { +{ $_->get_columns } } @ips ] if @ips > 2;
+      return ( $ips[0]->ip, $ips[0]->mask, $ips[0]->gw );
     }
-  } 
+  }
 
-  no strict 'refs';
   if (! exists $param_ref->{reserve_uuid}) {
     croak "*** reserve_uuid is empty";
   }
+
   my $reserve_uuid = $param_ref->{reserve_uuid};
 
   # トランザクション 開始
   my $txn = $self->schema->txn_scope_guard;
   local $@;
   eval {
-    my @request_params = ( $param_ref->{vlan_id} );
-    exists $param_ref->{ip}
-      and push @request_params, $param_ref->{ip};
 
     my $r = $self->get_free_ip_object({
                                         vlan_id       => $param_ref->{vlan_id},
@@ -56,12 +53,13 @@ sub reserve_ip {
 
     $r or croak "*** query execute error";
 
-    $r->update( { reserve_uuid => $reserve_uuid });
+    $r->update( { reserve_uuid => $reserve_uuid } );
 
   };
 
   if ($@) {
     croak "get_assign_ip is failure(eval error: $@)";
+
   }
 
   # トランザクション 完了

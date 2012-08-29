@@ -570,7 +570,6 @@ sub record_cloning {
 
         local $@;
         eval {
-        warn Dumper \%param;
           my ($created) = $disk_define_rs->create( \%param );
 
           if (! $created) {
