@@ -289,8 +289,6 @@ sub create_or_modify: Private {
 
       my $info = $vps_define_model->info_include_tmp($uuid);
       my $disks_ref = $info->{disks};
-      warn "----- ", __PACKAGE__ , "#create_or_modify -----";
-      warn $uuid;
 
       # disk のハッシュを JSON化 失敗したら例外
       $to_params->{disks} = $disks_ref;
@@ -307,17 +305,29 @@ sub create_or_modify: Private {
                                                    reserve_uuid  => $reserve_uuid,
                                                    vlan_id       => $vlan_id,
                                                    used_vps_uuid => $mode eq 'modify'
-                                                                    ? $uuid
-                                                                    : undef,
+                                                                  ? $uuid
+                                                                  : undef,
                                                   } );
 
           if (@ip_params != 3) {
             warn "ip of vlan $vlan_id reserve none";
-            # croak "ip of vlan $vlan_id reserve none";
+
           } else {
-            # 取得した reserve_uuid をクエリにセット
-            $to_params->{reserve_uuid} = $reserve_uuid;
+            if ($mode eq 'modify') {
+              # modifyのときはすぐにcommit
+              $ip_model->commit_assign_ip({
+                                            reserve_uuid => $reserve_uuid,
+                                            vps_uuid     => $uuid,
+                                          });
+
+            } else {
+              # 取得した reserve_uuid をクエリにセット
+              $to_params->{reserve_uuid} = $reserve_uuid;
+
+            }
+
           }
+
         }
 
        }
