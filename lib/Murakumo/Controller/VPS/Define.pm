@@ -61,10 +61,10 @@ sub clone :Private {
   my $vps_model    = $c->model('VPS');
   my $ip_model     = $c->model('IP');
 
-  my $org_uuid     = $params->{org_uuid} = $c->stash->{uuid};
+  my $src_uuid     = $params->{src_uuid} = $c->stash->{uuid};
 
-  if ($vps_model->is_active_vps( $org_uuid )) {
-    $c->detach("/stop_error", ["vps($org_uuid) is already active"]);
+  if ($vps_model->is_active_vps( $src_uuid )) {
+    $c->detach("/stop_error", ["vps($src_uuid) is already active"]);
   }
 
   my $utils        = Murakumo::CLI::Utils->new;
@@ -103,7 +103,7 @@ sub clone :Private {
     # 指定されてないなら、undef で渡す
     my $vlan_id  = $params->{vlan_id};
 
-    $r = $define_model->record_cloning( $org_uuid, {
+    $r = $define_model->record_cloning( $src_uuid, {
                                                      uuid            => $dst_uuid,
                                                      name            => $dst_name,
                                                      instance_status => undef,
@@ -143,9 +143,9 @@ sub remove_commit :Local {
   my $iface_define_model = $c->model('InterfaceDefine');
   my $ip_model           = $c->model('IP');
 
-  my $vps_uuid     = $c->stash->{uuid} || $params->{uuid};
+  my $vps_uuid = $c->stash->{uuid} || $params->{uuid};
 
-  my $result       = $params->{result} || 0;
+  my $result   = $params->{result} || 0;
 
   local $@;
   eval {
