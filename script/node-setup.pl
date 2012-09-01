@@ -13,12 +13,13 @@ if ($> != 0) {
 
 our $tmpfile;
 my $node = shift;
+my $auto_select = shift || "1";
 my $api_key = make_api_key();
 chomp ( my $uuid = `uuidgen` );
 my $db = Murakumo::CLI::DB->new->schema; 
 my $rs = $db->resultset('NodeDefine');
 if (make_key_file_over_ssh( $node, { node_uuid => $uuid, api_key => $api_key, } )) {
-  $rs->create({ name => $node, uuid => $uuid, api_key => $api_key });
+  $rs->create({ name => $node, uuid => $uuid, api_key => $api_key, auto_select => $auto_select, });
 }
 
 sub make_key_file_over_ssh {
