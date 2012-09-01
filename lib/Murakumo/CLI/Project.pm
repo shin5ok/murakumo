@@ -38,12 +38,6 @@ sub auth {
   return $x->api_key eq $api_key;
 }
 
-sub is_admin_access {
-  my ($self, $admin_api_key, $request_object) = @_;
-  # キーに加え、ipアドレスとかでも認証する
-  1;
-}
-
 1;
 __END__
 
