@@ -50,12 +50,18 @@ sub select {
   my $resultset = $self->schema->resultset('Node');
 
   my $until = DateTime->now(time_zone => 'Asia/Tokyo');
-     $until->subtract( seconds => $config->{vps_list_expire_second} );
+     $until->subtract( seconds => $config->{node_list_expire_second} );
 
   my $query = {
                  disable     => { '!=' => 1      },
                  update_time => { '>'  => $until }, # 期限切れは対象外
+                 auto_select => 1,
               };
+
+  # 後でplan を指定するようにする
+  # $plan and 
+  #   $query->{plan} = $plan;
+
   $require_cpu_number
     and $query->{cpu_available} = { '>' => $require_cpu_number };
   $require_memory
