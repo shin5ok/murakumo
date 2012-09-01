@@ -59,10 +59,11 @@ sub auto :Private {
   my $project_model = $c->model('Project');
   my $node_model    = $c->model('Node');
 
-  my $api_key       = $c->request->query_params->{'key'};
-  my $node_uuid     = $c->request->query_params->{'node_uuid'};
-  my $node_name     = $c->request->query_params->{'name'};
-  my $admin_api_key = $c->request->query_params->{'admin_api_key'};
+  my $query_params  = $c->request->query_params;
+  my $api_key       = $query_params->{'key'};
+  my $node_uuid     = $query_params->{'node_uuid'};
+  my $node_name     = $query_params->{'name'};
+  my $admin_api_key = $query_params->{'admin_api_key'};
 
   if ( $admin_api_key ) {
 
