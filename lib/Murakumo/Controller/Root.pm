@@ -58,6 +58,7 @@ sub auto :Private {
 
   my $project_model = $c->model('Project');
   my $node_model    = $c->model('Node');
+  my $admin_model   = $c->model('Admin');
 
   my $query_params  = $c->request->query_params;
   my $api_key       = $query_params->{'key'};
@@ -67,7 +68,7 @@ sub auto :Private {
 
   if ( $admin_api_key ) {
 
-    if (! $project_model->is_admin_access( $admin_api_key, $c->request ) ) {
+    if (! $admin_model->is_admin_access( $admin_api_key, $c->request ) ) {
       $c->response->body( 'forbidden' );
       $c->response->status( 403 );
       $c->log->warn( "error forbidden" );

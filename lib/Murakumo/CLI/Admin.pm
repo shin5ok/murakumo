@@ -17,18 +17,24 @@ package Murakumo::CLI::Admin 0.01 {
     my @rs = $resultset->search;
   
     my $src_ip = $request_object->address;
+
+warn $src_ip;
   
-    for my $r ( @rs ) {
+    my $is_ok = 0;
+    _RS_: for my $r ( @rs ) {
       if (my $networks = $r->allow_network) {
-         if (! Net::CIDR::cidrlookup( $src_ip, ( split /,/, $networks ) )) {
-           croak "*** $src_ip is invalid allow network"; 
+         if (Net::CIDR::cidrlookup( $src_ip, ( split /,/, $networks ) )) {
+      warn $r->api_key, " eq " , $admin_api_key;
+
+           if ($r->api_key eq $admin_api_key) {
+             $is_ok = 1;
+             last _RS_;
+           }
          }
-  
       }
     }
   
-    return $x->api_key eq $admin_api_key;
-
+    return $is_ok;
   }
 }
 

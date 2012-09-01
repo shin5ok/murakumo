@@ -16,6 +16,21 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `admin`
+--
+
+DROP TABLE IF EXISTS `admin`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `admin` (
+  `api_key` varchar(128) NOT NULL,
+  `allow_network` varchar(255) NOT NULL,
+  `regist_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`api_key`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `disk_define`
 --
 
@@ -82,7 +97,7 @@ CREATE TABLE `ip` (
   `reserve_uuid` varchar(48) DEFAULT NULL,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4815 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5067 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -102,7 +117,7 @@ CREATE TABLE `job` (
   `lock_target` varchar(64) CHARACTER SET latin1 DEFAULT NULL,
   `project_id` varchar(8) CHARACTER SET latin1 DEFAULT NULL,
   PRIMARY KEY (`job_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9450 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=9604 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -259,7 +274,8 @@ CREATE TABLE `vps_define` (
   `regist_time` datetime DEFAULT NULL,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`uuid`),
-  UNIQUE KEY `project_id` (`project_id`,`uuid`)
+  UNIQUE KEY `project_id` (`project_id`,`uuid`),
+  UNIQUE KEY `project_id_2` (`project_id`,`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -292,4 +308,4 @@ CREATE TABLE `vps_template` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2012-08-29 11:36:14
+-- Dump completed on 2012-09-02  1:22:36
