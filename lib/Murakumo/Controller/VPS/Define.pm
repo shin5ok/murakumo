@@ -125,6 +125,8 @@ sub clone :Private {
   $params->{dst_hostname}   = $dst_name;
 
   $c->stash->{to_job_params} = $params;
+
+  $c->log->info( Dumper $c->stash->{to_job_params} );
   $c->detach( '/node/job/vps/clone/' );
 
 }
@@ -157,11 +159,13 @@ sub remove_commit :Local {
   };
   
   if ($@) {
-    warn $@;
+    $c->log->warn( "eval error: $@" );
     $c->stash->{message} = $@;
     $c->stash->{result}  = 0;
   }
   $c->stash->{result} = 1;
+
+  $c->log->info( $c->stash->{message} );
 
 }
 
@@ -199,6 +203,8 @@ sub commit :Local {
       $c->stash->{message} = sprintf "vps define clone() miss (%s)", Dumper $params;
       $@ and $c->stash->{message} .= " eval error $@";
 
+      $c->stath->warn( $c->stash->{message} );
+
       # 本当は、IPのmodelに切り出して、forwardした方がきれいかも
 
       # 予約したipをキャンセル
@@ -225,11 +231,12 @@ sub commit :Local {
   };
 
   if ($@) {
-    warn "eval error: $@";
+    $c->log->warn( "eval error: $@" );
     $c->stash->{error} = $@;
   }
 
   $c->stash->{result} = 1;
+  $c->log->info( sprintf "commit ok(%s)", Dumper $params );
 
 }
 
@@ -333,7 +340,7 @@ sub create_or_modify: Private {
        }
      
      } else {
-       croak "vps define create error project: $project_id, uuid: $uuid";
+       $c->detach("/stop_error", ["vps define create error project: $project_id, uuid: $uuid"] );
 
      }
 
@@ -342,6 +349,8 @@ sub create_or_modify: Private {
    if (! $@) {
 
       $to_params->{vps_uuid} = $uuid;
+
+      $c->log->info("vps define $mode...");
 
       # disk の作成処理が入っていたら
       # ip の コミット、キャンセルは、callback に任せる
@@ -356,8 +365,10 @@ sub create_or_modify: Private {
         if ($mode eq 'create') {
           $c->stash->{message} = "vps $uuid is created(no disk create)";
         } else {
-          $c->stash->{message} = "vps $uuid is modified(no disk modified)";
+          $c->stash->{message} = "vps $uuid is modified(no disk modify)";
         }
+
+        $c->log->info( $c->stash->{message} );
 
         if (exists $params->{reserve_uuid} and $params->{reserve_uuid}) {
           my $ip_param_commit = {
@@ -368,18 +379,21 @@ sub create_or_modify: Private {
         }
         $c->stash->{result}  = 1;
         return $c->forward( $c->view('JSON') );
-      }
 
+      }
     }
 
+    # ここからエラーのパート
     # ip をキャンセル
     if ($reserve_uuid) {
       $ip_model->cancel_reserve_ip( { reserve_uuid => $reserve_uuid } );
     }
 
-    $c->stash->{result}  = 0;
-    $c->stash->{message} = "vps $uuid is create error";
-    $c->stash->{message}.= "($@)" if $@;
+    $c->stash->{result}   = 0;
+    $c->stash->{message}  = "vps $uuid is create error";
+    $c->stash->{message} .= "($@)" if $@;
+
+    $c->log->warn( $c->stash->{message} );
 
 }
 
@@ -415,12 +429,14 @@ sub remove :Private {
   if ($vps_model->is_active_vps( $uuid )) {
     $c->{stash}->{message} = "vps $uuid is already active... delete error.";
     return $c->forward( $c->view('JSON') );
+
   }
 
   my $info = $define_model->info( $uuid );
   my @paths;
   for my $disk_info ( @{$info->{disks}} ) {
     push @paths, $disk_info->{image_path};
+
   }
   # 削除すべきディスクのパスをセット
   $c->stash->{to_job_params} = {
@@ -441,10 +457,14 @@ sub remove :Private {
 
   }
 
+  $c->log->info( $c->{stash}->{message} );
+
   if ($delete_result->{deleted}->{disk} > 0) {
     $c->detach('/node/job/vps/remove/');
+
   } else {
     $c->forward( $c->view('JSON') );
+
   }
 }
 

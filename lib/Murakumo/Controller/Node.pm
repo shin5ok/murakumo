@@ -107,22 +107,21 @@ sub job :Local {
     delete $c->stash->{__callback_for_error};
   }
 
-  # # デフォルト失敗
-  # $c->stash->{result} = 0;
-
   # どのノードに処理をさせるか
   my $node;
 
   # ストレージ操作、スイッチ操作とか、並列に動作させない処理は固定のノードに
   my $fix_request_arg = $c->config->{'fix_request_arg'};
   if ( grep { /$request_arg/ } @$fix_request_arg ) {
-    warn "url /$request_arg/ fix request node => ", $c->config->{'fix_request_node'};
+    $c->log->info( "url /$request_arg/ fix request node => " . $c->config->{'fix_request_node'} );
     $node = $c->config->{'fix_request_node'};
+
   }
 
   # でも、直に指定したら、そっち優先↓で
   if (exists $params->{node} and $params->{node}) {
     $node = $params->{node};
+
   }
   # uuid指定で、起動中のvps にshutdownや、操作をする場合
   elsif (exists $params->{uuid} and $params->{uuid}) {
@@ -136,7 +135,6 @@ sub job :Local {
     # uuidが起動しているnodeが取得できたら
     $vps_node and $node = $vps_node;
 
-    warn "================== node: $node";
   }
 
   # uuidが指定できない、つまり、起動していないvpsについて
@@ -161,9 +159,13 @@ sub job :Local {
       warn $@;
       $c->stash->{message} = "available node is none";
       $@ and $c->stash->{message} .= "($@)";
+
+      $c->log->warn( $c->stash->{message} );
+
       # コールバック関数を呼ぶ... revert
       ref $callback_func eq 'CODE' and $callback_func->();
       return $c->forward( $c->view('JSON') );
+
     }
   }
 
@@ -177,6 +179,9 @@ sub job :Local {
                               $node,
                               $request_arg,
                             );
+
+  $c->log->info("select node => $node");
+  $c->log->info("uri => $uri");
 
   # request_job は空で登録し、いったん、job_uuid を取得
   $job_uuid = $job_model->create( { request_job => "", project_id => $project_id, job_uuid => $job_uuid, } );
@@ -194,14 +199,15 @@ sub job :Local {
   $job_model->update( $job_uuid, { request_job => $request_job } );
 
   # node にproxy的に送ります
-  my $config = Murakumo::CLI::Utils->new;
-  my @hostnames = $config->my_hostname;
+  my $utils     = Murakumo::CLI::Utils->new;
+  my @hostnames = $utils->my_hostname;
 
   $params->{callback_host} = $hostnames[1];
   my $response_json = $node_model->api_json_post($uri, $params);
 
   if (! $response_json) {
     $c->detach('/stop_error', ["api request error($uri, $params)"]);
+
   }
 
   my $response_hash = decode_json $response_json;
@@ -209,6 +215,8 @@ sub job :Local {
   for my $key_of_hash ( keys %$response_hash ) {
     $c->stash->{$key_of_hash} = $response_hash->{$key_of_hash};
   }
+
+  $c->log->info("node job " . Dumper $c->stash );
 
 }
 
@@ -240,6 +248,7 @@ sub register :Local {
 }
 
 sub list :Local {
+
   my ($self, $c) = @_;
   my $node_model = $c->model('Node');
   $c->log->info("node list called");

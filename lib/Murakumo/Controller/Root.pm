@@ -37,8 +37,8 @@ sub stop_error :Private {
   $c->stash->{result} = "0";
 
   if (defined $error_message) {
-    $c->log->warn($error_message);
     $c->stash->{message} = $error_message;
+    $c->log->warn( $c->stash->{message} );
   }
 
   return;
@@ -131,10 +131,6 @@ sub end : ActionClass('RenderView') {
       $c->clear_errors;
     }
 
-warn "----------";
-warn Dumper ($c->stash);
-warn "----------";
-
     return $c->forward( $c->view( 'JSON' ) );
 
 }
@@ -166,11 +162,6 @@ sub default :Path{
 
   my $url = join "/", @args;
 
-  warn "----- detach -----";
-  warn Dumper \@args;
-  warn "------------------";
-  warn "url /$url";
-
   $c->log->info("/ => detach to $url");
 
   $c->request->args([]);
@@ -181,6 +172,7 @@ sub default :Path{
   # してるみたいなので $@ がセットされる
   # なので、$@ はエラーではないので評価しない
   eval {
+    $c->log->info("go /$url");
     $c->go( "/$url" );
   };
 
