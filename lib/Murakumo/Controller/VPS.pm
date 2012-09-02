@@ -101,6 +101,8 @@ sub boot :Private {
   };
 
   $c->stash->{to_job_params} = $params;
+
+  $c->log->info( "$uuid try boot request forward to node" );
   $c->detach( '/node/job/vps/boot/', [] );
 
 }
@@ -108,9 +110,11 @@ sub boot :Private {
 sub boot_tmp_cleanup :Local {
   my ($self, $c) = @_;
   my $vps_model  = $c->model('VPS');
-  no strict 'refs';
+
   my $body   = $c->request->body;
   my $params = decode_json <$body>;
+
+  no strict 'refs';
   my $uuid   = $c->stash->{uuid} || $params->{uuid};
   my $node   = $params->{node};
   my $r      = $vps_model->unset_tmp_active_vps( $uuid );
@@ -147,6 +151,7 @@ sub shutdown :Private {
 
   $c->stash->{to_job_params} = $to_params;
 
+  $c->log->info( "$uuid try shutdown request forward to node" );
   $c->detach( '/node/job/vps/shutdown/', \@args );
 }
 
@@ -171,6 +176,7 @@ sub terminate :Private {
 
   $c->stash->{to_job_params} = $to_params;
 
+  $c->log->info( "$uuid try terminate request forward to node" );
   $c->detach( '/node/job/vps/terminate/', \@args );
 }
 
@@ -202,6 +208,7 @@ sub migration :Private {
   
   $c->stash->{to_job_params} = $to_params;
 
+  $c->log->info( "$uuid try migration request forward to node" );
   $c->detach( '/node/job/vps/migration/', \@args );
 
 }

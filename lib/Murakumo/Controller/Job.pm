@@ -52,13 +52,13 @@ sub update :Local {
   if ($@ or ! $r) {
     $c->stash->{result}  = 0;
     $@ and $c->stash->{message} = $@;
+    $c->log->info( $job_uuid . " is update error" );
 
   } else {
     $c->stash->{result} = 1;
+    $c->log->info( $job_uuid . " is update ok" );
 
   }
-
-  return $c->forward( $c->view('JSON') );
 
 }
 
@@ -82,8 +82,6 @@ sub list :Local {
     $c->stash->{result}   = 0; 
     $c->stash->{message}  = 'job result failure';
   }
-
-  return $c->forward( $c->view('JSON') );
   
 }
 
