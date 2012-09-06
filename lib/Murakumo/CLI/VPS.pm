@@ -46,7 +46,7 @@ sub list {
   my $until = shift;
   my $resultset = $self->schema->resultset('Vps');
 
-  my $query_hash_ref = { state => 1 };
+  my $query_hash_ref = +{};
   $until and
     $query_hash_ref->{update_time} = { '>' => $until };
   my $rs = $resultset->search($query_hash_ref);

@@ -24,7 +24,8 @@ Catalyst Controller.
 sub info :Local {
 
   my ($self, $c) = @_;
-  my $uuid = $c->request->query_params->{uuid};
+  my $uuid = $c->stash->{uuid}
+          || $c->request->query_params->{uuid};
 
   local $@;
 

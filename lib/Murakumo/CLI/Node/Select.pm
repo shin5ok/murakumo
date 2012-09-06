@@ -55,7 +55,6 @@ sub select {
   my $query = {
                  disable     => { '!=' => 1      },
                  update_time => { '>'  => $until }, # 期限切れは対象外
-                 auto_select => 1,
               };
 
   # 後でplan を指定するようにする
