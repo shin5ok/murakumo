@@ -20,9 +20,11 @@ my $config = Murakumo::CLI::Utils->config;
 sub select {
   my ($self, %require_params) = @_;
 
-  warn "--- select require_params ---";
-  warn Dumper \%require_params;
-  warn "-----------------------------";
+  if (is_debug) {
+    warn "--- select require_params ---";
+    warn Dumper \%require_params;
+    warn "-----------------------------";
+  }
 
   my $require_cpu_number;
   my $require_memory    ;
@@ -37,6 +39,7 @@ sub select {
     $require_cpu_number = $require_params{cpu_number};
     $require_memory     = $require_params{memory};
 
+    warn Dumper{ %require_params};
     defined $require_cpu_for_node
       and $require_cpu_number += $require_cpu_number;
 
@@ -48,6 +51,7 @@ sub select {
   my $rs;
   local $@;
   my $resultset = $self->schema->resultset('Node');
+  my %auto_select_node = map { $_ => 1 } $self->get_auto_select_nodes;
 
   my $until = DateTime->now(time_zone => 'Asia/Tokyo');
      $until->subtract( seconds => $config->{node_list_expire_second} );
@@ -72,6 +76,8 @@ sub select {
   # 使っているコア数が少ない順に並び替え
   @rses = sort { $a->cpu_vps_used <=> $b->cpu_vps_used }
           grep { $_->cpu_vps_used <= $_->cpu_total }
+          grep { exists $auto_select_node{$_->uuid} }
+          # grep { my $uuid = $_->uuid; exists $auto_select_node{$uuid} }
           @rses;
 
   if (@rses == 0) {
@@ -89,10 +95,6 @@ sub select {
     if ($selected_node->loadavg > $r->loadavg) {
       $selected_node = $r;
     }
-    # メモリ空容量が多いノードを選択
-    # if ($selected_node->mem_free < $r->mem_free) {
-    #   $selected_node = $r;
-    # }
   }
 
   my $config = Murakumo::CLI::Utils->new->config;
@@ -104,13 +106,13 @@ sub select {
 
 }
 
+sub get_auto_select_nodes {
+  my $self = shift;
+  my $define_resultset = $self->schema->resultset('NodeDefine');
+  map { $_->uuid => 1 }
+      $define_resultset->search({ auto_select => 1 });
+}
+
+
 1;
-__END__
-mysql> select * from selected_node;
-+-------------------------+------+-----------+-----------+----------+------------+--------------+---------------------+---------+
-| name                    | uuid | cpu_total | mem_total | mem_free | vps_number | cpu_vps_used | regist_time         | disable |
-+-------------------------+------+-----------+-----------+----------+------------+--------------+---------------------+---------+
-| relay301.hosting-pf.net | NULL |         4 |   8175972 |  7507364 |          0 |            0 | 2012-02-14 05:36:07 |    NULL |
-| relay302.hosting-pf.net | NULL |         4 |   8043876 |  7311604 |          1 |            2 | 2012-02-14 05:36:07 |    NULL |
-+-------------------------+------+-----------+-----------+----------+------------+--------------+---------------------+---------+
 

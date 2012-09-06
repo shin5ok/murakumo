@@ -143,8 +143,8 @@ sub job :Local {
   if (! $node) {
 
     my %require_params = ();
-    if (exists $params->{vps}->{spec}) {
-      my $spec = $params->{vps}->{spec};
+    if (exists $params->{vps_params}) {
+      my $spec = $params->{vps_params};
       %require_params = (
                           cpu_number => $spec->{cpu_number},
                           memory     => $spec->{memory},
@@ -237,6 +237,7 @@ sub register :Local {
   my $node_r = $node_model->register(
                                      $params->{node}->{name},
                                      $params->{node},
+                                     $params->{node_uuid},
                                     );
 
   if ( $vps_r and $node_r ) {

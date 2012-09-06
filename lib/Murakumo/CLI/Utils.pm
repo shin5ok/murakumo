@@ -21,7 +21,8 @@ our $config_path   = qq{$FindBin::Bin/../murakumo.conf};
 sub import {
   my $caller = caller;
   no strict 'refs';
-  *{"${caller}::dumper"} = \&dumper;
+  *{"${caller}::dumper"}   = \&dumper;
+  *{"${caller}::is_debug"} = \&is_debug;
 }
 
 sub new {
@@ -163,6 +164,10 @@ sub is_valid_api_key {
   }
   croak "*** api key error";
 
+}
+
+sub is_debug {
+  exists $ENV{DEBUG};
 }
 
 1;
