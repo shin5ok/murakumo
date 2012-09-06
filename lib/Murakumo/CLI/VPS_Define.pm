@@ -361,7 +361,6 @@ sub create_or_modify {
   local $@;
   eval {
     # できれば mysqlの日付型に自動変換
-    # my $now = $utils->now_string;
     my $now = DateTime->now(time_zone => 'Asia/Tokyo');
 
     my ($is_vps_exists) = $vps_define_rs->search({ uuid => $uuid });
@@ -458,7 +457,6 @@ sub list_from_db {
     croak "project_id parameter must be specified...";
   }
   my $resultset = $self->schema->resultset('VpsDefine');
-  # きちんとエラー処理をすること
   my $rs = $resultset->search( { project_id => $project_id, ready => 1, }, { order_by => 'regist_time' } );
   my @vpses;
   while (my $x = $rs->next) {

@@ -52,7 +52,7 @@ sub list {
                           $define_resultset
                           ->search( { project_id => $project_id } );
 
-  my $query_hash_ref = +{};
+  my $query_hash_ref = +{ state => { "!=" => "0" } };
   $until and
     $query_hash_ref->{update_time} = { '>' => $until };
   my $rs = $resultset->search($query_hash_ref);
@@ -61,12 +61,8 @@ sub list {
   no strict 'refs';
   while (my $x = $rs->next) {
     my $uuid  = $x->uuid;
-    my $state = $x->state;
 
     $project_uuids{$uuid} or  next;
-    # とりあえず state 0 (bootup temporary) は除外
-    # 本当は、query レベルで除外する
-    $state eq '0'         and next;
 
     push @vpses, {
                    name        => $x->name,
@@ -74,10 +70,9 @@ sub list {
                    node        => $x->node,
                    memory      => $x->memory,
                    cpu         => $x->cpu,
-                   state       => $state,
+                   state       => $x->state,
                    update_time => $x->update_time,
                    vnc_port    => $x->vnc_port,
-                   enable      => $x->enable,
                  };
   }
 
@@ -112,8 +107,8 @@ sub get_node {
 sub set_tmp_active_vps {
   my ($self, $uuid) = @_;
   if (! $uuid) {
-    warn "uuid is not found parameter";
-    return 0;
+    croak "uuid is not found parameter";
+
   }
   my $vps_rs = $self->schema->resultset('Vps');
   local $@;
