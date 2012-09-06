@@ -436,8 +436,6 @@ sub node_list {
 
   my $response = _www_get( $uri );
 
-  warn $response->content;
-
   my @cols = qw( name uuid cpu_total mem_total mem_free loadavg vps_number cpu_vps_used auto_select update_time );
 
   my $data = decode_json $response->content;
