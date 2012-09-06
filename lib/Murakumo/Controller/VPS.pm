@@ -53,20 +53,8 @@ sub list :Private {
     }
   }
 
-  my $vpses_ref   = $vps_model->list( $time_until );
-  my $defines_ref = $define_model->list( $project_id );
-
-  my %uuids;
-  for my $defined_vps (@{$defines_ref}) {
-    $uuids{$defined_vps->{uuid}} = 1;
-  }
-
-  my @vpses;
-  for my $d ( @$vpses_ref ) {
-    exists $uuids{$d->{uuid}}
-      and push @vpses, $d;
-  }
-  $c->stash->{vps_list} = \@vpses;
+  my $vpses_ref   = $vps_model->list( $project_id, $time_until );
+  $c->stash->{vps_list} = $vpses_ref;
   $c->stash->{result}   = 1;
 
 }
