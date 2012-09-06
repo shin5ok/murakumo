@@ -15,8 +15,10 @@ sub info {
   my ($self, $uuid) = @_;
   $uuid or croak "*** uuid is empty";
 
+warn "storage uuid is $uuid";
   my $resultset = $self->schema->resultset('Storage');
   my ($info) = $resultset->search({ uuid => $uuid });
+warn Dumper ref $info;
 
   my %result;
   for my $col ( qw( uuid export_path mount_path host type available ) ) {
