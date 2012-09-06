@@ -42,23 +42,39 @@ sub register {
 
 # vps一覧
 sub list {
-  my $self  = shift;
-  my $until = shift;
-  my $resultset = $self->schema->resultset('Vps');
+  my $self       = shift;
+  my $project_id = shift;
+  my $until      = shift;
+  my $resultset        = $self->schema->resultset('Vps');
+  my $define_resultset = $self->schema->resultset('VpsDefine');
+
+  my %project_uuids = map { $_->uuid => 1 }
+                          $define_resultset
+                          ->search( { project_id => $project_id } );
 
   my $query_hash_ref = +{};
   $until and
     $query_hash_ref->{update_time} = { '>' => $until };
   my $rs = $resultset->search($query_hash_ref);
   my @vpses;
+
+  no strict 'refs';
   while (my $x = $rs->next) {
+    my $uuid  = $x->uuid;
+    my $state = $x->state;
+
+    $project_uuids{$uuid} or  next;
+    # とりあえず state 0 (bootup temporary) は除外
+    # 本当は、query レベルで除外する
+    $state eq '0'         and next;
+
     push @vpses, {
                    name        => $x->name,
-                   uuid        => $x->uuid,
+                   uuid        => $uuid,
                    node        => $x->node,
                    memory      => $x->memory,
                    cpu         => $x->cpu,
-                   state       => $x->state,
+                   state       => $state,
                    update_time => $x->update_time,
                    vnc_port    => $x->vnc_port,
                    enable      => $x->enable,
