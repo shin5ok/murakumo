@@ -13,7 +13,13 @@ if ($> != 0) {
 
 our $tmpfile;
 my $node = shift;
+
+if (! $node) {
+  _usage();
+  exit 0;
+}
 my $auto_select = shift || "1";
+
 my $api_key = make_api_key();
 chomp ( my $uuid = `uuidgen` );
 my $db = Murakumo::CLI::DB->new->schema; 
@@ -41,8 +47,13 @@ sub make_key_file_over_ssh {
   if (-e $tmpfile) {
     system "chmod 600 $tmpfile";
     system "scp $tmpfile $node:/root/murakumo_node.key";
-    return $? == 0;
+    system "ssh $node /etc/init.d/murakumo_node_submit stop";
+    sleep 1;
+    system "ssh $node /etc/init.d/murakumo_node_submit start";
+    return 1;
+
   }
+
   return 0;
 
 }
@@ -58,4 +69,15 @@ END {
   -f $tmpfile
     and unlink $tmpfile;
 }
+
+sub _usage {
+  print << "_END_OF_MESSAGE_";
+  (root) # $0 hostname-of-node auto_select_flag
+  ex:
+  (root) # $0 node000 1
+  (root) # $0 node999 0
+
+_END_OF_MESSAGE_
+}
+
 

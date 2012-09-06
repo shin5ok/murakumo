@@ -97,7 +97,8 @@ CREATE TABLE `ip` (
   `reserve_uuid` varchar(48) DEFAULT NULL,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `vlan_id` (`vlan_id`,`ip`)
+  UNIQUE KEY `vlan_id` (`vlan_id`,`ip`),
+  UNIQUE KEY `vlan_id_2` (`vlan_id`,`ip`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5067 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -118,7 +119,7 @@ CREATE TABLE `job` (
   `lock_target` varchar(64) CHARACTER SET latin1 DEFAULT NULL,
   `project_id` varchar(8) CHARACTER SET latin1 DEFAULT NULL,
   PRIMARY KEY (`job_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9625 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=9772 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -241,11 +242,8 @@ CREATE TABLE `vps` (
   `memory` int(32) DEFAULT NULL,
   `cpu` int(8) DEFAULT NULL,
   `state` varchar(32) DEFAULT NULL,
-  `status` varchar(32) DEFAULT NULL,
   `node` varchar(255) DEFAULT NULL,
   `vnc_port` int(11) DEFAULT NULL,
-  `ip` varchar(16) DEFAULT NULL,
-  `enable` tinyint(1) DEFAULT NULL,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `update_key` varchar(48) DEFAULT NULL,
   PRIMARY KEY (`uuid`)
@@ -311,4 +309,4 @@ CREATE TABLE `vps_template` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2012-09-02  2:11:00
+-- Dump completed on 2012-09-06 21:19:35
