@@ -47,7 +47,7 @@ sub info {
         $query{$x}->{ready} = 1;
       }
     }
-    warn Dumper \%query if exists $ENV{DEBUG};
+    warn Dumper \%query if is_debug;
 
     my ($vps_r)  = $vps_define_rs  ->search( $query{vps}                                 ); 
     # diskは regist_timeでソート
@@ -465,6 +465,8 @@ sub list_from_db {
 sub record_cloning {
   my ( $self, $src_uuid, $args_ref, $opt_args_ref ) = @_;
 
+  logger "debug", "call record_cloning";
+
   my $vps_define_rs   = $self->schema->resultset('VpsDefine');
   my $disk_define_rs  = $self->schema->resultset('DiskDefine');
   my $iface_define_rs = $self->schema->resultset('InterfaceDefine');
@@ -591,8 +593,8 @@ sub record_cloning {
 
     my @ifaces = @{$org_info->{interfaces}};
     if (@ifaces > 0) {
-      for my $interface ( @ifaces ) {
-      # for my $interface ( $ifaces[0] ) {
+      # for my $interface ( @ifaces ) {
+      for my $interface ( $ifaces[0] ) {
 
         my $mac = $utils->create_random_mac;
         $mac_of_first ||= $mac;
@@ -602,7 +604,6 @@ sub record_cloning {
           vlan_id     => exists $specify_vlan_ids[$number]
                          ? $specify_vlan_ids[$number]
                          : $interface->{vlan_id},
-          # vlan_id     => $interface->{vlan_id},
           driver      => $interface->{driver},
           ip          => undef,
           vps_uuid    => $uuid,
@@ -687,12 +688,12 @@ sub is_valid_vps_for_project {
     croak "project_id or uuid is empty";
   }
   my $vps_define_rs = $self->schema->resultset('VpsDefine');
-  my @vpses = $vps_define_rs->search({
+  my $count = $vps_define_rs->search({
                                      project_id => $project_id,
                                      uuid       => $uuid,
-                                   });
+                                    })->count;
 
-  if ( @vpses != 1 ){
+  if ( $count != 1 ){
     croak "*** vps $uuid is invalid for project $project_id";
   }
 

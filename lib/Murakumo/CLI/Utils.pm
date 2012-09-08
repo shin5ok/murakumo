@@ -13,16 +13,19 @@ use Config::General;
 use IPC::Open2;
 use Sys::Hostname;
 use FindBin;
+use Log::Log4perl;
 
 our $VERSION = q(0.0.3);
 
-our $config_path   = qq{$FindBin::Bin/../murakumo.conf};
+our $config_path     = qq{$FindBin::Bin/../murakumo.conf};
+our $log_config_path = qq{$FindBin::Bin/../log4perl.conf};
 
 sub import {
   my $caller = caller;
   no strict 'refs';
   *{"${caller}::dumper"}   = \&dumper;
   *{"${caller}::is_debug"} = \&is_debug;
+  *{"${caller}::logger"}   = \&logger;
 }
 
 sub new {
@@ -141,6 +144,7 @@ __PYTHON__
               [0-9a-f]{2}: 
               [0-9a-f]{2}
            $/xms or croak "mac address create failure...";
+  close $r;
   return $mac;
 }
 
@@ -168,9 +172,18 @@ sub is_valid_api_key {
 
 sub is_debug {
   my @callers = caller;
-  warn "##### debug caller " . join ",", @callers;
+  warn "##### debug caller {" . join ",", @callers . "}";
   exists $ENV{DEBUG};
 }
+
+sub logger {
+  Log::Log4perl->init( $log_config_path );
+  my $log = Log::Log4perl->get_logger;
+  my $level      = shift;
+  my $log_string = shift;
+  $log->$level( $log_string );
+}
+
 
 1;
 __END__
