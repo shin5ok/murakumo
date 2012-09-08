@@ -167,6 +167,8 @@ sub is_valid_api_key {
 }
 
 sub is_debug {
+  my @callers = caller;
+  warn "##### debug caller " . join ",", @callers;
   exists $ENV{DEBUG};
 }
 
