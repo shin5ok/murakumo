@@ -207,7 +207,7 @@ sub vps_list {
   my $response = _www_get( $uri );
   my $data = decode_json $response->content;
 
-  my @cols = ('name','uuid','node', 'cpu','memory', 'vnc_port', 'update_time', 'state', );
+  my @cols = ('name','uuid','node', 'vnc_port', 'cpu','memory', 'update_time', 'state', );
   my @rows;
   for my $x ( @{$data->{vps_list}} ) {
     my @p;

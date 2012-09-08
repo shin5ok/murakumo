@@ -53,7 +53,7 @@ sub list :Private {
     }
   }
 
-  my $vpses_ref   = $vps_model->list( $project_id, $time_until );
+  my $vpses_ref         = $vps_model->list( $project_id, $time_until );
   $c->stash->{vps_list} = $vpses_ref;
   $c->stash->{result}   = 1;
 

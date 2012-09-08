@@ -416,16 +416,6 @@ sub create_or_modify {
       }
     }
    
-    # 使われてない ip の解放
-    # $ip_rs->search({ vps_uuid => $uuid })
-    #       ->search(\@vlan_ids)
-    #       ->update( {
-    #                   used_vps_uuid => undef,
-    #                   reserve_uuid  => undef,
-    #                   try_release   => undef,
-    #                   mac           => undef,
-    #                  } );
-
     $vps_spec->{regist_time} = $now;
 
     $vps_spec->{project_id}  = $project_id;
@@ -479,9 +469,11 @@ sub record_cloning {
   my $disk_define_rs  = $self->schema->resultset('DiskDefine');
   my $iface_define_rs = $self->schema->resultset('InterfaceDefine');
 
-  warn "record_cloning...";
-  warn Dumper $src_uuid;
-  warn Dumper $args_ref;
+  if (is_debug) {
+    warn "record_cloning...";
+    warn Dumper $src_uuid;
+    warn Dumper $args_ref;
+  }
 
   my $uuid = $args_ref->{uuid};
   my $project_id;
@@ -489,7 +481,6 @@ sub record_cloning {
 
   my $org_info = $self->info( $src_uuid );
 
-  # my $now = $utils->now_string;
   my $now = $utils->now;
   my $txn = $self->schema->txn_scope_guard;
 
@@ -511,8 +502,10 @@ sub record_cloning {
     );  
 
     %param = (%param, %$args_ref);
-    warn "record cloning vps";
-    warn Dumper \%param;
+    if (is_debug) {
+      warn "record cloning vps";
+      warn Dumper \%param;
+    }
 
     # 元となるvpsのname
     $param{'original'} = $src_uuid;
@@ -598,7 +591,8 @@ sub record_cloning {
 
     my @ifaces = @{$org_info->{interfaces}};
     if (@ifaces > 0) {
-      for my $interface ( $ifaces[0] ) {
+      for my $interface ( @ifaces ) {
+      # for my $interface ( $ifaces[0] ) {
 
         my $mac = $utils->create_random_mac;
         $mac_of_first ||= $mac;
@@ -619,7 +613,6 @@ sub record_cloning {
 
         local $@;
         eval {
-        warn Dumper \%param;
           my ($created) = $iface_define_rs->create( \%param );
 
           if (! $created) {

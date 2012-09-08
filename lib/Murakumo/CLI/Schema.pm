@@ -6,7 +6,6 @@ use base q(DBIx::Class::Schema::Loader);
 
 __PACKAGE__->loader_options(
   debug         => 0,
-  # debug         => exists $ENV{DEBUG},
   naming        => 'v4',
   relationships => 1
 );

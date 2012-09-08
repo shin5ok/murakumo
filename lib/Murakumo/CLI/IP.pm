@@ -7,13 +7,17 @@ use Data::Dumper;
 use FindBin;
 use lib qq{$FindBin::Bin/../lib};
 use base q(Murakumo::CLI::DB);
+use Murakumo::CLI::Utils;
 
 # フリーのipを割り当てのため予約
 sub reserve_ip {
   my ($self, $param_ref) = @_;
 
-  no strict 'refs';
+  if (is_debug) {
+    warn Dumper $param_ref;
+  }
 
+  no strict 'refs';
   my $resultset = $self->schema->resultset('Ip');
 
   # vlan と、ipが管理されているか
