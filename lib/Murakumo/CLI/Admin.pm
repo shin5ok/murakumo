@@ -7,6 +7,7 @@ package Murakumo::CLI::Admin 0.01 {
   use Data::Dumper;
   use FindBin;
   use lib qq{$FindBin::Bin/../lib};
+  use Murakumo::CLI::Utils;
   use Murakumo::CLI::DB;
   use base q(Murakumo::CLI::DB);
   
@@ -30,6 +31,7 @@ package Murakumo::CLI::Admin 0.01 {
       }
     }
   
+    logger('debug', "admin auth $is_ok");
     return $is_ok;
 
   }

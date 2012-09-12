@@ -592,25 +592,27 @@ sub record_cloning {
     my $number = 0;
 
     my @ifaces = @{$org_info->{interfaces}};
-    if (@ifaces > 0) {
-      # for my $interface ( @ifaces ) {
-      for my $interface ( $ifaces[0] ) {
+    my $n = 0;
+    if (@specify_vlan_ids > 0) {
+      for my $specify_vlan_id ( $specify_vlan_ids[0] ) { # とりあえず、最初の1つだけ作成する
 
         my $mac = $utils->create_random_mac;
         $mac_of_first ||= $mac;
 
         my %param = (
           project_id  => $project_id,
-          vlan_id     => exists $specify_vlan_ids[$number]
-                         ? $specify_vlan_ids[$number]
-                         : $interface->{vlan_id},
-          driver      => $interface->{driver},
+          vlan_id     => $specify_vlan_id,
+          driver      => exists $ifaces[$n]->{driver}
+                         ? $ifaces[$n]->{driver}
+                         : "virtio",
           ip          => undef,
           vps_uuid    => $uuid,
           mac         => $mac,
           regist_time => $now,
           seq         => ++$number,
         );
+
+        $n++;
 
         local $@;
         eval {
