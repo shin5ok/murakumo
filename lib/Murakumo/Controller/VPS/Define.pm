@@ -285,14 +285,17 @@ sub create_or_modify: Private {
   my $ip_model = $c->model('IP');
   my $reserve_uuid;
 
-  # my $to_params = $params;
   my $to_params;
   local $@;
   eval {
 
     dumper($vps_params);
 
-    if ( $vps_define_model->create_or_modify($project_id, $uuid, $vps_params) ) {
+    my $options = {};
+    exists $params->{driver} and
+      $options->{driver} = $params->{driver};
+
+    if ( $vps_define_model->create_or_modify($project_id, $uuid, $vps_params, $options) ) {
 
       my $info = $vps_define_model->info_include_tmp($uuid);
       my $disks_ref = $info->{disks};
