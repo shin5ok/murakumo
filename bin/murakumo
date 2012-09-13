@@ -25,6 +25,7 @@ opts my $name         => 'Str',
      my $cpu_number   => 'Int',
      my $memory       => 'Int',
      my $set_network  => 'Bool',
+     my $no_virtio    => 'Bool',
      my $storage_uuid => 'Str',
      my $assign_ip    => 'Bool',
      my $clock        => 'Str',
@@ -395,6 +396,7 @@ sub _vps_define_create_or_modify {
                      # uuid       => $uuid,
                      assign_ip  => $assign_ip,
                      vlan_id    => $vlan_id,
+                     driver     => $no_virtio ? "ide" : "virtio",
                    };
   my $response = _www_json_post( $uri, $params_all );
 

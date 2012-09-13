@@ -294,7 +294,7 @@ sub create_disk_param_array {
 }
 
 sub create_or_modify {
-  my ($self, $project_id, $uuid, $vps_params) = @_;
+  my ($self, $project_id, $uuid, $vps_params, $options) = @_;
 
   if ($ENV{DEBUG}) {
     warn "--- ", __FILE__ , "#create_or_modify -----------";
@@ -337,9 +337,11 @@ sub create_or_modify {
     my @current_disks = $disk_define_rs->search({ vps_uuid => $uuid });
 
     my $storage_uuid;
+    my $driver;
     {
       no strict 'refs';
       $storage_uuid = $vps_params->{storage_uuid};
+      $driver       = $options->{driver} || "virtio";
     }
     my $current_disk_number = @current_disks + 1;
     @disk_args_refs = $self->create_disk_param_array( $vps_params->{disk},
@@ -348,6 +350,7 @@ sub create_or_modify {
                                                        uuid         => $uuid,
                                                        number       => $current_disk_number,
                                                        storage_uuid => $storage_uuid,
+                                                       driver       => $driver,
                                                      }
                                                     );
   }
@@ -514,13 +517,8 @@ sub record_cloning {
 
     local $@;
     eval {
-      warn Dumper \%param;
-      my ($created) = $vps_define_rs->create( \%param );
+      $vps_define_rs->create( \%param );
 
-      if (! $created) {
-        warn   "create error";
-        return "create error";
-      }
     };
 
     if ($@) {
@@ -563,11 +561,8 @@ sub record_cloning {
 
         local $@;
         eval {
-          my ($created) = $disk_define_rs->create( \%param );
+          $disk_define_rs->create( \%param );
 
-          if (! $created) {
-            croak "disk create error";
-          }
         };
 
         if ($@) {
@@ -616,11 +611,7 @@ sub record_cloning {
 
         local $@;
         eval {
-          my ($created) = $iface_define_rs->create( \%param );
-
-          if (! $created) {
-            croak "interface create error";
-          }
+          $iface_define_rs->create( \%param );
         };
 
         if ($@) {

@@ -116,6 +116,7 @@ sub set_tmp_active_vps {
     $vps_rs->create({ uuid => $uuid, state => 0, });
   };
   if ($@) {
+    logger 'info', $@;
     return 0;
   } else {
     return 1;
