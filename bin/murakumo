@@ -18,26 +18,27 @@ our $base_url = exists $ENV{MURAKUMO_API_URI}
               ? $ENV{MURAKUMO_API_URI}
               : 'http://127.0.0.1:3000/';
 
-opts my $name         => 'Str',
-     my $org          => 'Str',
-     my $uuid         => 'Str',
-     my $project_id   => 'Str',
-     my $cpu_number   => 'Int',
-     my $memory       => 'Int',
-     my $set_network  => 'Bool',
-     my $no_virtio    => 'Bool',
-     my $storage_uuid => 'Str',
-     my $assign_ip    => 'Bool',
-     my $clock        => 'Str',
-     my $verbose      => 'Bool',
-     my $ip           => 'Str',
-     my $disk         => 'Str',
-     my $api_key      => 'Str',
-     my $vlan_id      => 'Str',
-     my $vnc_password => 'Str',
-     my $cdrom        => 'Str',
-     my $dst_node     => 'Str',
-     my $node         => 'Str';
+opts my $name          => 'Str',
+     my $org           => 'Str',
+     my $uuid          => 'Str',
+     my $project_id    => 'Str',
+     my $cpu_number    => 'Int',
+     my $memory        => 'Int',
+     my $set_network   => 'Bool',
+     my $no_virtio     => 'Bool',
+     my $storage_uuid  => 'Str',
+     my $assign_ip     => 'Bool',
+     my $clock         => 'Str',
+     my $verbose       => 'Bool',
+     my $ip            => 'Str',
+     my $disk          => 'Str',
+     my $api_key       => 'Str',
+     my $vlan_id       => 'Str',
+     my $vnc_password  => 'Str',
+     my $cdrom         => 'Str',
+     my $clean_traffic => 'Bool',
+     my $dst_node      => 'Str',
+     my $node          => 'Str';
 
 our $debug = exists $ENV{DEBUG};
 
@@ -279,7 +280,13 @@ sub vps_boot_by_uuid {
   my $set_node = defined $node
                ? $node
                : "";
-  my $response = _www_json_post( $uri, { node => $set_node, uuid => $uuid } );
+  my $response = _www_json_post(
+                                 $uri, {
+                                         node => $set_node, 
+                                         uuid => $uuid, 
+                                         clean_traffic => $clean_traffic || 0,
+                                       }
+                                );
 
   return $response->content;
 }
