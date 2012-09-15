@@ -310,7 +310,6 @@ sub create_or_modify {
   no strict 'refs';
   my $vps_spec = $vps_params->{spec};
 
-  warn "mode: ", Dumper $options;
   if ($options->{mode} eq 'create') {
     my ($is_named_vps) = $vps_define_rs->search({
                                                   project_id => $project_id, 

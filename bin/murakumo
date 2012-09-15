@@ -293,9 +293,7 @@ sub vps_boot_by_uuid {
 
 sub vps_shutdown {
   my $uri = _create_uri( "/$project_id/vps/shutdown/$uuid/" );
-  my %param = (
-    project_id => $project_id,
-  );
+  my %param = ();
    
   my $response = _www_json_post( $uri, \%param );
 
@@ -305,10 +303,8 @@ sub vps_shutdown {
 
 sub vps_terminate {
   my $uri = _create_uri( "/$project_id/vps/terminate/$uuid/" );
-  my %param = (
-    project_id => $project_id,
-  );
-   
+  my %param = (); 
+
   my $response = _www_json_post( $uri, \%param );
 
   return $response->content;
