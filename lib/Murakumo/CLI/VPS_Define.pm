@@ -302,6 +302,25 @@ sub create_or_modify {
     warn "-----------------------------------------------";
   }
 
+  my $iface_define_rs = $self->schema->resultset('InterfaceDefine');
+  my $disk_define_rs  = $self->schema->resultset('DiskDefine');
+  my $vps_define_rs   = $self->schema->resultset('VpsDefine');
+  my $ip_rs           = $self->schema->resultset('Ip');
+
+  no strict 'refs';
+  my $vps_spec = $vps_params->{spec};
+
+  warn "mode: ", Dumper $options;
+  if ($options->{mode} eq 'create') {
+    my ($is_named_vps) = $vps_define_rs->search({
+                                                  project_id => $project_id, 
+                                                  name       => $vps_spec->{name},
+                                                });
+    if ($is_named_vps) {
+      croak "*** $vps_spec->{name}\@$project_id is already exist";
+    }
+  }
+
   # 引数
   # create_or_modify( プロジェクトID(ex: 111),
   #                   vpsのuuid(ex: cd9b431b-a612-4685-bb97-c44a07072382),
@@ -312,8 +331,6 @@ sub create_or_modify {
   #                     disk       => disk      の array ref,
   #                   },
   #                  );
-
-  my $vps_spec = $vps_params->{spec};
 
   my @iface_args_refs = exists $vps_params->{interface} 
                       ? @{$vps_params->{interface}}
@@ -327,11 +344,6 @@ sub create_or_modify {
     $vps_spec->{uuid} = $uuid;
   }
 
-  my $iface_define_rs = $self->schema->resultset('InterfaceDefine');
-  my $disk_define_rs  = $self->schema->resultset('DiskDefine');
-  my $vps_define_rs   = $self->schema->resultset('VpsDefine');
-  my $ip_rs           = $self->schema->resultset('Ip');
-
   my @disk_args_refs;
   if (exists $vps_params->{disk}) {
     my @current_disks = $disk_define_rs->search({ vps_uuid => $uuid });
@@ -339,7 +351,6 @@ sub create_or_modify {
     my $storage_uuid;
     my $driver;
     {
-      no strict 'refs';
       $storage_uuid = $vps_params->{storage_uuid};
       $driver       = $options->{driver} || "virtio";
     }
@@ -366,9 +377,8 @@ sub create_or_modify {
     # できれば mysqlの日付型に自動変換
     my $now = DateTime->now(time_zone => 'Asia/Tokyo');
 
-    my ($is_vps_exists) = $vps_define_rs->search({ uuid => $uuid });
-   
-    no strict 'refs';
+    my ($is_vps_exists) = $vps_define_rs->search({ uuid => $uuid, project_id => $project_id });
+
     my $seq = 0;
     if ( @disk_args_refs > 0) {
       # vpsに関連付けられた既存のdiskのレコードを削除
@@ -443,6 +453,7 @@ sub create_or_modify {
   return 1;
 }
 
+
 # vps一覧 => list()
 sub list_from_db {
   my ($self, $project_id) = @_;
@@ -464,6 +475,7 @@ sub list_from_db {
   }
   return \@vpses;
 }
+
 
 sub record_cloning {
   my ( $self, $src_uuid, $args_ref, $opt_args_ref ) = @_;
