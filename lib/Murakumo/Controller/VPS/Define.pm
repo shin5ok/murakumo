@@ -268,7 +268,8 @@ sub create_or_modify: Private {
       $c->detach( '/stop_error', [ "*** vps $uuid is not found..." ] );
     }
 
-  } else {
+  }
+  elsif ($mode eq 'create') {
 
     # create で uuidが指定されなかったら自動生成
     if (! $uuid) {
@@ -279,6 +280,10 @@ sub create_or_modify: Private {
     # create の場合、name が指定されていなかったら、uuidを入れる
     defined $vps_params->{spec}->{name}
       or $vps_params->{spec}->{name} = $uuid;
+
+
+  } else {
+    $c->detach('/stop_error', ["mode: $mode is error"]);
 
   }
 
@@ -294,6 +299,8 @@ sub create_or_modify: Private {
     my $options = {};
     exists $params->{driver} and
       $options->{driver} = $params->{driver};
+
+    $options->{mode} = $mode;
 
     if ( $vps_define_model->create_or_modify($project_id, $uuid, $vps_params, $options) ) {
 
