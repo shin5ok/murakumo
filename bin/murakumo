@@ -349,7 +349,7 @@ sub _vps_define_create_or_modify {
       }
 
       my $interface = +{ 
-                          driver  => "virtio",
+                          driver  => $no_virtio ? "e1000" : "virtio",
                           vlan_id => $vlan_number,
                        };
       if ($ip) {

@@ -342,12 +342,9 @@ sub create_or_modify: Private {
               $to_params->{reserve_uuid} = $reserve_uuid;
 
             }
-
           }
-
         }
-
-       }
+      }
      
      } else {
        $c->detach("/stop_error", ["vps define create error project: $project_id, uuid: $uuid"] );
