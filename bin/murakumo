@@ -559,12 +559,15 @@ sub _www_json_post {
   $request->content( encode_json $params );
 
   if ($debug) {
-    local $Data::Dumper::Terse = 1;
+
+    my $json = JSON->new->allow_nonref;
+    my $json_params = $json->pretty->encode( $params );
+
     printf "+--- request debug -----------------------------------------------------------------------------------------------+\n";
     printf "method      : POST" . "\n";
     printf "uri         : %s\n", $uri; 
     printf "params(json):\n";
-    printf "%s", Dumper $params;
+    printf "%s", $json_params;
     printf "+-----------------------------------------------------------------------------------------------------------------+\n";
   }
 
