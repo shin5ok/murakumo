@@ -250,8 +250,8 @@ sub vps_clone {
   my $uri   = _create_uri( "/$project_id/vps/define/clone/$uuid/" );
   # my $uri   = _create_uri( '/node/job/vps/clone/' );
   my %param = (
-    # uuid       => $uuid,
-    vlan_id    => $vlan_id,
+    vlan_id      => $vlan_id,
+    storage_uuid => $storage_uuid,
   );
 
   $assign_ip and
@@ -575,6 +575,8 @@ sub _www_json_post {
 }
 
 __END__
+
+
 
 
 
