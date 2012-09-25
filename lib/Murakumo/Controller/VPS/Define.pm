@@ -96,6 +96,8 @@ sub clone :Private {
                ? $params->{name}
                : $dst_uuid;
 
+  my $storage_uuid = $params->{storage_uuid};
+
   my $r;
   local $@;
   eval {
@@ -108,7 +110,10 @@ sub clone :Private {
                                                      name            => $dst_name,
                                                      instance_status => undef,
                                                     },
-                                                    { vlan_id => $vlan_id },
+                                                    {
+                                                      vlan_id      => $vlan_id,
+                                                      storage_uuid => $storage_uuid,
+                                                    },
                                       );
   };
 

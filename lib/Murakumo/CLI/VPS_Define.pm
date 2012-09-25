@@ -491,7 +491,6 @@ sub record_cloning {
     warn Dumper $args_ref;
   }
 
-  my $uuid = $args_ref->{uuid};
   my $project_id;
   my $param_ref;
 
@@ -500,8 +499,11 @@ sub record_cloning {
   my $now = $utils->now;
   my $txn = $self->schema->txn_scope_guard;
 
+  my ($uuid, $storage_uuid);
   {
     no strict 'refs';
+    $uuid         = $args_ref->{uuid};
+    $storage_uuid = $opt_args_ref->{storage_uuid};
 
     $project_id = $args_ref->{project_id} || $org_info->{project_id};
 
@@ -549,9 +551,10 @@ sub record_cloning {
 
         my $dst_image = $self->create_disk_param_array( 0,  # 名前だけがほしいので、サイズは 0
                                                        {
-                                                         number     => $number,
-                                                         project_id => $project_id,
-                                                         uuid       => $uuid,
+                                                         number       => $number,
+                                                         project_id   => $project_id,
+                                                         uuid         => $uuid,
+                                                         storage_uuid => $storage_uuid,
                                                        },
                                                       );
 
