@@ -201,10 +201,6 @@ sub vps_list {
   my $uri = _create_uri( "/$project_id/vps/list/" );
 
   my %param_hash;
-  # $verbose
-  #   and $param_hash{'verbose'} = 1;
-
-  # $uri->query_form( %param_hash );
 
   my $response = _www_get( $uri );
   my $data = decode_json $response->content;
@@ -228,14 +224,28 @@ sub vps_list {
 }
 
 sub vps_define_list {
+
+  my ($cols, $vps_rows) = vps_list();
+  my %vps_status = map { $_->[1] => $_->[2] } @$vps_rows;
+
   my $uri = _create_uri( "/$project_id/vps/define/list/" );
 
   my $response = _www_get( $uri );
   my $data = decode_json $response->content;
 
-  my @cols = ('name','uuid', 'cpu_number','memory', 'update_time', 'regist_time');
+  no strict 'refs';
+
+  my @cols = ('name','uuid', 'boot_node', 'cpu_number','memory', 'update_time', 'regist_time');
   my @rows;
-  for my $x ( @{$data->{list}} ) {
+  my @lists = map { 
+                $_->{boot_node} = exists $vps_status{$_->{uuid}}
+                            ? $vps_status{$_->{uuid}}
+                            : qq{};
+                $_;
+
+              } @{$data->{list}};
+  
+  for my $x ( @lists ) {
     my @p;
 
     push @p, $x->{$_} for ( @cols );

@@ -208,7 +208,7 @@ sub commit :Local {
       $c->stash->{message} = sprintf "vps define clone() miss (%s)", Dumper $params;
       $@ and $c->stash->{message} .= " eval error $@";
 
-      $c->stath->warn( $c->stash->{message} );
+      $c->log->warn( $c->stash->{message} );
 
       # 本当は、IPのmodelに切り出して、forwardした方がきれいかも
 
