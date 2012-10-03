@@ -207,6 +207,78 @@ sub release_ip {
   $txn->commit;
 }
 
+
+sub list_count {
+  my ($self) = @_;
+
+  my $list_ref = $self->list;
+
+  no strict 'refs';
+  my %count;
+  for my $vlan_id ( keys %$list_ref ) {
+
+    for my $v ( @{$list_ref->{$vlan_id}} ) {
+
+      $count{$vlan_id}->{total}++;
+
+      exists $count{$vlan_id}->{used}
+        or $count{$vlan_id}->{used} = 0;
+
+      exists $count{$vlan_id}->{free}
+        or $count{$vlan_id}->{free} = 0;
+
+      exists $count{$vlan_id}->{network}
+        or $count{$vlan_id}->{network} = $v->{network};
+
+      exists $count{$vlan_id}->{netmask}
+        or $count{$vlan_id}->{netmask} = $v->{netmask};
+
+      if ($v->{used}) {
+        $count{$vlan_id}->{used}++;
+
+      } else {
+        $count{$vlan_id}->{free}++;
+
+      }
+    }
+  }
+
+  return \%count;
+
+}
+
+
+sub list {
+  my ($self, $query) = @_;
+  # { network => $network }
+  # または
+  # { vlan_id => $vlan_id }
+
+  my $resultset = $self->schema->resultset('Ip');
+  my @ips       = $resultset->search( $query );
+
+  my %hash;
+  for my $ip ( @ips ) {
+    my $vlan_id = $ip->vlan_id;
+    
+    if (! exists $hash{$vlan_id}) {
+      $hash{$vlan_id} = [];
+    }
+
+    push @{$hash{$vlan_id}}, {
+                               network => $ip->network,
+                               ip      => $ip->ip,
+                               netmask => $ip->mask,
+                               gw      => $ip->gw,
+                               used    => $ip->used_vps_uuid || undef,
+                             };
+
+  }
+
+  return \%hash;
+
+}
+
 1;
 __END__
 +---------------+--------------+------+-----+-------------------+-----------------------------+

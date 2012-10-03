@@ -235,12 +235,12 @@ sub vps_define_list {
 
   no strict 'refs';
 
-  my @cols = ('name','uuid', 'boot_node', 'cpu_number','memory', 'update_time', 'regist_time');
+  my @cols = ('name', 'uuid', 'current_node', 'cpu_number', 'memory', 'update_time', 'regist_time');
   my @rows;
   my @lists = map { 
-                $_->{boot_node} = exists $vps_status{$_->{uuid}}
-                            ? $vps_status{$_->{uuid}}
-                            : qq{};
+                $_->{current_node} = exists $vps_status{$_->{uuid}}
+                                   ? $vps_status{$_->{uuid}}
+                                   : qq{};
                 $_;
 
               } @{$data->{list}};
@@ -509,6 +509,36 @@ sub storage_list {
     push @p, $x->{$_} for ( @cols );
     push @rows, \@p;
 
+  }
+
+  return (\@cols, \@rows);
+
+}
+
+sub network_list {
+  my $uri = _create_uri( "/$project_id/ip/list_count/" );
+
+  my $response = _www_get( $uri );
+
+  my $data = decode_json $response->content;
+
+  my @cols          = qw( vlan_id network netmask total used free used_rate );
+  my @cols_for_rows = @cols[1 .. $#cols - 1];
+
+  my $list = $data->{list};
+  my @rows;
+  for my $x ( keys %$list ) {
+    my $vlan_list = $list->{$x};
+
+    my @p = ( $x );
+
+    for my $name ( @cols_for_rows ) {
+      push @p, $vlan_list->{$name};
+    }
+    my $used_rate = sprintf "%d %%", $vlan_list->{used} / $vlan_list->{total} * 100;
+    push @p, $used_rate;
+
+    push @rows, \@p;
   }
 
   return (\@cols, \@rows);
