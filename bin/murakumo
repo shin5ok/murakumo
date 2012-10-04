@@ -527,7 +527,7 @@ sub network_list {
 
   my $list = $data->{list};
   my @rows;
-  for my $x ( keys %$list ) {
+  for my $x ( sort { $a cmp $b } keys %$list ) {
     my $vlan_list = $list->{$x};
 
     my @p = ( $x );

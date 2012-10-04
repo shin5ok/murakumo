@@ -265,12 +265,16 @@ sub list {
       $hash{$vlan_id} = [];
     }
 
+    my $used = $ip->used_vps_uuid or $ip->reserve_uuid
+             ? 1
+             : 0;
+
     push @{$hash{$vlan_id}}, {
                                network => $ip->network,
                                ip      => $ip->ip,
                                netmask => $ip->mask,
                                gw      => $ip->gw,
-                               used    => $ip->used_vps_uuid || undef,
+                               used    => $used,
                              };
 
   }
