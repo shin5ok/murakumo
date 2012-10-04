@@ -68,11 +68,15 @@ sub auto :Private {
 
   if ( $admin_api_key ) {
 
+    my $project_id = shift @args;
+
     if (! $admin_model->is_admin_access( $admin_api_key, $c->request ) ) {
       $c->response->body( 'forbidden' );
       $c->response->status( 403 );
       $c->log->warn( "error forbidden" );
       return 0;
+    } else {
+      $c->stash->{project_id} = $project_id;
     }
 
   }
