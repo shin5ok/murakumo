@@ -25,10 +25,14 @@ use JSON;
 use DateTime;
 use Data::Dumper;
 
-sub index :Path :Args(0) {
-    my ( $self, $c ) = @_;
-
-    $c->response->body('Matched Murakumo::Controller::VPS in VPS.');
+sub default :Path {
+  my ($self, $c, @args) = @_;
+  if (@args > 0) {
+    $c->go( join "/", @args );
+  }
+  if ($c->request->method eq 'GET' ) {
+    goto \&list;
+  }
 }
 
 sub list :Private {
@@ -54,7 +58,7 @@ sub list :Private {
   }
 
   my $vpses_ref         = $vps_model->list( $project_id, $time_until );
-  $c->stash->{vps_list} = $vpses_ref;
+  $c->stash->{list} = $vpses_ref;
   $c->stash->{result}   = 1;
 
 }
