@@ -36,6 +36,7 @@ opts my $name          => 'Str',
      my $vlan_id       => 'Str',
      my $vnc_password  => 'Str',
      my $cdrom         => 'Str',
+     my $tag           => 'Str',
      my $clean_traffic => 'Bool',
      my $dst_node      => 'Str',
      my $node          => 'Str';
@@ -126,7 +127,7 @@ sub vps_define_info {
   my @cols = qw( param_name value );
 
   my @rows;
-  my @param_names = qw( project_id uuid name cpu_number memory clock cdrom_path vnc_password );
+  my @param_names = qw( project_id uuid name tag cpu_number memory clock cdrom_path vnc_password );
   for my $param_name ( @param_names ) {
 
     my $value = $info->{$param_name};
@@ -186,7 +187,6 @@ sub vps_cdrom {
 
   my %param = (
     cdrom_path => $cdrom,
-    project_id => $project_id,
     uuid       => $uuid,
   );
 
@@ -207,7 +207,7 @@ sub vps_list {
 
   my @cols = ('name','uuid','node', 'vnc_port', 'cpu','memory', 'update_time', 'state', );
   my @rows;
-  for my $x ( @{$data->{vps_list}} ) {
+  for my $x ( @{$data->{list}} ) {
     my @p;
 
     push @p, $x->{$_} for ( @cols );
@@ -229,6 +229,12 @@ sub vps_define_list {
   my %vps_status = map { $_->[1] => $_->[2] } @$vps_rows;
 
   my $uri = _create_uri( "/$project_id/vps/define/list/" );
+  if(defined $tag) {
+    my %hash = $uri->query_form;
+    $hash{tag} = $tag;
+    $uri->query_form( %hash );
+
+  }
 
   my $response = _www_get( $uri );
   my $data = decode_json $response->content;
@@ -371,10 +377,7 @@ sub _vps_define_create_or_modify {
 
   }
 
-  my $vps = +{
-    # uuid       => $uuid,
-    project_id => $project_id,
-  };
+  my $vps = +{};
 
   defined $name
     and $vps->{name}         = $name;
@@ -388,10 +391,10 @@ sub _vps_define_create_or_modify {
     and $vps->{cdrom_path}   = $cdrom || "";
   defined $vnc_password
     and $vps->{vnc_password} = $vnc_password;
+  defined $tag
+    and $vps->{tag}          = $tag;
 
   my $vps_params = {
-     # uuid         => $uuid,
-     # project_id   => $project_id,
      spec         => $vps,
      disk         => \@disks,
      interface    => \@interfaces,
@@ -405,8 +408,6 @@ sub _vps_define_create_or_modify {
 
   my $params_all = {
                      vps        => $vps_params,
-                     project_id => $project_id,
-                     # uuid       => $uuid,
                      assign_ip  => $assign_ip,
                      vlan_id    => $vlan_id,
                      driver     => $no_virtio ? "ide" : "virtio",
@@ -418,6 +419,7 @@ sub _vps_define_create_or_modify {
 }
 
 sub vps_define_remove {
+                     # uuid       => $uuid,
   my $uri = _create_uri( "/$project_id/vps/define/remove/$uuid/" );
   my $response = _www_json_post( $uri );
 

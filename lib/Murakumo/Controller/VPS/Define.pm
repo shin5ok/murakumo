@@ -27,6 +27,16 @@ use Data::Dumper;
 use Path::Class;
 use Murakumo::CLI::Utils;
 
+sub default :Path {
+  my ($self, $c, @args) = @_;
+  if (@args > 0) {
+    $c->go( join "/", @args );
+  }
+  if ($c->request->method eq 'GET' ) {
+    goto \&list;
+  }
+}
+
 sub list :Private {
   my ($self, $c) = @_;
 
@@ -35,8 +45,10 @@ sub list :Private {
     $c->detach("/stop_error", ["project_id is empty"]);
   }
 
+  my $tag             = $c->request->query_params->{tag} || '';
   my $define_model    = $c->model('VPS_Define');
-  $c->stash->{list}   = $define_model->list( $project_id );
+  $c->stash->{list}   = $define_model->list( $project_id, $tag );
+  $c->stash->{tag}    = $tag;
   $c->stash->{result} = 1;
 
 }

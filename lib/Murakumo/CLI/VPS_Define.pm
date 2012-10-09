@@ -8,6 +8,7 @@ use XML::TreePP;
 use DateTime;
 use Carp;
 use Path::Class;
+use URI::Escape;
 
 use FindBin;
 use lib qq{$FindBin::Bin/../lib};
@@ -65,6 +66,7 @@ sub info {
       cdrom_path   => $vps_r->cdrom_path,
       project_id   => $vps_r->project_id,
       vnc_password => $vps_r->vnc_password,
+      tag          => $vps_r->tag || q{},
     };
 
     my %ips;
@@ -455,12 +457,15 @@ sub create_or_modify {
 
 # vps一覧 => list()
 sub list_from_db {
-  my ($self, $project_id) = @_;
+  my ($self, $project_id, $tag) = @_;
   if (! defined $project_id) {
     croak "project_id parameter must be specified...";
   }
   my $resultset = $self->schema->resultset('VpsDefine');
-  my $rs = $resultset->search( { project_id => $project_id, ready => 1, }, { order_by => 'regist_time' } );
+  my $query = { project_id => $project_id, ready => 1, };
+  $tag and $query->{tag} = uri_unescape $tag;
+
+  my $rs = $resultset->search( $query, { order_by => 'regist_time' } );
   my @vpses;
   while (my $x = $rs->next) {
     push @vpses, {
