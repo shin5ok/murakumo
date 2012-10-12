@@ -75,6 +75,59 @@ sub reserve_ip {
 
 }
 
+
+sub get_assign_ip {
+  my ($self, $vlan_id, $vps_uuid) = @_;
+
+  my $resultset = $self->schema->resultset('Ip');
+  my @ips = $resultset->search( {
+                                  used_vps_uuid => $vps_uuid,
+                                  vlan_id       => $vlan_id,
+                                } );
+  
+  no strict 'refs';
+  my @result_ips;
+  my $primary_ip;
+  for my $ip ( @ips ) {
+    my $x = +{ $ip->get_columns };
+    if (not $x->{secondary}) {
+      $primary_ip = $x;
+    } else {
+      push @result_ips, $x;
+
+    }
+
+  }
+
+  $primary_ip
+    or croak "*** primary ip is not found";
+
+  unshift @result_ips, $primary_ip;
+  warn Dumper \@result_ips;
+  return \@result_ips;
+  
+}
+
+
+sub add_ip {
+  my ($self, $vlan_id, $vps_uuid, $number) = @_;
+  $number ||= 1;
+
+  if (! $self->get_assign_ip($vlan_id, $vps_uuid)) {
+    croak "*** $vlan_id for $vps_uuid assign primary ip is not found";
+
+  }
+
+  while ($number--) {
+    my $rs = $self->get_free_ip_object({ vlan_id => $vlan_id });
+    $rs->update({ used_vps_uuid => $vps_uuid, secondary => 1 });
+
+  }
+  return 1;
+
+}
+
+
 # 指定したvlanで、空いているip の ResultSet オブジェクトを返す
 sub get_free_ip_object {
   my ($self, $params) = @_;
@@ -150,6 +203,7 @@ sub commit_assign_ip {
   return 1;
 
 }
+
 
 # 予約したip をジョブ失敗等のために キャンセルします
 sub cancel_reserve_ip {

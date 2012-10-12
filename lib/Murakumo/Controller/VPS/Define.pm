@@ -516,7 +516,7 @@ sub info :Private {
     $c->detach("/stop_error", ["project_id is empty"]);
   }
 
-  my $params     = $c->request->query_params;
+  my $params = $c->request->query_params;
   my $uuid   = $c->stash->{uuid};
 
   my $define_model = $c->model('VPS_Define');
@@ -532,6 +532,37 @@ sub info :Private {
   }
 
 }
+
+
+sub add_ip :Private {
+  my ($self, $c) = @_;
+
+  my $body   = $c->request->body;
+  my $params = decode_json <$body>;
+
+  my $uuid       = $c->stash->{uuid};
+  my $project_id = $c->stash->{project_id};
+
+  if (! $project_id) {
+    $c->detach("/stop_error", ["project_id is empty"]);
+  }
+
+  no strict 'refs';
+  my $vlan_ids      = $params->{vlan_id};
+  my $add_ip_number = $params->{add_ip_number} || 1;
+
+  my $ip_model = $c->model('IP');
+
+  for my $vlan_id ( split /,/, $vlan_ids ) {
+    $ip_model->add_ip( $vlan_id, $uuid, $add_ip_number );
+
+  }
+
+  $c->stash->{result} = 1;
+
+
+}
+
 
 sub auto :Private {
   my ($self, $c) = @_;
