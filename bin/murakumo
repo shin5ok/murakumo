@@ -33,6 +33,7 @@ opts my $name          => 'Str',
      my $ip            => 'Str',
      my $disk          => 'Str',
      my $api_key       => 'Str',
+     my $secondary_ip  => 'Bool',
      my $vlan_id       => 'Str',
      my $vnc_password  => 'Str',
      my $cdrom         => 'Str',
@@ -145,7 +146,7 @@ sub vps_define_info {
     my $string = "";
     for my $name ( qw( image_path driver size ) ) {
       if (exists $disk->{$name}) {
-        $string .= sprintf "%-10s:%s\n", $name, $disk->{$name};
+        $string .= sprintf "%-16s:%s\n", $name, $disk->{$name};
       }
     }
     push @rows, [
@@ -163,10 +164,16 @@ sub vps_define_info {
       if (exists $iface->{$name}) {
         if ($name eq 'ip') {
           for my $ip_param ( keys %{$iface->{ip}}) {
-            $string .= sprintf "%-10s:%s\n", $ip_param, $iface->{ip}->{$ip_param};
+            my $p = $iface->{ip}->{$ip_param};
+
+            if (ref $p eq 'ARRAY') {
+              $p = join ", ", @$p;
+            }
+            $string .= sprintf "%-16s:%s\n", $ip_param, $p;
           }
+
         } else {
-          $string .= sprintf "%-10s:%s\n", $name, $iface->{$name};
+          $string .= sprintf "%-16s:%s\n", $name, $iface->{$name};
         }
       }
     }
@@ -407,10 +414,11 @@ sub _vps_define_create_or_modify {
   my $uri = _create_uri( $request_uri );
 
   my $params_all = {
-                     vps        => $vps_params,
-                     assign_ip  => $assign_ip,
-                     vlan_id    => $vlan_id,
-                     driver     => $no_virtio ? "ide" : "virtio",
+                     vps          => $vps_params,
+                     assign_ip    => $assign_ip,
+                     vlan_id      => $vlan_id,
+                     driver       => $no_virtio ? "ide" : "virtio",
+                     
                    };
   my $response = _www_json_post( $uri, $params_all );
 
@@ -480,7 +488,7 @@ sub job_list {
   my @cols = qw(job_uuid result message update_time request_job);
 
   my @rows;
-  for my $x ( @{$data->{job_list}} ) {
+  for my $x ( @{$data->{list}} ) {
     my @p;
 
     push @p, $x->{$_} for ( @cols );

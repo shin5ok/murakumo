@@ -37,6 +37,20 @@ sub default :Path {
   }
 }
 
+sub tag_list :Private {
+  my ($self, $c) = @_;
+
+  my $project_id = $c->stash->{project_id};
+  if (! $project_id) {
+    $c->detach("/stop_error", ["project_id is empty"]);
+  }
+
+  my $define_model    = $c->model('VPS_Define');
+  $c->stash->{list}   = $define_model->tag_list( $project_id );
+  $c->stash->{result} = 1;
+
+}
+
 sub list :Private {
   my ($self, $c) = @_;
 
@@ -334,6 +348,7 @@ sub create_or_modify: Private {
 
         $reserve_uuid = $utils->create_uuid;
         my @vlan_ids = split /,/, $params->{vlan_id};
+
         for my $vlan_id ( @vlan_ids ) {
           my @ip_params = $ip_model->reserve_ip( {
                                                    reserve_uuid  => $reserve_uuid,

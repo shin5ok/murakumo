@@ -75,8 +75,8 @@ sub list :Local {
 
   no strict 'refs';
   if ($job_ref) {
-    $c->stash->{result}   = 1; 
-    $c->stash->{job_list} = $job_ref;
+    $c->stash->{result} = 1; 
+    $c->stash->{list}   = $job_ref;
 
   } else {
     $c->stash->{result}   = 0; 

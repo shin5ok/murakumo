@@ -131,14 +131,13 @@ sub commit_assign_ip {
   my $update_param_ref = {
                            used_vps_uuid => $vps_uuid,
                            reserve_uuid  => undef,
+                           secondary     => $param_ref->{secondary} ? 1 : 0,
                          };
 
   my $resultset = $self->schema->resultset('Ip');
   my $updated;
   local $@;
   eval {
-    local $ENV{DBIC_TRACE} = 1;
-    warn Dumper $update_param_ref;
     my $rs = $resultset->search( { reserve_uuid => $reserve_uuid } );
     $updated = $rs->update( $update_param_ref );
   };
@@ -284,18 +283,3 @@ sub list {
 }
 
 1;
-__END__
-+---------------+--------------+------+-----+-------------------+-----------------------------+
-| Field         | Type         | Null | Key | Default           | Extra                       |
-+---------------+--------------+------+-----+-------------------+-----------------------------+
-| id            | mediumint(9) | NO   | PRI | NULL              | auto_increment              |
-| network       | varchar(32)  | YES  |     | NULL              |                             |
-| ip            | varchar(16)  | NO   |     |                   |                             |
-| used_vps_uuid | varchar(48)  | YES  |     | NULL              |                             |
-| start_time    | time         | YES  |     | NULL              |                             |
-| end_time      | time         | YES  |     | NULL              |                             |
-| enable        | tinyint(1)   | YES  |     | NULL              |                             |
-| update_time   | timestamp    | NO   |     | CURRENT_TIMESTAMP | on update CURRENT_TIMESTAMP |
-+---------------+--------------+------+-----+-------------------+-----------------------------+
-
-

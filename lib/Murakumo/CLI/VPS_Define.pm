@@ -70,15 +70,35 @@ sub info {
     };
 
     my %ips;
+    my %secondary_ips;
     for my $ip_r ( @ip_rs_rs ) {
-      # 同じvlanに複数ある場合は上書きされて、新しいものが優先される
-      my $x = {
-        ip      => $ip_r->ip,
-        mask    => $ip_r->mask,
-        gw      => $ip_r->gw,
-      };
       my $vlan_id = $ip_r->vlan_id;
+
+      if ($ip_r->secondary) {
+
+        if (not exists $secondary_ips{$vlan_id}) {
+          $secondary_ips{$vlan_id} = [];
+        }
+
+        push @{$secondary_ips{$vlan_id}}, $ip_r->ip;
+        next;
+      }
+
+      my $x = {
+        ip   => $ip_r->ip,
+        mask => $ip_r->mask,
+        gw   => $ip_r->gw,
+      };
       $ips{$vlan_id} = $x;
+
+    }
+
+    for my $vlan_id (keys %secondary_ips) {
+
+      if (exists $ips{$vlan_id}) {
+        $ips{$vlan_id}->{secondary_ip} = $secondary_ips{$vlan_id};
+      }
+
     }
 
     my @iface_results;
@@ -122,14 +142,6 @@ sub info {
   }
 
   return $r;
-
-}
-
-sub get_define_json2 {
-  my ($self, $uuid) = @_;
-  my $ref = $self->info( $uuid );
-
-  encode_json { root => $ref };
 
 }
 
@@ -475,11 +487,25 @@ sub list_from_db {
                    cpu_number         => $x->cpu_number,
                    update_time        => $x->update_time,
                    regist_time        => $x->regist_time,
+                   tag                => $x->tag || qq{},
                  };
   }
   return \@vpses;
 }
 
+
+sub tag_list {
+  my ($self, $project_id) = @_;
+  my $vps_ref = $self->list( $project_id );
+
+  no strict 'refs';
+  my %tag = map { $_->{tag} => 1 }
+            grep { $_->{tag} }
+            @$vps_ref;
+
+  [ keys %tag ];
+
+}
 
 sub record_cloning {
   my ( $self, $src_uuid, $args_ref, $opt_args_ref ) = @_;
