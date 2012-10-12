@@ -33,7 +33,7 @@ opts my $name          => 'Str',
      my $ip            => 'Str',
      my $disk          => 'Str',
      my $api_key       => 'Str',
-     my $secondary_ip  => 'Bool',
+     my $add_ip        => 'Int',
      my $vlan_id       => 'Str',
      my $vnc_password  => 'Str',
      my $cdrom         => 'Str',
@@ -452,6 +452,15 @@ sub vps_migration {
 sub vps_boot_cleanup {
   my $uri = _create_uri( "/$project_id/vps/boot_tmp_cleanup/$uuid/" );
   my $response = _www_json_post( $uri, {} );
+  return $response->content;
+
+}
+
+sub vps_add_ip {
+  my $uri    = _create_uri( "/$project_id/vps/define/add_ip/$uuid/" );
+  my $number = $add_ip || 1;
+
+  my $response = _www_json_post( $uri, { vlan_id => $vlan_id, add_ip_number => $number } );
   return $response->content;
 
 }
