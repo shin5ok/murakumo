@@ -142,6 +142,10 @@ sub vps_define_info {
       $value = '**********';
     }
 
+    if ($param_name eq 'extra_info') {
+      $value = uri_unescape $info->{$param_name};
+    }
+
     push @rows, [ $param_name, $value ];
 
   }
@@ -406,7 +410,7 @@ sub _vps_define_create_or_modify {
   defined $tag
     and $vps->{tag}          = $tag;
   defined $extra_info
-    and $vps->{extra_info}   = $extra_info;
+    and $vps->{extra_info}   = uri_escape $extra_info;
 
   my $vps_params = {
      spec         => $vps,
