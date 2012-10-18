@@ -80,9 +80,36 @@ sub list :Local {
 
   } else {
     $c->stash->{result}   = 0; 
-    $c->stash->{message}  = 'job result failure';
+    $c->stash->{message}  = 'get error for job result';
   }
   
+}
+
+sub result :Local {
+  my ($self, $c) = @_;
+
+  no strict 'refs';
+  # GET
+  my $project_id = $c->stash->{project_id};
+  my $job_uuid   = $c->stash->{uuid};
+
+  if (! $job_uuid) {
+    $c->detach('/stop_error', ["job uuid is empty"]);
+  }
+
+  my $model   = $c->model('Job');
+  my $job_ref = $model->get_status( $project_id, $job_uuid );
+
+  no strict 'refs';
+  if ($job_ref) {
+    $c->stash->{result}     = 1;
+    $c->stash->{job_status} = { uuid => $job_uuid, result => $job_ref->[0]->{result} + 0 };
+
+  } else {
+    $c->stash->{result}   = 0; 
+    $c->stash->{message}  = 'get error for job result';
+  }
+
 }
 
 
