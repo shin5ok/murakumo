@@ -40,6 +40,7 @@ opts my $name          => 'Str',
      my $tag           => 'Str',
      my $clean_traffic => 'Bool',
      my $dst_node      => 'Str',
+     my $extra_info    => 'Str',
      my $node          => 'Str';
 
 our $debug = exists $ENV{DEBUG};
@@ -128,7 +129,11 @@ sub vps_define_info {
   my @cols = qw( param_name value );
 
   my @rows;
-  my @param_names = qw( project_id uuid name tag cpu_number memory clock cdrom_path vnc_password );
+  my @param_names = qw(
+                        project_id uuid name tag cpu_number memory clock
+                        cdrom_path vnc_password extra_info
+                      );
+
   for my $param_name ( @param_names ) {
 
     my $value = $info->{$param_name};
@@ -400,6 +405,8 @@ sub _vps_define_create_or_modify {
     and $vps->{vnc_password} = $vnc_password;
   defined $tag
     and $vps->{tag}          = $tag;
+  defined $extra_info
+    and $vps->{extra_info}   = $extra_info;
 
   my $vps_params = {
      spec         => $vps,
