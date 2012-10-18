@@ -66,7 +66,8 @@ sub info {
       cdrom_path   => $vps_r->cdrom_path,
       project_id   => $vps_r->project_id,
       vnc_password => $vps_r->vnc_password,
-      tag          => $vps_r->tag || q{},
+      tag          => $vps_r->tag        || qq{},
+      extra_info   => $vps_r->extra_info || qq{},
     };
 
     my %ips;
