@@ -66,7 +66,7 @@ sub make_api_key {
 }
 
 END {
-  -f $tmpfile
+  ( $tmpfile and -f $tmpfile )
     and unlink $tmpfile;
 }
 
