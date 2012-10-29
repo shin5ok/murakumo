@@ -49,20 +49,17 @@ sub reserve_ip {
   local $@;
   eval {
 
-    my $r = $self->get_free_ip_object({
-                                        vlan_id       => $param_ref->{vlan_id},
-                                        ip            => $param_ref->{ip},
-                                        used_vps_uuid => $param_ref->{used_vps_uuid},
-                                      });
-
-    $r or croak "*** query execute error";
-
-    $r->update( { reserve_uuid => $reserve_uuid } );
+    $self->set_free_ip({
+                          vlan_id       => $param_ref->{vlan_id},
+                          ip            => $param_ref->{ip},
+                          used_vps_uuid => $param_ref->{used_vps_uuid},
+                       },
+                       { reserve_uuid => $reserve_uuid });
 
   };
 
   if ($@) {
-    croak "get_assign_ip is failure(eval error: $@)";
+    croak "set_free_ip method is failure(eval error: $@)";
 
   }
 
@@ -103,7 +100,6 @@ sub get_assign_ip {
     or croak "*** primary ip is not found";
 
   unshift @result_ips, $primary_ip;
-  warn Dumper \@result_ips;
   return \@result_ips;
   
 }
@@ -118,19 +114,29 @@ sub add_ip {
 
   }
 
+  my $fail = "";
+  my $update_query = +{ used_vps_uuid => $vps_uuid, secondary => 1 };
   while ($number--) {
-    my $rs = $self->get_free_ip_object({ vlan_id => $vlan_id });
-    $rs->update({ used_vps_uuid => $vps_uuid, secondary => 1 });
-
+    local $@;
+    eval {
+      $self->set_free_ip({ vlan_id => $vlan_id }, $update_query);
+    };
+    if ($@) {
+      $fail and $fail = " ";
+      $fail .= $@;
+    }
   }
-  return 1;
+  
+  return ! $fail;
 
 }
 
 
 # 指定したvlanで、空いているip の ResultSet オブジェクトを返す
-sub get_free_ip_object {
-  my ($self, $params) = @_;
+# ・・・のではなく第2引数で渡した クエリで update する
+# todo: このロジック見直す
+sub set_free_ip {
+  my ($self, $params, $update_query) = @_;
   no strict 'refs';
   my $vlan_id       = $params->{vlan_id};
   my $ip            = $params->{ip};
@@ -140,34 +146,28 @@ sub get_free_ip_object {
 
   my $resultset = $self->schema->resultset('Ip');
   my $rs;
-  local $@;
-  eval {
-    my $query = { vlan_id => $vlan_id };
-    $ip and $query->{ip} = $ip;
 
-    $rs   = $resultset->search($query);
-    ($rs) = $rs->search({ used_vps_uuid => { is => undef         ,}})
-               ->search({ reserve_uuid  => { is => undef         ,}})
-               ->search(
-                          undef,
-                          {
-                            order_by => { -asc => 'id' },
-                            rows     => 1,
-                          },
-                        );
+  # 予約できなければ例外
+  my $query = { vlan_id => $vlan_id };
+  $ip and $query->{ip} = $ip;
 
-  };
-  if ($@) {
-    croak "get free ip object is failure($@)";
-  }
+  $rs   = $resultset->search($query);
+  ($rs) = $rs->search({ used_vps_uuid => { is => undef         ,}})
+             ->search({ reserve_uuid  => { is => undef         ,}})
+             ->search(
+                        undef,
+                        {
+                          order_by => { -asc => 'id' },
+                          rows     => 1,
+                        },
+                      )
+            ->update( $update_query );
 
-  if (! $rs) {
-    croak "*** error";
 
-  }
   return $rs;
 
 }
+
 
 # 予約した ip を vpsに割り当てて、確定します
 sub commit_assign_ip {
