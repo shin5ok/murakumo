@@ -1,4 +1,4 @@
-package Murakumo::Controller::VPS::Template;
+package Murakumo::Controller::Template;
 use Moose;
 use namespace::autoclean;
 
@@ -6,7 +6,7 @@ BEGIN {extends 'Catalyst::Controller'; }
 
 =head1 NAME
 
-Murakumo::Controller::VPS::Template - Catalyst Controller
+Murakumo::Controller::Template - Catalyst Controller
 
 =head1 DESCRIPTION
 
@@ -35,7 +35,7 @@ sub list :Private {
 sub clone :Private {
   my ($self, $c) = @_;
 
-  $c->go('/vps/define/clone');
+  $c->detach('/vps/define/clone');
 
 }
 

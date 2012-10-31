@@ -301,6 +301,29 @@ sub vps_clone {
   return $response->content;
 }
 
+
+sub vps_template_clone {
+  my $uri   = _create_uri( "/$project_id/template/clone/$uuid/" );
+  my %param = (
+    vlan_id      => $vlan_id,
+    storage_uuid => $storage_uuid,
+  );
+
+  $assign_ip and
+    $param{assign_ip}   = 1;
+
+  $set_network and
+    $param{set_network} = 1;
+
+  $name and
+    $param{name}        = $name;
+   
+  my $response = _www_json_post( $uri, \%param );
+
+  return $response->content;
+}
+
+
 sub vps_boot {
   goto &vps_boot_by_uuid;
 }
@@ -499,8 +522,9 @@ sub node_list {
   return (\@cols, \@rows);
 }
 
-sub template_list {
-  my $uri = _create_uri("/$project_id/vps/template/list/");
+
+sub vps_template_list {
+  my $uri = _create_uri("/$project_id/template/list/");
 
   my $response = _www_get( $uri );
 
@@ -511,11 +535,10 @@ sub template_list {
   my @rows;
   my $data = $json->{data};
 
-  my @p;
   no strict 'refs';
   for my $x ( @$data ) {
     my @p;
-
+    
     push @p, $x->{$_} for ( @cols );
     push @rows, \@p;
 
