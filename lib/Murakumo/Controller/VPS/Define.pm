@@ -135,6 +135,7 @@ sub clone :Private {
                                                      uuid            => $dst_uuid,
                                                      name            => $dst_name,
                                                      instance_status => undef,
+                                                     project_id      => $project_id,
                                                     },
                                                     {
                                                       vlan_id      => $vlan_id,

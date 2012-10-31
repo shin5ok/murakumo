@@ -765,4 +765,26 @@ sub is_valid_vps_for_project {
   return 1;
 }
 
+sub is_template_uuid {
+  my ($self, $uuid) = @_;
+  
+  if (! $uuid) {
+    croak "*** uuid is empty";
+
+  }
+
+  my $vps_define_rs = $self->schema->resultset('VpsDefine');
+  my $count = $vps_define_rs->search({
+                                       uuid            => $uuid,
+                                       public_template => 1,
+                                    })->count;
+
+  if ( $count != 1 ){
+    croak "*** $uuid is invalid for template";
+  }
+
+  return 1;
+
+}
+
 1;
