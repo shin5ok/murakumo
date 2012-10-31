@@ -58,17 +58,17 @@ sub info {
     my @ip_rs_rs = $ip_rs          ->search( { used_vps_uuid => $uuid }                  );
 
     $r = {
-      uuid          => $vps_r->uuid,
-      name          => $vps_r->name,
-      cpu_number    => $vps_r->cpu_number,
-      memory        => $vps_r->memory,
-      clock         => $vps_r->clock,
-      cdrom_path    => $vps_r->cdrom_path,
-      project_id    => $vps_r->project_id,
-      vnc_password  => $vps_r->vnc_password,
-      tag           => $vps_r->tag  || qq{},
-      extra_info    => $vps_r->extra_info || qq{},
-      template_flag => $vps_r->public_template,
+      uuid            => $vps_r->uuid,
+      name            => $vps_r->name,
+      cpu_number      => $vps_r->cpu_number,
+      memory          => $vps_r->memory,
+      clock           => $vps_r->clock,
+      cdrom_path      => $vps_r->cdrom_path,
+      project_id      => $vps_r->project_id,
+      vnc_password    => $vps_r->vnc_password,
+      tag             => $vps_r->tag  || qq{},
+      extra_info      => $vps_r->extra_info || qq{},
+      public_template => $vps_r->public_template,
     };
 
     my %ips;
@@ -566,13 +566,13 @@ sub record_cloning {
     $project_id = $args_ref->{project_id} || $org_info->{project_id};
 
     my %param = (
-      memory        => $org_info->{memory},
-      cpu_number    => $org_info->{cpu_number},
-      uuid          => $uuid,
-      name          => $uuid,
-      project_id    => $project_id,
-      clock         => $org_info->{clock},
-      template_flag => 0,
+      memory          => $org_info->{memory},
+      cpu_number      => $org_info->{cpu_number},
+      uuid            => $uuid,
+      name            => $uuid,
+      project_id      => $project_id,
+      clock           => $org_info->{clock},
+      public_template => 0,
       ready         => 0,
       regist_time   => $now,
     );  
