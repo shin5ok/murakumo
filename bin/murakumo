@@ -18,30 +18,31 @@ our $base_url = exists $ENV{MURAKUMO_API_URI}
               ? $ENV{MURAKUMO_API_URI}
               : 'http://127.0.0.1:3000/';
 
-opts my $name          => 'Str',
-     my $org           => 'Str',
-     my $uuid          => 'Str',
-     my $project_id    => 'Str',
-     my $cpu_number    => 'Int',
-     my $memory        => 'Int',
-     my $set_network   => 'Bool',
-     my $no_virtio     => 'Bool',
-     my $storage_uuid  => 'Str',
-     my $assign_ip     => 'Bool',
-     my $clock         => 'Str',
-     my $verbose       => 'Bool',
-     my $ip            => 'Str',
-     my $disk          => 'Str',
-     my $api_key       => 'Str',
-     my $add_ip        => 'Int',
-     my $vlan_id       => 'Str',
-     my $vnc_password  => 'Str',
-     my $cdrom         => 'Str',
-     my $tag           => 'Str',
-     my $clean_traffic => 'Bool',
-     my $dst_node      => 'Str',
-     my $extra_info    => 'Str',
-     my $node          => 'Str';
+opts my $name            => 'Str',
+     my $org             => 'Str',
+     my $uuid            => 'Str',
+     my $project_id      => 'Str',
+     my $cpu_number      => 'Int',
+     my $memory          => 'Int',
+     my $set_network     => 'Bool',
+     my $no_virtio       => 'Bool',
+     my $storage_uuid    => 'Str',
+     my $assign_ip       => 'Bool',
+     my $clock           => 'Str',
+     my $verbose         => 'Bool',
+     my $ip              => 'Str',
+     my $disk            => 'Str',
+     my $api_key         => 'Str',
+     my $add_ip          => 'Int',
+     my $vlan_id         => 'Str',
+     my $vnc_password    => 'Str',
+     my $cdrom           => 'Str',
+     my $tag             => 'Str',
+     my $clean_traffic   => 'Bool',
+     my $dst_node        => 'Str',
+     my $extra_info      => 'Str',
+     my $public_template => 'Int',
+     my $node            => 'Str';
 
 our $debug = exists $ENV{DEBUG};
 
@@ -396,21 +397,23 @@ sub _vps_define_create_or_modify {
   my $vps = +{};
 
   defined $name
-    and $vps->{name}         = $name;
+    and $vps->{name}            = $name;
   defined $memory
-    and $vps->{memory}       = $memory;
+    and $vps->{memory}          = $memory;
   defined $cpu_number
-    and $vps->{cpu_number}   = $cpu_number;
+    and $vps->{cpu_number}      = $cpu_number;
   defined $clock
-    and $vps->{clock}        = $clock;
+    and $vps->{clock}           = $clock;
   defined $cdrom
-    and $vps->{cdrom_path}   = $cdrom || "";
+    and $vps->{cdrom_path}      = $cdrom || "";
   defined $vnc_password
-    and $vps->{vnc_password} = $vnc_password;
+    and $vps->{vnc_password}    = $vnc_password;
   defined $tag
-    and $vps->{tag}          = $tag;
+    and $vps->{tag}             = $tag;
   defined $extra_info
-    and $vps->{extra_info}   = uri_escape $extra_info;
+    and $vps->{extra_info}      = uri_escape $extra_info;
+  defined $public_template
+    and $vps->{public_template} = $public_template;
 
   my $vps_params = {
      spec         => $vps,
@@ -494,6 +497,32 @@ sub node_list {
   }
 
   return (\@cols, \@rows);
+}
+
+sub template_list {
+  my $uri = _create_uri("/$project_id/vps/template/list/");
+
+  my $response = _www_get( $uri );
+
+  my @cols = ('tag', 'name', 'uuid', 'cpu_number', 'memory', 'update_time', 'regist_time');
+
+  my $json = decode_json $response->content;
+
+  my @rows;
+  my $data = $json->{data};
+
+  my @p;
+  no strict 'refs';
+  for my $x ( @$data ) {
+    my @p;
+
+    push @p, $x->{$_} for ( @cols );
+    push @rows, \@p;
+
+  }
+
+  return (\@cols, \@rows);
+
 }
 
 

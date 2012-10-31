@@ -1,3 +1,4 @@
 murakumo
 ========
-Very simple Cloud management Controller and web API.
+Simple Cloud management Controller and web API(unique style).
+

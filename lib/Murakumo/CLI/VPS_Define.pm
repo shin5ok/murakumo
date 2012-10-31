@@ -58,16 +58,17 @@ sub info {
     my @ip_rs_rs = $ip_rs          ->search( { used_vps_uuid => $uuid }                  );
 
     $r = {
-      uuid         => $vps_r->uuid,
-      name         => $vps_r->name,
-      cpu_number   => $vps_r->cpu_number,
-      memory       => $vps_r->memory,
-      clock        => $vps_r->clock,
-      cdrom_path   => $vps_r->cdrom_path,
-      project_id   => $vps_r->project_id,
-      vnc_password => $vps_r->vnc_password,
-      tag          => $vps_r->tag  || qq{},
-      extra_info   => $vps_r->extra_info || qq{},
+      uuid          => $vps_r->uuid,
+      name          => $vps_r->name,
+      cpu_number    => $vps_r->cpu_number,
+      memory        => $vps_r->memory,
+      clock         => $vps_r->clock,
+      cdrom_path    => $vps_r->cdrom_path,
+      project_id    => $vps_r->project_id,
+      vnc_password  => $vps_r->vnc_password,
+      tag           => $vps_r->tag  || qq{},
+      extra_info    => $vps_r->extra_info || qq{},
+      template_flag => $vps_r->public_template,
     };
 
     my %ips;
@@ -465,6 +466,31 @@ sub create_or_modify {
   }
 
   return 1;
+}
+
+
+sub list_template {
+  my ($self, $tag) = @_;
+
+  my $resultset = $self->schema->resultset('VpsDefine');
+  my $query     = +{ public_template => 1 };
+  $tag and $query->{tag} = $tag;
+
+  my $rs = $resultset->search( $query, { order_by => 'regist_time' } );
+  my @vpses;
+  while (my $x = $rs->next) {
+    push @vpses, {
+                   name               => $x->name,
+                   uuid               => $x->uuid,
+                   memory             => $x->memory,
+                   cpu_number         => $x->cpu_number,
+                   update_time        => $x->update_time,
+                   regist_time        => $x->regist_time,
+                   tag                => $x->tag || qq{},
+                 };
+  }
+  return \@vpses;
+
 }
 
 
