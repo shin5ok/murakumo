@@ -42,6 +42,17 @@ sub clone :Private {
 
 }
 
+
+sub info :Private {
+  my ($self, $c) = @_;
+
+  my $define_model = $c->model('VPS_Define');
+  $define_model->is_template_uuid( $c->stash->{uuid} );
+
+  $c->detach('/vps/define/info');
+
+}
+
 sub auto :Private {
   return 1;
 }
