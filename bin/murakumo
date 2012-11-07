@@ -129,7 +129,7 @@ sub vps_define_info {
 
   my $uri = _create_uri( "/$project_id/vps/define/info/$uuid/" );
   if (exists $option{template} and $option{template}) {
-    $uri = _create_uri( "/$project_id/template/define/info/$uuid/" );
+    $uri = _create_uri( "/$project_id/template/info/$uuid/" );
 
   }
 
