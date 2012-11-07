@@ -24,7 +24,7 @@ opts my $name            => 'Str',
      my $project_id      => 'Str',
      my $cpu_number      => 'Int',
      my $memory          => 'Int',
-     my $set_network     => 'Bool',
+     my $set_network     => 'Str',
      my $no_virtio       => 'Bool',
      my $storage_uuid    => 'Str',
      my $assign_ip       => 'Bool',
@@ -115,11 +115,23 @@ sub _create_uri {
   return $uri;
 }
 
+sub vps_template_info {
+  vps_define_info( template => 1 );
+
+}
+
 sub vps_define_info {
+
   defined $uuid
     or croak "*** uuid parameter is not found";
 
+  my %option = @_;
+
   my $uri = _create_uri( "/$project_id/vps/define/info/$uuid/" );
+  if (exists $option{template} and $option{template}) {
+    $uri = _create_uri( "/$project_id/template/define/info/$uuid/" );
+
+  }
 
   my $response    = _www_get( $uri );
   my $content_ref = decode_json $response->content;
@@ -287,13 +299,13 @@ sub vps_clone {
     storage_uuid => $storage_uuid,
   );
 
-  $assign_ip and
+  defined $assign_ip and
     $param{assign_ip}   = 1;
 
-  $set_network and
-    $param{set_network} = 1;
+  defined $set_network and
+    $param{set_network} = $set_network;
 
-  $name and
+  defined $name and
     $param{name}        = $name;
    
   my $response = _www_json_post( $uri, \%param );
@@ -309,13 +321,13 @@ sub vps_template_clone {
     storage_uuid => $storage_uuid,
   );
 
-  $assign_ip and
+  defined $assign_ip and
     $param{assign_ip}   = 1;
 
-  $set_network and
-    $param{set_network} = 1;
+  defined $set_network and
+    $param{set_network} = $set_network;
 
-  $name and
+  defined $name and
     $param{name}        = $name;
    
   my $response = _www_json_post( $uri, \%param );
