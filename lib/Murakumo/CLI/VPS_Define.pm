@@ -563,9 +563,12 @@ sub record_cloning {
     $uuid         = $args_ref->{uuid};
     $storage_uuid = $opt_args_ref->{storage_uuid};
 
+    # storage_uuid が指定されていれば
     # storage_uuid が登録されているかチェック
     # なければ例外
-    Murakumo::CLI::Storage->new->info( $storage_uuid );
+    if ($storage_uuid) {
+      Murakumo::CLI::Storage->new->info( $storage_uuid );
+    }
 
     $project_id = $args_ref->{project_id} || $org_info->{project_id};
 
