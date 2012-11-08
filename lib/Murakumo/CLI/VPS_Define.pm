@@ -14,6 +14,7 @@ use FindBin;
 use lib qq{$FindBin::Bin/../lib};
 use Murakumo::CLI::Utils;
 use Murakumo::CLI::DB;
+use Murakumo::CLI::Storage;
 use base q(Murakumo::CLI::DB);
 
 # utils オブジェクト
@@ -274,7 +275,6 @@ sub create_disk_param_array {
   my $storage_uuid = $argv->{storage_uuid};
 
   if (! $storage_uuid) {
-    require Murakumo::CLI::Storage;
     $storage_uuid = Murakumo::CLI::Storage->new->select;
 
   }
@@ -562,6 +562,10 @@ sub record_cloning {
     no strict 'refs';
     $uuid         = $args_ref->{uuid};
     $storage_uuid = $opt_args_ref->{storage_uuid};
+
+    # storage_uuid が登録されているかチェック
+    # なければ例外
+    Murakumo::CLI::Storage->new->info( $storage_uuid );
 
     $project_id = $args_ref->{project_id} || $org_info->{project_id};
 

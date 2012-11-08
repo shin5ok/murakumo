@@ -18,6 +18,10 @@ sub info {
   my $resultset = $self->schema->resultset('Storage');
   my ($info) = $resultset->search({ uuid => $uuid });
 
+  if (! $info) {
+    croak "*** storage uuid $uuid is not found... failure";
+  }
+
   my %result;
   for my $col ( qw( uuid export_path mount_path host type available ) ) {
     $result{$col} = $info->$col || "";
