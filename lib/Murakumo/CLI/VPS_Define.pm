@@ -414,6 +414,7 @@ sub create_or_modify {
 
     my @vlan_ids;
     if ( @iface_args_refs > 0 ) {
+
       # vpsに関連付けられた既存のinterfaceのレコードを削除
       my $now_iface_rs = $iface_define_rs->search({ vps_uuid => $uuid });
       my %now_vlan;
@@ -423,8 +424,15 @@ sub create_or_modify {
       $now_iface_rs->delete;
 
       # 新しくvpsに関連付けたinterfaceのレコードを追加
+      my %already_vlan_id_cache;
       my $seq = 0;
       for my $iface_args_ref ( @iface_args_refs ) {
+
+        exists $already_vlan_id_cache{$iface_args_ref->{vlan_id}}
+          and croak "*** vlan_id duplicate error";
+
+        $already_vlan_id_cache{$iface_args_ref->{vlan_id}} = 1;
+          
         $iface_args_ref->{project_id}  = $project_id;
         $iface_args_ref->{vps_uuid}    = $uuid;
         $iface_args_ref->{regist_time} = $now;
@@ -656,8 +664,17 @@ sub record_cloning {
   }
 
   my @specify_vlan_ids;
+  my %already_vlan_id_cache;
   if (exists $opt_args_ref->{vlan_id} and $opt_args_ref->{vlan_id}) {
-    @specify_vlan_ids = split /,/, $opt_args_ref->{vlan_id};
+    for my $id ( split /,/, $opt_args_ref->{vlan_id} ) {
+
+      exists $already_vlan_id_cache{$id}
+        and croak "*** vlan_id duplicate error";
+
+      push @specify_vlan_ids, $id;
+      $already_vlan_id_cache{$id} = 1;
+
+    }
   }
 
   my $mac_of_first;
