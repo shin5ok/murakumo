@@ -463,15 +463,11 @@ sub create_or_modify {
 
   };
 
-  my $defined_error = $@;
+  croak "vps defined error > ", $@ if $@;
 
   # トランザクション確定
   $txn->commit;
 
-  if ($defined_error) {
-    warn "defined error > ", $defined_error;
-    return 0;
-  }
 
   return 1;
 }
