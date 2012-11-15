@@ -151,7 +151,7 @@ sub info {
 sub list { goto \&list_from_db; }
 
 sub all_deleted {
-  my ($self, $uuid, $cancel) = @_;
+  my ($self, $uuid, $cancel, $option) = @_;
 
   my $iface_define_rs = $self->schema->resultset('InterfaceDefine');
   my $disk_define_rs  = $self->schema->resultset('DiskDefine');
@@ -165,9 +165,20 @@ sub all_deleted {
 
     if (! $cancel) {
 
-      $disk_define_rs ->search({ vps_uuid => $uuid, try_remove => 1, })->delete; 
-      $iface_define_rs->search({ vps_uuid => $uuid, try_remove => 1, })->delete;
-      $vps_define_rs  ->search({     uuid => $uuid, try_remove => 1, })->delete;
+      no strict 'refs';
+      if (! $option->{force_remove}) {
+        $disk_define_rs ->search({ vps_uuid => $uuid, try_remove => 1, })->delete; 
+        $iface_define_rs->search({ vps_uuid => $uuid, try_remove => 1, })->delete;
+        $vps_define_rs  ->search({     uuid => $uuid, try_remove => 1, })->delete;
+
+      } else {
+
+        # force_remove を指定して、強制削除 主にお掃除用
+        $disk_define_rs ->search({ vps_uuid => $uuid })->delete; 
+        $iface_define_rs->search({ vps_uuid => $uuid })->delete;
+        $vps_define_rs  ->search({     uuid => $uuid })->delete;
+
+      }
 
       # ipは消さずに解放
       $ip_rs->search({ used_vps_uuid => $uuid, try_release => 1, })
@@ -202,8 +213,8 @@ sub all_deleted {
 }
 
 sub all_cancel_deleted {
-  my ($self, $uuid) = @_;
-  $self->all_deleted( $uuid, 1 );
+  my ($self, $uuid, $option) = @_;
+  $self->all_deleted( $uuid, 1, $option );
 
 }
 

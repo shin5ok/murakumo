@@ -22,7 +22,8 @@ sub is_exist {
   my $resultset = $self->schema->resultset('Project');
   my $count = $resultset->search( { project_id => $project_id, } )->count;
   if ($count != 1) {
-    croak "*** project id is invalid";
+    warn "*** project id is invalid";
+    return 0;
   }
   return 1;
 

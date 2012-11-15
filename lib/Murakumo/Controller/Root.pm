@@ -66,42 +66,41 @@ sub auto :Private {
   my $node_name     = $query_params->{'name'};
   my $admin_api_key = $query_params->{'admin_api_key'};
 
-  if ( $admin_api_key ) {
+  my $project_id = $args[0];
 
-    my $project_id = shift @args;
+  if ($project_id and $project_model->is_exist( $project_id )) {
+    shift @args;
+    $c->stash->{project_id} = $project_id;
 
-    if (! $admin_model->is_admin_access( $admin_api_key, $c->request ) ) {
-      $c->response->body( 'forbidden' );
-      $c->response->status( 403 );
-      $c->log->warn( "error forbidden" );
-      return 0;
+    if ( $admin_api_key ) {
+
+      if ($admin_model->is_admin_access( $admin_api_key, $c->request ) ) {
+        $c->stash->{authed} = 1;
+
+      }
+
     } else {
-      $c->stash->{project_id} = $project_id;
-    }
 
-  }
-  elsif ($node_uuid and $node_name and $api_key) {
+      if ($project_model->auth( $project_id, $api_key ) ) {
+        $c->stash->{authed} = 1;
 
-    if (! $node_model->is_valid_node( $node_name, $node_uuid, $api_key ) ) {
-      $c->response->body( 'forbidden' );
-      $c->response->status( 403 );
-      $c->log->warn( "error forbidden" );
-      return 0;
+      }
+
     }
 
   } else {
 
-    my $project_id = shift @args;
-
-    if (! $project_model->auth( $project_id, $api_key ) ) {
-      $c->response->body( 'forbidden' );
-      $c->response->status( 403 );
-      return 0;
-
-    } else {
-      $c->stash->{project_id} = $project_id;
+    if ($node_model->is_valid_node( $node_name, $node_uuid, $api_key ) ) {
+      $c->stash->{authed} = 1;
     }
 
+  }
+
+  if ($c->stash->{authed} != 1) {
+     $c->response->body( 'forbidden' );
+     $c->response->status( 403 );
+     $c->log->warn( "error forbidden" );
+     return 0;
   }
 
   # default値の設定
