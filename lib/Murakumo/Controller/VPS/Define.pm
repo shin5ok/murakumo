@@ -164,6 +164,7 @@ sub clone :Private {
 }
 
 sub remove_commit :Local {
+
   my ($self, $c) = @_;
   my $body   = $c->request->body;
   my $params = decode_json <$body>;
@@ -177,14 +178,15 @@ sub remove_commit :Local {
   my $iface_define_model = $c->model('InterfaceDefine');
   my $ip_model           = $c->model('IP');
 
-  my $vps_uuid = $c->stash->{uuid} || $params->{uuid};
+  my $force_flag = $params->{force_remove};
+  my $vps_uuid   = $c->stash->{uuid} || $params->{vps_uuid};
 
   my $result   = $params->{result} || 0;
 
   local $@;
   eval {
     if ($result) { 
-      $define_model->all_deleted( $vps_uuid );
+      $define_model->all_deleted( $vps_uuid, 0, { force_remove => $force_flag } );
     } else {
       $define_model->all_cancel_deleted( $vps_uuid );
     }
@@ -232,7 +234,7 @@ sub commit :Local {
 
     if ( ! $result ) {
       local $Data::Dumper::Terse = 1;
-      $c->stash->{message} = sprintf "vps define clone() miss (%s)", Dumper $params;
+      $c->stash->{message} = sprintf "vps define create/clone miss (%s)", Dumper $params;
       $@ and $c->stash->{message} .= " eval error $@";
 
       $c->log->warn( $c->stash->{message} );
