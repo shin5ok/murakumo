@@ -22,6 +22,7 @@ Catalyst Controller.
 =cut
 
 use JSON;
+use Carp;
 use DateTime;
 use Data::Dumper;
 
@@ -75,6 +76,12 @@ sub boot :Private {
   my $project_id = $c->stash->{project_id};
   if (! $project_id or ! $uuid ) {
     $c->detach( "/stop_error", ["project_id or uuid is empty"]);
+  }
+
+  if ($params->{node}) {
+    my $node_model = $c->model('Node');
+    $node_model->is_available($params->{node})
+      or croak "*** $params->{node} is not available";
   }
 
   my $vps_model    = $c->model('VPS');

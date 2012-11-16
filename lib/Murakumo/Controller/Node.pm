@@ -53,10 +53,6 @@ sub run :Local {
     $node = $vps_model->get_node( $params->{uuid} );
   }
 
-  # ノードにポート番号がついていなかったら、付ける
-  $node =~ /:\d+$/
-     or $node .= ":" . $c->config->{api_port};
-
   my $uri = $node_model->make_uri(
                               $node,
                               $request_arg,

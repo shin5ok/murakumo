@@ -36,6 +36,11 @@ sub wwwua {
 sub make_uri {
   my ($self, $node, $path, $schema) = @_;
   $schema ||= 'http';
+
+  # ノードにポート番号がついていなかったら、付ける
+  $node =~ /:\d+$/
+     or $node .= ":" . $config->{api_port};
+
   my $uri = sprintf "%s://%s/%s", $schema, $node, $path;
   return URI->new( $uri );
 }
@@ -151,7 +156,6 @@ sub list {
                               uuid         => $uuid,
                               auto_select  => $auto_select_node{$uuid} || 0,
 
-                              # $_->update_time,
                             }
 
                          } @nodes;
@@ -159,6 +163,21 @@ sub list {
   $@ and warn $@;
   return @node_results;
 
+}
+
+
+sub is_available {
+  my ($self, $node) = @_;
+
+  my $node_check_uri = exists $config->{node_check_uri}
+                     ? $config->{node_check_uri}
+                     : q{/check};
+
+  my $uri = $self->make_uri( $node, $node_check_uri );
+  my $r = $self->wwwua->get( $uri );
+
+  return $r->is_success;
+   
 }
 
 1;

@@ -595,8 +595,8 @@ sub record_cloning {
       project_id      => $project_id,
       clock           => $org_info->{clock},
       public_template => 0,
-      ready         => 0,
-      regist_time   => $now,
+      ready           => 0,
+      regist_time     => $now,
     );  
 
     %param = (%param, %$args_ref);
