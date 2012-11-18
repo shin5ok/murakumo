@@ -42,6 +42,7 @@ opts my $name            => 'Str',
      my $dst_node        => 'Str',
      my $extra_info      => 'Str',
      my $public_template => 'Int',
+     my $cdrom_boot      => 'Bool',
      my $node            => 'Str';
 
 our $debug = exists $ENV{DEBUG};
@@ -354,6 +355,7 @@ sub vps_boot_by_uuid {
                                          node => $set_node, 
                                          uuid => $uuid, 
                                          clean_traffic => $clean_traffic || 0,
+                                         cdrom_boot => $cdrom_boot,
                                        }
                                 );
 
