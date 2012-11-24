@@ -42,7 +42,6 @@ opts my $name            => 'Str',
      my $dst_node        => 'Str',
      my $extra_info      => 'Str',
      my $public_template => 'Int',
-     my $cdrom_boot      => 'Bool',
      my $node            => 'Str';
 
 our $debug = exists $ENV{DEBUG};
@@ -238,7 +237,7 @@ sub vps_list {
 
   my @cols = ('name','uuid','node', 'vnc_port', 'cpu','memory', 'update_time', 'state', );
   my @rows;
-  for my $x ( @{$data->{list}} ) {
+  for my $x ( @{$data->{data}} ) {
     my @p;
 
     push @p, $x->{$_} for ( @cols );
@@ -280,7 +279,7 @@ sub vps_define_list {
                                    : qq{};
                 $_;
 
-              } @{$data->{list}};
+              } @{$data->{data}};
   
   for my $x ( @lists ) {
     my @p;
@@ -355,7 +354,6 @@ sub vps_boot_by_uuid {
                                          node => $set_node, 
                                          uuid => $uuid, 
                                          clean_traffic => $clean_traffic || 0,
-                                         cdrom_boot => $cdrom_boot,
                                        }
                                 );
 
@@ -479,7 +477,6 @@ sub _vps_define_create_or_modify {
 }
 
 sub vps_define_remove {
-                     # uuid       => $uuid,
   my $uri = _create_uri( "/$project_id/vps/define/remove/$uuid/" );
   my $response = _www_json_post( $uri );
 
@@ -526,7 +523,7 @@ sub node_list {
 
   my $data = decode_json $response->content;
   my @rows;
-  for my $x ( @{$data->{node}} ) {
+  for my $x ( @{$data->{data}} ) {
     my @p;
 
     push @p, $x->{$_} for ( @cols );
@@ -575,7 +572,7 @@ sub job_list {
   my @cols = qw(job_uuid result message update_time request_job);
 
   my @rows;
-  for my $x ( @{$data->{list}} ) {
+  for my $x ( @{$data->{data}} ) {
     my @p;
 
     push @p, $x->{$_} for ( @cols );
@@ -600,7 +597,7 @@ sub storage_list {
   my @cols = qw( uuid type export_path host mount_path priority regist_time );
 
   my @rows;
-  for my $x ( @{$data->{list}} ) {
+  for my $x ( @{$data->{data}} ) {
     my @p;
 
     push @p, $x->{$_} for ( @cols );
@@ -622,7 +619,7 @@ sub network_list {
   my @cols          = qw( vlan_id network netmask total used free used_rate );
   my @cols_for_rows = @cols[1 .. $#cols - 1];
 
-  my $list = $data->{list};
+  my $list = $data->{data};
   my @rows;
   for my $x ( sort { $a cmp $b } keys %$list ) {
     my $vlan_list = $list->{$x};

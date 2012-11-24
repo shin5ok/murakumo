@@ -46,7 +46,7 @@ sub tag_list :Private {
   }
 
   my $define_model    = $c->model('VPS_Define');
-  $c->stash->{list}   = $define_model->tag_list( $project_id );
+  $c->stash->{data}   = $define_model->tag_list( $project_id );
   $c->stash->{result} = 1;
 
 }
@@ -61,7 +61,7 @@ sub list :Private {
 
   my $tag             = $c->request->query_params->{tag} || '';
   my $define_model    = $c->model('VPS_Define');
-  $c->stash->{list}   = $define_model->list( $project_id, $tag );
+  $c->stash->{data}   = $define_model->list( $project_id, $tag );
   $c->stash->{tag}    = $tag;
   $c->stash->{result} = 1;
 

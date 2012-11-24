@@ -26,7 +26,7 @@ sub list :Local {
   my $vlan_id = $c->request->query_params->{vlan_id};
   
   my $ip_model = $c->model('IP');
-  $c->stash->{list} = $ip_model->list( $vlan_id );
+  $c->stash->{data} = $ip_model->list( $vlan_id );
   $c->stash->{result} = 1;
 
 }
@@ -35,7 +35,7 @@ sub list_count :Local {
   my ($self, $c) = @_;
   
   my $ip_model = $c->model('IP');
-  $c->stash->{list}   = $ip_model->list_count;
+  $c->stash->{data}   = $ip_model->list_count;
   $c->stash->{result} = 1;
 
 }
