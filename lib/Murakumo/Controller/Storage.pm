@@ -47,7 +47,7 @@ sub list :Local {
   eval {
     my $storage_model   = $c->model('Storage');
     $c->stash->{result} = 1;
-    $c->stash->{list}   = [ $storage_model->list ];
+    $c->stash->{data}   = [ $storage_model->list ];
 
   };
 

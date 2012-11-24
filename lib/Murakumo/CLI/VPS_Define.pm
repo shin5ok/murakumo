@@ -53,7 +53,8 @@ sub info {
 
     my ($vps_r)  = $vps_define_rs  ->search( $query{vps}                                 ); 
     # diskは regist_timeでソート
-    my @disk_rs  = $disk_define_rs ->search( $query{disk} , { order_by => 'regist_time' } );
+    my @disk_rs  = $disk_define_rs ->search( $query{disk} , { order_by => 'image_path' } );
+    # my @disk_rs  = $disk_define_rs ->search( $query{disk} , { order_by => 'regist_time' } );
     # interfacesは seqが登録順なので、それでソート
     my @iface_rs = $iface_define_rs->search( $query{iface}, { order_by => 'seq' }        );
     my @ip_rs_rs = $ip_rs          ->search( { used_vps_uuid => $uuid }                  );

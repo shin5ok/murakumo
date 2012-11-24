@@ -267,7 +267,7 @@ sub list :Local {
   $c->stash->{result} = 0;
   $c->stash->{node}   = [];
   if (my @node_lists = $node_model->list($time_until)) {
-    $c->stash->{node}   = \@node_lists;
+    $c->stash->{data}   = \@node_lists;
     $c->stash->{result} = 1;
   }
 
