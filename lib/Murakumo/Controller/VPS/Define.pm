@@ -531,7 +531,7 @@ sub info :Private {
     $c->stash->{message} = $@;
   } else {
     $c->stash->{result}  = 1;
-    $c->stash->{info}    = $info;
+    $c->stash->{data}    = $info;
   }
 
 }

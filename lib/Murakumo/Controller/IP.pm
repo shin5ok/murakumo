@@ -24,9 +24,13 @@ Catalyst Controller.
 sub list :Local {
   my ($self, $c) = @_;
   my $vlan_id = $c->request->query_params->{vlan_id};
+  my $args = {};
+  if ($vlan_id) {
+    $args = { vlan_id => $vlan_id };
+  }
   
   my $ip_model = $c->model('IP');
-  $c->stash->{data} = $ip_model->list( $vlan_id );
+  $c->stash->{data} = $ip_model->list( $args );
   $c->stash->{result} = 1;
 
 }

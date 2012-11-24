@@ -136,7 +136,7 @@ sub vps_define_info {
 
   my $response    = _www_get( $uri );
   my $content_ref = decode_json $response->content;
-  my $info        = $content_ref->{info};
+  my $info        = $content_ref->{data};
   local $Data::Dumper::Terse = 1;
 
   no strict 'refs';

@@ -306,6 +306,7 @@ sub list {
   # { network => $network }
   # または
   # { vlan_id => $vlan_id }
+  # または なし
 
   my $resultset = $self->schema->resultset('Ip');
   my @ips       = $resultset->search( $query );
@@ -318,8 +319,10 @@ sub list {
       $hash{$vlan_id} = [];
     }
 
-    my $used = ( $ip->used_vps_uuid or $ip->reserve_uuid )
-             ? 1
+    my $used = $ip->used_vps_uuid
+             ? $ip->used_vps_uuid
+             : $ip->reserve_uuid
+             ? 1 # reserved
              : 0;
 
     push @{$hash{$vlan_id}}, {
@@ -332,7 +335,6 @@ sub list {
 
   }
 
-  dumper \%hash;
   return \%hash;
 
 }
