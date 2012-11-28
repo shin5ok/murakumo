@@ -305,6 +305,10 @@ sub create_or_modify: Private {
   }
   elsif ($mode eq 'create') {
 
+    if (not exists $vps_params->{disk}->[0]) {
+      $c->detach('/stop_error', ["disk parameter is required"]);
+    }
+
     # create で uuidが指定されなかったら自動生成
     if (! $uuid) {
       $uuid = $utils->create_uuid;

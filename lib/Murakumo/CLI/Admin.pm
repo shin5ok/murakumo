@@ -41,4 +41,3 @@ package Murakumo::CLI::Admin 0.01 {
 1;
 __END__
 
-

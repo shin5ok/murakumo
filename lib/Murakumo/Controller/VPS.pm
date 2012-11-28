@@ -179,6 +179,7 @@ sub terminate :Private {
   $c->detach( '/node/job/vps/terminate/', \@args );
 }
 
+
 sub migration :Private {
   my ($self, $c, @args) = @_;
 
