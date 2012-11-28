@@ -25,12 +25,6 @@ use Data::Dumper;
 use JSON;
 use Murakumo::CLI::Utils;
 
-sub index :Path :Args(0) {
-    my ( $self, $c ) = @_;
-
-    $c->response->body('Matched Murakumo::Controller::Node in Node.');
-}
-
 sub run :Local {
 
   my ($self, $c, @args) = @_;
