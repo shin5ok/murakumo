@@ -17,11 +17,12 @@ sub vps_register {
 
   my $update_ok = 0;
   my @vpses     = @$vpses_ref;
+  no strict 'refs';
   for my $vps (@vpses) {
+    $vps->{state} == 1 or next;
     $vps->{update_key} = $update_key;
     local $@;
     eval {
-      no strict 'refs';
       $vps->{node} = $node;
       $resultset->update_or_create($vps, { uuid => $vps->{uuid} });
     };
