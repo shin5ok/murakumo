@@ -7,6 +7,7 @@ use Carp;
 use Data::Dumper;
 use HTTP::Request::Common qw/ POST GET /;
 use LWP::UserAgent;
+use Socket;
 
 use FindBin;
 use lib qq{$FindBin::Bin/../lib};
@@ -155,6 +156,7 @@ sub list {
                               regist_time  => $_->regist_time,
                               uuid         => $uuid,
                               auto_select  => $auto_select_node{$uuid} || 0,
+                              ip           => _get_ip_by_nodename( $_->name ),
 
                             }
 
@@ -162,6 +164,19 @@ sub list {
   };
   $@ and warn $@;
   return @node_results;
+
+}
+
+
+sub _get_ip_by_nodename {
+  my $name = shift;
+
+  my $ip;
+  eval {
+    $ip = inet_ntoa(inet_aton( $name ));
+  };
+
+  return $ip || undef;
 
 }
 
