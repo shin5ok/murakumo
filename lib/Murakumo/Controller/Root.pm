@@ -48,7 +48,33 @@ sub stop_error :Private {
 sub auto :Private {
   my ( $self, $c, @args ) = @_;
 
-  $c->log->info($c->request->uri);
+  my $request_uri = $c->request->uri;
+  $c->log->info($request_uri);
+
+  # 設定で禁止されたapi
+  if (exists $c->config->{'forbidden_api'}) {
+
+    my $request_path = $c->request->path;
+
+    my $forbidden_api  = $c->config->{'forbidden_api'};
+    my @forbidden_apis = ref $forbidden_api eq 'ARRAY'
+                       ? @$forbidden_api
+                       : ($forbidden_api);
+
+    warn Dumper \@forbidden_apis;
+    for my $api ( @forbidden_apis ) {
+    warn "$request_path : $api";
+      if ($request_path =~ m{$api}) {
+        $c->response->body( 'forbidden' );
+        $c->response->status( 403 );
+        $c->log->warn( "$request_path forbidden api" );
+        return 0;
+      }
+
+    }
+
+  }
+
 
   # すでに認証されていれば
   {

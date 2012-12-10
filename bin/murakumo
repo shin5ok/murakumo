@@ -224,7 +224,7 @@ sub vps_cdrom {
 
   my $response = _www_json_post( $uri, \%param );
 
-  return $response->content;
+  return _r($response);
 
 }
 
@@ -313,7 +313,7 @@ sub vps_clone {
    
   my $response = _www_json_post( $uri, \%param );
 
-  return $response->content;
+  return _r($response);
 }
 
 
@@ -335,7 +335,7 @@ sub vps_template_clone {
    
   my $response = _www_json_post( $uri, \%param );
 
-  return $response->content;
+  return _r($response);
 }
 
 
@@ -361,7 +361,7 @@ sub vps_boot_by_uuid {
                                        }
                                 );
 
-  return $response->content;
+  return _r($response);
 }
 
 sub vps_shutdown {
@@ -370,7 +370,7 @@ sub vps_shutdown {
    
   my $response = _www_json_post( $uri, \%param );
 
-  return $response->content;
+  return _r($response);
 
 }
 
@@ -380,7 +380,7 @@ sub vps_terminate {
 
   my $response = _www_json_post( $uri, \%param );
 
-  return $response->content;
+  return _r($response);
 
 }
 
@@ -476,7 +476,7 @@ sub _vps_define_create_or_modify {
                    };
   my $response = _www_json_post( $uri, $params_all );
 
-  return $response->content;
+  return _r($response);
 
 }
 
@@ -484,7 +484,7 @@ sub vps_define_remove {
   my $uri = _create_uri( "/$project_id/vps/define/remove/$uuid/" );
   my $response = _www_json_post( $uri );
 
-  return $response->content;
+  return _r($response);
   
 }
 
@@ -498,14 +498,14 @@ sub vps_migration {
     or croak "dst node is error";
 
   my $response = _www_json_post( $uri, { dst_node => $dst_node, } );
-  return $response->content;
+  return _r($response);
 
 }
 
 sub vps_boot_cleanup {
   my $uri = _create_uri( "/$project_id/vps/boot_tmp_cleanup/$uuid/" );
   my $response = _www_json_post( $uri, {} );
-  return $response->content;
+  return _r($response);
 
 }
 
@@ -514,7 +514,7 @@ sub vps_add_ip {
   my $number = $add_ip || 1;
 
   my $response = _www_json_post( $uri, { vlan_id => $vlan_id, add_ip_number => $number } );
-  return $response->content;
+  return _r($response);
 
 }
 
@@ -536,6 +536,24 @@ sub node_list {
   }
 
   return (\@cols, \@rows);
+}
+
+sub _r { goto \&_response }
+
+sub _response {
+  my ($response) = @_;
+
+  if ($response->is_success) {
+    return $response->content;
+
+  } else {
+    my $content = $response->content || qq{};
+    my $code    = $response->code;
+    $content   .= sprintf "(%s)", $code if $code;
+    return $content;
+
+  }
+
 }
 
 
