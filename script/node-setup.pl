@@ -18,7 +18,9 @@ if (! $node) {
   _usage();
   exit 0;
 }
-my $auto_select = shift || "1";
+my $auto_select = shift;
+
+$auto_select //= 1;
 
 my $api_key = make_api_key();
 chomp ( my $uuid = `uuidgen` );
