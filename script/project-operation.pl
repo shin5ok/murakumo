@@ -36,7 +36,7 @@ $rs->create({
    api_key    => $api_key,
 });
 
-my ($result) = $rs->search({ project => $project_id });
+my ($result) = $rs->search({ project_id => $project_id });
 
 if (! $result) {
   croak "*** register failure??? project_id may be too long???";
