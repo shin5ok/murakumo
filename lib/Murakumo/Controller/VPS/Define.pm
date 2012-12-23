@@ -67,6 +67,21 @@ sub list :Private {
 
 }
 
+sub info_list: Private {
+  my ($self, $c) = @_;
+  my $project_id = $c->stash->{project_id};
+  if (! $project_id) {
+    $c->detach("/stop_error", ["project_id is empty"]);
+  }
+
+  my $tag             = $c->request->query_params->{tag} || '';
+  my $define_model    = $c->model('VPS_Define');
+  $c->stash->{data}   = $define_model->info_list( $project_id, $tag );
+  $c->stash->{tag}    = $tag;
+  $c->stash->{result} = 1;
+
+}
+
 sub clone :Private {
   my ($self, $c) = @_;
   $c->log->info("clone start");
