@@ -509,6 +509,27 @@ sub list_template {
 
 }
 
+sub info_list {
+  my ($self, $project_id, $tag) = @_;
+
+  if (! defined $project_id) {
+    croak "project_id parameter must be specified...";
+  }
+
+  my $define_vps = $self->list( $project_id, $tag );
+  my @uuids = map { $_->{uuid} } @$define_vps;
+
+  my @infos;
+  for my $uuid ( @uuids ) {
+    my $info = $self->info( $uuid );
+    push @infos, $info;
+
+  }
+
+  return \@infos;
+
+}
+
 
 # vps一覧 => list()
 sub list_from_db {
