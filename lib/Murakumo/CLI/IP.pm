@@ -326,11 +326,12 @@ sub list {
              : 0;
 
     push @{$hash{$vlan_id}}, {
-                               network => $ip->network,
-                               ip      => $ip->ip,
-                               netmask => $ip->mask,
-                               gw      => $ip->gw,
-                               used    => $used,
+                               network   => $ip->network,
+                               ip        => $ip->ip,
+                               netmask   => $ip->mask,
+                               gw        => $ip->gw,
+                               used      => $used,
+                               secondary => $ip->secondary ? 1 : 0,
                              };
 
   }
