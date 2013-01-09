@@ -613,6 +613,7 @@ sub record_cloning {
       memory          => $org_info->{memory},
       cpu_number      => $org_info->{cpu_number},
       uuid            => $uuid,
+      tag             => $org_info->{tag},
       name            => $uuid,
       project_id      => $project_id,
       clock           => $org_info->{clock},
