@@ -49,25 +49,23 @@ opts my $name            => 'Str',
 
 our $debug = exists $ENV{DEBUG};
 
-if (exists $ENV{VPS_PROJECT_ID}) {
-  # 以前の互換性のため
-  $project_id = $ENV{VPS_PROJECT_ID};
-}
-
-if (exists $ENV{MURAKUMO_PROJECT_ID}) {
-  # 環境変数を優先
-  # 環境変数をセットしていたら、いちいち指定しなくてもよい
-  $project_id = $ENV{MURAKUMO_PROJECT_ID};
-}
-
 if (exists $ENV{MURAKUMO_BASE_URL}) {
   $base_url = $ENV{MURAKUMO_BASE_URL};
 }
 
-if (exists $ENV{MURAKUMO_ADMIN_KEY}) {
+# 引数を優先
+if (! defined $project_id
+      and exists $ENV{MURAKUMO_PROJECT_ID}) {
+  $project_id = $ENV{MURAKUMO_PROJECT_ID};
+}
+
+# 引数を優先
+if (! defined $admin_key
+      and exists $ENV{MURAKUMO_ADMIN_KEY}) {
   $admin_key = $ENV{MURAKUMO_ADMIN_KEY};
 }
-elsif (exists $ENV{MURAKUMO_API_KEY}) {
+elsif (! defined $api_key
+         and exists $ENV{MURAKUMO_API_KEY}) {
   $api_key   = $ENV{MURAKUMO_API_KEY};
 }
 
