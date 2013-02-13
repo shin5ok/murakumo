@@ -90,7 +90,7 @@ sub auto :Private {
   my $api_key       = $query_params->{'key'};
   my $node_uuid     = $query_params->{'node_uuid'};
   my $node_name     = $query_params->{'name'};
-  my $admin_api_key = $query_params->{'admin_api_key'};
+  my $admin_api_key = $query_params->{'admin_key'};
 
   my $project_id = $args[0];
 
@@ -101,7 +101,8 @@ sub auto :Private {
     if ( $admin_api_key ) {
 
       if ($admin_model->is_admin_access( $admin_api_key, $c->request ) ) {
-        $c->stash->{authed} = 1;
+        $c->stash->{authed}   = 1;
+        $c->stash->{is_admin} = 1;
 
       }
 

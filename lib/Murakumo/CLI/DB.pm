@@ -18,7 +18,7 @@ package Murakumo::CLI::DB 0.03 {
   
   sub new {
     my ($class) = @_;
-    my $obj = bless +{}, $class; 
+    my $obj = bless +{}, $class;
   
     local $@;
     our ($dsn, $pass, $user);
