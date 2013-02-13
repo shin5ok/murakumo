@@ -33,6 +33,7 @@ opts my $name            => 'Str',
      my $ip              => 'Str',
      my $disk            => 'Str',
      my $api_key         => 'Str',
+     my $admin_key       => 'Str',
      my $add_ip          => 'Int',
      my $vlan_id         => 'Str',
      my $vnc_password    => 'Str',
@@ -63,8 +64,11 @@ if (exists $ENV{MURAKUMO_BASE_URL}) {
   $base_url = $ENV{MURAKUMO_BASE_URL};
 }
 
-if (exists $ENV{MURAKUMO_API_KEY}) {
-  $api_key = $ENV{MURAKUMO_API_KEY};
+if (exists $ENV{MURAKUMO_ADMIN_KEY}) {
+  $admin_key = $ENV{MURAKUMO_ADMIN_KEY};
+}
+elsif (exists $ENV{MURAKUMO_API_KEY}) {
+  $api_key   = $ENV{MURAKUMO_API_KEY};
 }
 
 my @args   = @ARGV;
@@ -110,8 +114,12 @@ sub _create_uri {
   $verbose
     and $param_key{verbose} = 1;
 
-  $api_key
-    and $param_key{key}     = $api_key;
+  if ($admin_key) {
+    $param_key{admin_key} = $admin_key;
+  }
+  elsif ($api_key) {
+    $param_key{key} = $api_key;
+  }
 
   $uri->query_form( %param_key );
   return $uri;

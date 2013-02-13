@@ -10,13 +10,13 @@ package Murakumo::CLI::Admin 0.01 {
   use Murakumo::CLI::Utils;
   use Murakumo::CLI::DB;
   use base q(Murakumo::CLI::DB);
-  
+
   sub is_admin_access {
     my ($self, $admin_api_key, $request_object) = @_;
 
     my $resultset = $self->schema->resultset('Admin');
     my @rs = $resultset->search;
-  
+
     my $src_ip = $request_object->address;
 
     my $is_ok = 0;
@@ -30,7 +30,7 @@ package Murakumo::CLI::Admin 0.01 {
          }
       }
     }
-  
+
     logger('debug', "admin auth $is_ok");
     return $is_ok;
 
