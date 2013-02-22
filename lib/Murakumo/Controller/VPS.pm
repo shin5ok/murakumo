@@ -205,7 +205,7 @@ sub migration :Private {
                     dst_node => $params->{dst_node},
                     info     => $info,
                   };
-  
+
   $c->stash->{to_job_params} = $to_params;
 
   $c->log->info( "$uuid try migration request forward to node" );

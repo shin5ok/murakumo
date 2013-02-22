@@ -37,25 +37,6 @@ sub is_valid_project :Private {
 
 }
 
-# sub default :Path{
-#   my ( $self, $c, $project_id, @args ) = @_;
-# 
-#   $c->stash->{project_id} = $project_id;
-#   my $args = $c->request->args;
-# 
-#   warn "----- detach -----";
-#   warn Dumper \@args;
-#   warn "------------------";
-# 
-#   my $url = join "/", @args;
-# 
-#   $c->request->args([]);
-# 
-#   $c->detach( "/$url", [] );
-# 
-# }
-
-
 =head1 AUTHOR
 
 shingo

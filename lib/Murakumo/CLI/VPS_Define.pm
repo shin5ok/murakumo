@@ -51,10 +51,10 @@ sub info {
     }
     warn Dumper \%query if is_debug;
 
-    my ($vps_r)  = $vps_define_rs  ->search( $query{vps}                                 ); 
+    my ($vps_r)  = $vps_define_rs  ->search( $query{vps}                                 );
     # diskは regist_timeでソート
-    my @disk_rs  = $disk_define_rs ->search( $query{disk} , { order_by => 'image_path' } );
-    # my @disk_rs  = $disk_define_rs ->search( $query{disk} , { order_by => 'regist_time' } );
+    # my @disk_rs  = $disk_define_rs ->search( $query{disk} , { order_by => 'image_path' } );
+    my @disk_rs  = $disk_define_rs ->search( $query{disk} , { order_by => 'regist_time' } );
     # interfacesは seqが登録順なので、それでソート
     my @iface_rs = $iface_define_rs->search( $query{iface}, { order_by => 'seq' }        );
     my @ip_rs_rs = $ip_rs          ->search( { used_vps_uuid => $uuid }                  );
@@ -534,9 +534,11 @@ sub info_list {
 # vps一覧 => list()
 sub list_from_db {
   my ($self, $project_id, $tag) = @_;
+
   if (! defined $project_id) {
     croak "project_id parameter must be specified...";
   }
+
   my $resultset = $self->schema->resultset('VpsDefine');
   my $query = { project_id => $project_id, ready => 1, };
   $tag and $query->{tag} = uri_unescape $tag;
@@ -545,13 +547,13 @@ sub list_from_db {
   my @vpses;
   while (my $x = $rs->next) {
     push @vpses, {
-                   name               => $x->name,
-                   uuid               => $x->uuid,
-                   memory             => $x->memory,
-                   cpu_number         => $x->cpu_number,
-                   update_time        => $x->update_time,
-                   regist_time        => $x->regist_time,
-                   tag                => $x->tag || qq{},
+                   name        => $x->name,
+                   uuid        => $x->uuid,
+                   memory      => $x->memory,
+                   cpu_number  => $x->cpu_number,
+                   update_time => $x->update_time,
+                   regist_time => $x->regist_time,
+                   tag         => $x->tag || qq{},
                  };
   }
   return \@vpses;
