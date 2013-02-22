@@ -264,7 +264,7 @@ sub vps_list {
 
 sub vps_list_all {
 
-  _is_admin();
+  _is_has_admin_key();
   my $uri_base = "/admin/vps_list_all";
   $uri_base .= "/$project_id" if $project_id;
 
@@ -349,7 +349,7 @@ sub vps_clone {
 
   defined $name and
     $param{name}        = $name;
-   
+
   my $response = _www_json_post( $uri, \%param );
 
   return _r($response);
@@ -371,7 +371,7 @@ sub vps_template_clone {
 
   defined $name and
     $param{name}        = $name;
-   
+
   my $response = _www_json_post( $uri, \%param );
 
   return _r($response);
@@ -406,7 +406,7 @@ sub vps_boot_by_uuid {
 sub vps_shutdown {
   my $uri = _create_uri( "/$project_id/vps/shutdown/$uuid/" );
   my %param = ();
-   
+
   my $response = _www_json_post( $uri, \%param );
 
   return _r($response);
@@ -415,7 +415,7 @@ sub vps_shutdown {
 
 sub vps_terminate {
   my $uri = _create_uri( "/$project_id/vps/terminate/$uuid/" );
-  my %param = (); 
+  my %param = ();
 
   my $response = _www_json_post( $uri, \%param );
 
@@ -511,7 +511,6 @@ sub _vps_define_create_or_modify {
                      assign_ip    => $assign_ip,
                      vlan_id      => $vlan_id,
                      driver       => $no_virtio ? "ide" : "virtio",
-                     
                    };
   my $response = _www_json_post( $uri, $params_all );
 
@@ -519,17 +518,19 @@ sub _vps_define_create_or_modify {
 
 }
 
+
 sub vps_define_remove {
   my $uri = _create_uri( "/$project_id/vps/define/remove/$uuid/" );
   my $response = _www_json_post( $uri );
 
   return _r($response);
-  
 }
+
 
 sub vps_define_clone {
   goto &vps_clone;
 }
+
 
 sub vps_migration {
   my $uri = _create_uri( "/$project_id/vps/migration/$uuid/" );
@@ -548,6 +549,7 @@ sub vps_boot_cleanup {
 
 }
 
+
 sub vps_add_ip {
   my $uri    = _create_uri( "/$project_id/vps/define/add_ip/$uuid/" );
   my $number = $add_ip || 1;
@@ -556,6 +558,7 @@ sub vps_add_ip {
   return _r($response);
 
 }
+
 
 sub node_list {
   my $uri = _create_uri( "/$project_id/node/list/" );
@@ -579,6 +582,30 @@ sub node_list {
 
 sub _r { goto \&_response }
 
+
+sub project_list {
+  _is_has_admin_key();
+
+  my @cols = ('project_id', 'api_key', 'regist_time');
+
+  my $uri = _create_uri( "/admin/project_list" );
+  my $response = _www_get( $uri );
+
+  my $result = decode_json $response->content;
+
+  my @rows;
+  for my $x ( @{$result->{data}} ) {
+    my @p;
+
+    push @p, $x->{$_} for ( @cols );
+    push @rows, \@p;
+
+  }
+
+  return (\@cols, \@rows);
+
+}
+
 sub _response {
   my ($response) = @_;
 
@@ -597,7 +624,7 @@ sub _response {
 
 
 sub vps_define_list_all {
-  _is_admin();
+  _is_has_admin_key();
 
   my ($cols, $vps_rows) = vps_list_all();
   my %vps_status = map { $_->[2] => $_->[3] } @$vps_rows;
@@ -635,8 +662,9 @@ sub vps_define_list_all {
 }
 
 
-sub _is_admin {
-  return 1;
+sub _is_has_admin_key {
+  $admin_key
+    or croak "*** cannot get admin_key";
 }
 
 
@@ -655,7 +683,7 @@ sub vps_template_list {
   no strict 'refs';
   for my $x ( @$data ) {
     my @p;
-    
+
     push @p, $x->{$_} for ( @cols );
     push @rows, \@p;
 
@@ -689,7 +717,7 @@ sub job_list {
   $cols[$#cols] = q(request_job|30);
 
   return (\@cols, \@rows);
- 
+
 }
 
 sub storage_list {

@@ -102,6 +102,24 @@ package Murakumo::CLI::Admin 0.01 {
 
   }
 
+  sub project_list {
+    my ($self) = @_;
+
+    my $resultset = $self->schema->resultset('Project');
+    my $rs = $resultset->search;
+
+    my @projects;
+    while (my $x = $rs->next) {
+      push @projects, {
+                        project_id  => $x->project_id,
+                        api_key     => $x->api_key,
+                        regist_time => $x->regist_time,
+                      };
+    }
+
+    return \@projects;
+  }
+
 }
 
 1;
