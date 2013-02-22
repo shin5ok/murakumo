@@ -137,11 +137,11 @@ __PYTHON__
   close $w;
   chomp ( my $mac = <$r> );
   $mac =~ /^
-              [0-9a-f]{2}: 
-              [0-9a-f]{2}: 
-              [0-9a-f]{2}: 
-              [0-9a-f]{2}: 
-              [0-9a-f]{2}: 
+              [0-9a-f]{2}:
+              [0-9a-f]{2}:
+              [0-9a-f]{2}:
+              [0-9a-f]{2}:
+              [0-9a-f]{2}:
               [0-9a-f]{2}
            $/xms or croak "mac address create failure...";
   close $r;
@@ -172,8 +172,7 @@ sub is_valid_api_key {
 
 sub is_debug {
   my @callers = caller;
-  warn "##### debug caller {" . join ",", @callers . "}";
-  exists $ENV{DEBUG};
+  return exists $ENV{DEBUG} and $ENV{DEBUG};
 }
 
 sub logger {

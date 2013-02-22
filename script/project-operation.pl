@@ -15,7 +15,11 @@ if ($> != 0) {
   croak "*** $0 must be run by super user";
 }
 
-if ($mode eq 'add') { 
+if ($project_id eq 'admin') {
+  croak "*** 'admin' is invalid project id";
+}
+
+if ($mode eq 'add') {
   if (! $project_id) {
     usage();
     exit 255;
@@ -25,14 +29,14 @@ if ($mode eq 'add') {
   exit 0;
 }
 
-my $db = Murakumo::CLI::DB->new->schema; 
+my $db = Murakumo::CLI::DB->new->schema;
 my $rs = $db->resultset('Project');
 
 chomp( my $api_key = `uuidgen` );
 $api_key =~ s/\-//g;
 
 $rs->create({
-   project_id => $project_id, 
+   project_id => $project_id,
    api_key    => $api_key,
 });
 

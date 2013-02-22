@@ -63,7 +63,7 @@ sub list {
   while (my $x = $rs->next) {
     my $uuid  = $x->uuid;
 
-    $project_uuids{$uuid} or  next;
+    $project_uuids{$uuid} or next;
 
     push @vpses, {
                    name        => $x->name,

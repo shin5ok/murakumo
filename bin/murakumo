@@ -261,6 +261,39 @@ sub vps_list {
 
 }
 
+
+sub vps_list_all {
+
+  _is_admin();
+  my $uri_base = "/admin/vps_list_all";
+  $uri_base .= "/$project_id" if $project_id;
+
+  my $uri = _create_uri( $uri_base );
+
+  my %param_hash;
+
+  my $response = _www_get( $uri );
+  my $data = decode_json $response->content;
+
+  my @cols = ('project_id', 'name','uuid','node', 'vnc_port', 'cpu','memory', 'update_time', 'state', );
+  my @rows;
+  for my $x ( @{$data->{data}} ) {
+    my @p;
+
+    push @p, $x->{$_} for ( @cols );
+    push @rows, \@p;
+
+  }
+  if ($node) {
+    @rows = grep { $_->[2] eq $node } @rows;
+  }
+
+  # 列名、行の配列リファレンス
+  return ( \@cols, \@rows );
+
+}
+
+
 sub vps_define_list {
 
   my ($cols, $vps_rows) = vps_list();
@@ -281,14 +314,14 @@ sub vps_define_list {
 
   my @cols = ('name', 'uuid', 'current_node', 'cpu_number', 'memory', 'update_time', 'regist_time');
   my @rows;
-  my @lists = map { 
+  my @lists = map {
                 $_->{current_node} = exists $vps_status{$_->{uuid}}
                                    ? $vps_status{$_->{uuid}}
                                    : qq{};
                 $_;
 
               } @{$data->{data}};
-  
+
   for my $x ( @lists ) {
     my @p;
 
@@ -560,6 +593,50 @@ sub _response {
 
   }
 
+}
+
+
+sub vps_define_list_all {
+  _is_admin();
+
+  my ($cols, $vps_rows) = vps_list_all();
+  my %vps_status = map { $_->[2] => $_->[3] } @$vps_rows;
+
+  my $uri_base = "/admin/vps_define_list_all";
+  $uri_base .= "/$project_id" if $project_id;
+
+  my $uri = _create_uri( $uri_base );
+
+  my $response = _www_get( $uri );
+
+  my $data = decode_json $response->content;
+
+  no strict 'refs';
+
+  my @cols = ('project_id', 'name', 'uuid', 'current_node', 'cpu_number', 'memory', 'update_time', 'regist_time');
+  my @rows;
+  my @lists = map {
+                $_->{current_node} = exists $vps_status{$_->{uuid}}
+                                   ? $vps_status{$_->{uuid}}
+                                   : qq{};
+                $_;
+
+              } @{$data->{data}};
+
+  for my $x ( @lists ) {
+    my @p;
+
+    push @p, $x->{$_} for ( @cols );
+    push @rows, \@p;
+  }
+  # 列名、行の配列リファレンス
+  return ( \@cols, [ sort { $a->[4] cmp $b->[4] } @rows ] );
+
+}
+
+
+sub _is_admin {
+  return 1;
 }
 
 

@@ -87,12 +87,12 @@ sub auto :Private {
   my $admin_model   = $c->model('Admin');
 
   my $query_params  = $c->request->query_params;
+  my $admin_api_key = $query_params->{'admin_key'};
   my $api_key       = $query_params->{'key'};
   my $node_uuid     = $query_params->{'node_uuid'};
   my $node_name     = $query_params->{'name'};
-  my $admin_api_key = $query_params->{'admin_key'};
 
-  my $project_id = $args[0];
+  my $project_id = $args[0] || q{};
 
   if ($project_id and $project_model->is_exist( $project_id )) {
     shift @args;
@@ -110,6 +110,18 @@ sub auto :Private {
 
       if ($project_model->auth( $project_id, $api_key ) ) {
         $c->stash->{authed} = 1;
+      }
+
+    }
+
+  }
+  elsif ( $c->request->path =~ m{^admin/?}i ) {
+
+    if ( $admin_api_key ) {
+
+      if ($admin_model->is_admin_access( $admin_api_key, $c->request ) ) {
+        $c->stash->{authed}   = 1;
+        $c->stash->{is_admin} = 1;
 
       }
 
@@ -123,7 +135,7 @@ sub auto :Private {
 
   }
 
-  if ($c->stash->{authed} != 1) {
+  if (! $c->stash->{authed}) {
      $c->response->body( 'forbidden' );
      $c->response->status( 403 );
      $c->log->warn( "error forbidden" );
