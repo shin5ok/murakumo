@@ -266,7 +266,8 @@ sub vps_list_all {
 
   _is_has_admin_key();
   my $uri_base = "/admin/vps_list_all";
-  $uri_base .= "/$project_id" if $project_id;
+  # 使い勝手がよくないのでいったん外した
+  # $uri_base .= "/$project_id" if $project_id;
 
   my $uri = _create_uri( $uri_base );
 
@@ -630,7 +631,8 @@ sub vps_define_list_all {
   my %vps_status = map { $_->[2] => $_->[3] } @$vps_rows;
 
   my $uri_base = "/admin/vps_define_list_all";
-  $uri_base .= "/$project_id" if $project_id;
+  # 使い勝手がよくないのでいったん外した
+  # $uri_base .= "/$project_id" if $project_id;
 
   my $uri = _create_uri( $uri_base );
 
