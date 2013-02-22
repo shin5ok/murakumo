@@ -73,6 +73,17 @@ sub vps_list_all :Local {
 }
 
 
+sub project_list :Local {
+  my ($self, $c) = @_;
+
+  my $admin_model = $c->model('Admin');
+
+  $c->stash->{data}   = $admin_model->project_list;
+  $c->stash->{result} = 1;
+
+}
+
+
 
 
 =head2 index

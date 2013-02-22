@@ -75,7 +75,6 @@ sub auto :Private {
 
   }
 
-
   # すでに認証されていれば
   {
     no strict 'refs';
@@ -94,7 +93,20 @@ sub auto :Private {
 
   my $project_id = $args[0] || q{};
 
-  if ($project_id and $project_model->is_exist( $project_id )) {
+  if ( $c->request->path =~ m{^admin/?}i ) {
+
+    if ( $admin_api_key ) {
+
+      if ($admin_model->is_admin_access( $admin_api_key, $c->request ) ) {
+        $c->stash->{authed}   = 1;
+        $c->stash->{is_admin} = 1;
+
+      }
+
+    }
+
+  }
+  elsif ($project_id and $project_model->is_exist( $project_id )) {
     shift @args;
     $c->stash->{project_id} = $project_id;
 
@@ -110,19 +122,6 @@ sub auto :Private {
 
       if ($project_model->auth( $project_id, $api_key ) ) {
         $c->stash->{authed} = 1;
-      }
-
-    }
-
-  }
-  elsif ( $c->request->path =~ m{^admin/?}i ) {
-
-    if ( $admin_api_key ) {
-
-      if ($admin_model->is_admin_access( $admin_api_key, $c->request ) ) {
-        $c->stash->{authed}   = 1;
-        $c->stash->{is_admin} = 1;
-
       }
 
     }
