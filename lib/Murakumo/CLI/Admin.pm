@@ -120,9 +120,15 @@ package Murakumo::CLI::Admin 0.01 {
     return \@projects;
   }
 
+  sub project_register {
+    my ($self, $project_id) = @_;
+
+    my $resultset = $self->schema->resultset('Project');
+
+  }
+
 }
 
 1;
 
 __END__
-

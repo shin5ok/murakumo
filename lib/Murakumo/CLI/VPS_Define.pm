@@ -4,6 +4,7 @@ package Murakumo::CLI::VPS_Define 0.01;
 
 use JSON;
 use Data::Dumper;
+use File::Basename;
 use XML::TreePP;
 use DateTime;
 use Carp;
@@ -51,13 +52,12 @@ sub info {
     }
     warn Dumper \%query if is_debug;
 
-    my ($vps_r)  = $vps_define_rs  ->search( $query{vps}                                 );
-    # diskは regist_timeでソート
-    # my @disk_rs  = $disk_define_rs ->search( $query{disk} , { order_by => 'image_path' } );
-    my @disk_rs  = $disk_define_rs ->search( $query{disk} , { order_by => 'regist_time' } );
+    my ($vps_r)  = $vps_define_rs  ->search( $query{vps}  );
+    # diskは 検索後、後で image_path の basename でソート
+    my @disk_rs  = $disk_define_rs ->search( $query{disk} );
     # interfacesは seqが登録順なので、それでソート
-    my @iface_rs = $iface_define_rs->search( $query{iface}, { order_by => 'seq' }        );
-    my @ip_rs_rs = $ip_rs          ->search( { used_vps_uuid => $uuid }                  );
+    my @iface_rs = $iface_define_rs->search( $query{iface}, { order_by => 'seq' } );
+    my @ip_rs_rs = $ip_rs          ->search( { used_vps_uuid => $uuid }           );
 
     $r = {
       uuid            => $vps_r->uuid,
@@ -127,15 +127,27 @@ sub info {
 
     my @disk_results;
     for my $disk_r ( @disk_rs ) {
+      my $image_path = $disk_r->image_path;
+      my $image_name = basename $image_path;
       my $x = {
-        image_path => $disk_r->image_path,
+        image_path => $image_path,
+        image_name => $image_name,
         driver     => $disk_r->driver,
         size       => $disk_r->size,
       };
       push @disk_results, $x;
     }
 
-    $r->{disks}      = \@disk_results;
+  warn Dumper \@disk_results;
+    $r->{disks} = [
+                    sort {
+                            $a->{image_name} cmp $b->{image_name}
+                         }
+                    @disk_results
+                  ];
+
+  warn Dumper $r->{disks};
+
     $r->{interfaces} = \@iface_results;
 
   };
@@ -444,7 +456,7 @@ sub create_or_modify {
           and croak "*** vlan_id duplicate error";
 
         $already_vlan_id_cache{$iface_args_ref->{vlan_id}} = 1;
-          
+
         $iface_args_ref->{project_id}  = $project_id;
         $iface_args_ref->{vps_uuid}    = $uuid;
         $iface_args_ref->{regist_time} = $now;
@@ -458,12 +470,12 @@ sub create_or_modify {
         } else {
           $iface_args_ref->{mac} ||= $utils->create_random_mac;
         }
-        
+
         $iface_define_rs->create( $iface_args_ref );
 
       }
     }
-   
+
     $vps_spec->{regist_time} = $now;
 
     $vps_spec->{project_id}  = $project_id;
@@ -675,7 +687,7 @@ sub record_cloning {
           vps_uuid    => $uuid,
           size        => $disk->{size},
           regist_time => $now,
-        );  
+        );
 
 
         local $@;
