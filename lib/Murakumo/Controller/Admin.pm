@@ -20,6 +20,8 @@ use Data::Dumper;
 use JSON;
 use Murakumo::CLI::Utils;
 
+my $config = Murakumo::CLI::Utils->config;
+
 sub vps_define_list_all :Local {
 
   no strict 'refs';
@@ -80,6 +82,32 @@ sub project_list :Local {
 
   $c->stash->{data}   = $admin_model->project_list;
   $c->stash->{result} = 1;
+
+}
+
+
+sub project_register :Local {
+  my ($self, $c) = @_;
+
+  my $admin_model = $c->model('Admin');
+
+  my $body       = $c->request->body;
+  my $params     = decode_json <$body>;
+  my $project_id = $params->{project_id};
+
+  if (! defined $project_id) {
+    croak "*** project_id is empty";
+  }
+
+  if ($project_id !~ /$config->{project_id_regex}/i) {
+    croak "*** invalid project_id";
+  }
+
+  if (my $data = $admin_model->project_register( $project_id )) {
+    $c->stash->{result} = 1;
+    $c->stash->{data}   = $data;
+
+  }
 
 }
 
