@@ -45,6 +45,7 @@ opts my $name            => 'Str',
      my $extra_info      => 'Str',
      my $public_template => 'Int',
      my $cdrom_boot      => 'Bool',
+     my $new_project_id  => 'Str',
      my $node            => 'Str';
 
 our $debug = exists $ENV{DEBUG};
@@ -719,6 +720,30 @@ sub job_list {
   $cols[$#cols] = q(request_job|30);
 
   return (\@cols, \@rows);
+
+}
+
+
+sub project_register {
+  my $uri = _create_uri( "/admin/project_register" );
+
+  my $response = _www_json_post( $uri, { project_id => $new_project_id } );
+  my $data     = decode_json $response->content;
+
+  no strict 'refs';
+  if ($data->{result} == 1) {
+    return (
+             [ qw( project_id api_key ) ],
+             [
+               [
+                 $data->{data}->{project_id},
+                 $data->{data}->{api_key},
+               ],
+             ],
+           );
+  } else {
+    return _r( $response );
+  }
 
 }
 

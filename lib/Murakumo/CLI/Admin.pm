@@ -125,6 +125,18 @@ package Murakumo::CLI::Admin 0.01 {
 
     my $resultset = $self->schema->resultset('Project');
 
+    my $key = Murakumo::CLI::Utils::create_uuid();
+       $key =~ s/\-//g;
+
+    my %project_args = (
+                         project_id => $project_id,
+                         api_key    => $key,
+                       );
+
+    $resultset->create( \%project_args );
+
+    return \%project_args;
+
   }
 
 }
