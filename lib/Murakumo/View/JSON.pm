@@ -3,6 +3,15 @@ package Murakumo::View::JSON;
 use strict;
 use base 'Catalyst::View::JSON';
 
+use JSON::XS ();
+
+sub encode_json {
+  my ($self, $c, $data) = @_;
+
+  JSON::XS->new->allow_nonref->pretty->encode( $data );
+
+}
+
 =head1 NAME
 
 Murakumo::View::JSON - Catalyst JSON View

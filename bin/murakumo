@@ -48,7 +48,9 @@ opts my $name            => 'Str',
      my $new_project_id  => 'Str',
      my $node            => 'Str';
 
-our $debug = exists $ENV{DEBUG};
+our $debug = exists $ENV{DEBUG}
+           ? $ENV{DEBUG}
+           : 0;
 
 if (exists $ENV{MURAKUMO_BASE_URL}) {
   $base_url = $ENV{MURAKUMO_BASE_URL};
@@ -820,7 +822,16 @@ sub _www_get {
     printf "+-----------------------------------------------------------------------------------------------------------------+\n";
   }
 
-  return $wwwua->get( $uri );
+  my $response = $wwwua->get( $uri );
+
+  if ($debug >= 2) {
+
+    printf "+--- response debug ----------------------------------------------------------------------------------------------+\n";
+    printf "%s", $response->content;
+    printf "+-----------------------------------------------------------------------------------------------------------------+\n";
+  }
+
+  return $response;
 }
 
 sub _www_post {
@@ -852,20 +863,29 @@ sub _www_json_post {
   $request->header('Content-Type' => 'application/json');
   $request->content( encode_json $params );
 
+  my $json = JSON->new->allow_nonref;
   if ($debug) {
 
-    my $json = JSON->new->allow_nonref;
     my $json_params = $json->pretty->encode( $params );
 
     printf "+--- request debug -----------------------------------------------------------------------------------------------+\n";
     printf "method      : POST" . "\n";
-    printf "uri         : %s\n", $uri; 
+    printf "uri         : %s\n", $uri;
     printf "params(json):\n";
     printf "%s", $json_params;
     printf "+-----------------------------------------------------------------------------------------------------------------+\n";
   }
 
-  return $wwwua->request( $request );
+  my $response = $wwwua->request( $request );
+
+  if ($debug >= 2) {
+
+    printf "+--- response debug ----------------------------------------------------------------------------------------------+\n";
+    printf "%s", $response->content;
+    printf "+-----------------------------------------------------------------------------------------------------------------+\n";
+  }
+
+  return $response;
 }
 
 __END__
