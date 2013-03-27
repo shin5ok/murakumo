@@ -7,7 +7,7 @@ package Murakumo::CLI::DB 0.03 {
   use Murakumo::CLI::Utils;
   use Murakumo::CLI::Schema;
   use base q(Murakumo::CLI::Schema);
-  
+
   {
     my $config = Murakumo::CLI::Utils->new->config;
     our $dsn  = $config->{db_dsn};
@@ -15,11 +15,11 @@ package Murakumo::CLI::DB 0.03 {
     our $user = $config->{db_user};
     our $conn;
   }
-  
+
   sub new {
     my ($class) = @_;
     my $obj = bless +{}, $class;
-  
+
     local $@;
     our ($dsn, $pass, $user);
     our $conn;
@@ -30,20 +30,20 @@ package Murakumo::CLI::DB 0.03 {
     if ($@) {
       croak "*** $dsn connect error($@)";
     }
-  
+
     return $obj;
   }
-  
+
   sub schema {
     my ($self, $schema) = @_;
-  
+
     if ($schema) {
       $self->{schema} = $schema;
     }
-  
+
     return $self->{schema};
   }
-  
+
 }
 
 1;
