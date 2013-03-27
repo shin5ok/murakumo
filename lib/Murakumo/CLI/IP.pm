@@ -101,13 +101,18 @@ sub get_assign_ip {
 
   unshift @result_ips, $primary_ip;
   return \@result_ips;
-  
+
 }
 
 
 sub add_ip {
   my ($self, $vlan_id, $vps_uuid, $number) = @_;
   $number ||= 1;
+
+  if (! defined $vps_uuid) {
+    croak "*** vps uuid is not found";
+
+  }
 
   if (! $self->get_assign_ip($vlan_id, $vps_uuid)) {
     croak "*** $vlan_id for $vps_uuid assign primary ip is not found";
@@ -126,7 +131,7 @@ sub add_ip {
       $fail .= $@;
     }
   }
-  
+
   return ! $fail;
 
 }
@@ -222,7 +227,7 @@ sub cancel_reserve_ip {
   local $@;
   eval {
     $resultset->search( { reserve_uuid => $reserve_uuid, } )
-              ->update( { reserve_uuid => undef,         } );
+              ->update( { reserve_uuid => undef, secondary => 0, } );
   };
 
   if ($@) {
@@ -233,6 +238,8 @@ sub cancel_reserve_ip {
   $txn->commit;
 }
 
+# This method is not used anywhere...
+# 2013/03/27
 sub release_ip {
   my ($self, $vlan_id, $used_vps_uuid) = @_;
 
@@ -250,6 +257,7 @@ sub release_ip {
                           reserve_uuid  => undef,
                           try_release   => undef,
                           mac           => undef,
+                          secondary     => 0,
                          } );
   };
 
