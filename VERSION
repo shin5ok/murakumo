@@ -1,3 +1,3 @@
-0.88
+0.97
 ######
-create vps define list all and vps list all for admin
+fix a bug that secondary ip was not unset where vps define was removed
