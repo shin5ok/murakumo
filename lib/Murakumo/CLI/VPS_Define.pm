@@ -138,15 +138,12 @@ sub info {
       push @disk_results, $x;
     }
 
-  warn Dumper \@disk_results;
     $r->{disks} = [
                     sort {
                             $a->{image_name} cmp $b->{image_name}
                          }
                     @disk_results
                   ];
-
-  warn Dumper $r->{disks};
 
     $r->{interfaces} = \@iface_results;
 
@@ -200,6 +197,7 @@ sub all_deleted {
                        used_vps_uuid => undef,
                        reserve_uuid  => undef,
                        try_release   => undef,
+                       secondary     => 0,
                      });
 
     } else {
@@ -210,7 +208,7 @@ sub all_deleted {
 
       # ipは消さずに解放
       $ip_rs->search({ used_vps_uuid => $uuid, try_release => 1, })
-            ->update({ try_release   => undef } );
+            ->update({ try_release   => undef, secondary   => 0, });
 
     }
   };
