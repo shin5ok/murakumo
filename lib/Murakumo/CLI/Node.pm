@@ -109,7 +109,7 @@ sub register {
   local $@;
   eval {
     no strict 'refs';
-    $resultset->update_or_create($node_ref, { node => $node_name });
+    $resultset->update_or_create( $node_ref );
 
   };
   if ($@) {

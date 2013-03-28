@@ -481,7 +481,7 @@ sub create_or_modify {
                              ? 1
                              : 0;
 
-    $vps_define_rs->update_or_create( $vps_spec, { uuid => $uuid } );
+    $vps_define_rs->update_or_create( $vps_spec );
 
   };
 
