@@ -6,7 +6,6 @@ package Murakumo::CLI::DB 0.03 {
   use lib qq{$FindBin::Bin/../lib};
   use Murakumo::CLI::Utils;
   use Murakumo::CLI::Schema;
-  use base q(Murakumo::CLI::Schema);
 
   {
     my $config = Murakumo::CLI::Utils->new->config;
@@ -24,7 +23,7 @@ package Murakumo::CLI::DB 0.03 {
     our ($dsn, $pass, $user);
     our $conn;
     eval {
-      $conn ||= $class->connect( $dsn, $user, $pass );
+      $conn ||= Murakumo::CLI::Schema->connect( $dsn, $user, $pass );
       $obj->schema( $conn );
     };
     if ($@) {
