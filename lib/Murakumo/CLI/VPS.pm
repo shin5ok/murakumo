@@ -24,7 +24,7 @@ sub vps_register {
     local $@;
     eval {
       $vps->{node} = $node;
-      $resultset->update_or_create($vps, { uuid => $vps->{uuid} });
+      $resultset->update_or_create( $vps );
     };
     if ($@) {
       warn $@;
