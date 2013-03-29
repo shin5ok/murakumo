@@ -47,27 +47,29 @@ sub list {
   my $project_id = shift;
   my $until      = shift;
   my $resultset        = $self->schema->resultset('Vps');
-  my $define_resultset = $self->schema->resultset('VpsDefine');
-
-  my %project_uuids = map { $_->uuid => 1 }
-                          $define_resultset
-                          ->search( { project_id => $project_id } );
 
   my $query_hash_ref = +{ state => { "!=" => "0" } };
+
   $until and
-    $query_hash_ref->{update_time} = { '>' => $until };
-  my $rs = $resultset->search($query_hash_ref);
+    $query_hash_ref->{'me.update_time'} = { '>' => $until };
+  my $rs = $resultset ->search( {
+                                 'vps_define_rel.project_id' => $project_id, 
+                               }
+                             )
+                     ->search(
+                               $query_hash_ref,
+                               {
+                                 prefetch => [ 'vps_define_rel', ],
+                               }
+                            );
+
   my @vpses;
 
   no strict 'refs';
   while (my $x = $rs->next) {
-    my $uuid  = $x->uuid;
-
-    $project_uuids{$uuid} or next;
-
     push @vpses, {
                    name        => $x->name,
-                   uuid        => $uuid,
+                   uuid        => $x->uuid,
                    node        => $x->node,
                    memory      => $x->memory,
                    cpu         => $x->cpu,
@@ -122,7 +124,7 @@ sub set_tmp_active_vps {
   } else {
     return 1;
   }
-  
+
 }
 
 # 起動が失敗したら
@@ -145,7 +147,7 @@ sub unset_tmp_active_vps {
     return 1;
 
   }
-  
+
 }
 
 # vpsがactiveか
