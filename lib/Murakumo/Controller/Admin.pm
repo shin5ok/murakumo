@@ -112,6 +112,15 @@ sub project_register :Local {
 }
 
 
+sub ip_with_name :Local {
+  my ($self, $c, $vlan_id) = @_;
+
+  my $ip_model = $c->model('IP');
+
+  $c->stash->{result} = 1;
+  $c->stash->{data}   = $ip_model->ip_with_name( $vlan_id );
+
+}
 
 
 =head2 index
