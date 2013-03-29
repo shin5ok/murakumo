@@ -322,7 +322,7 @@ sub list {
   my %hash;
   for my $ip ( @ips ) {
     my $vlan_id = $ip->vlan_id;
-    
+
     if (! exists $hash{$vlan_id}) {
       $hash{$vlan_id} = [];
     }
@@ -345,6 +345,36 @@ sub list {
   }
 
   return \%hash;
+
+}
+
+
+sub ip_with_name {
+  my ($self, $vlan_id) = @_;
+
+  my $resultset = $self->schema->resultset('Ip');
+  my $join_rs   = $resultset->search(
+                                      { vlan_id => $vlan_id },
+                                      {
+                                        prefetch => [ 'vps_define_rel' ],
+                                      },
+                                    );
+
+  my @lists;
+  while ( my $x = $join_rs->next ) {
+
+    push @lists, {
+               vps_uuid   => $x->used_vps_uuid,
+               name       => $x->vps_define_rel->name,
+               project_id => $x->vps_define_rel->project_id,
+               ip         => $x->ip,
+               mask       => $x->mask,
+               gw         => $x->gw,
+             }
+
+  }
+
+  return \@lists;
 
 }
 
