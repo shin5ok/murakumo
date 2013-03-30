@@ -46,14 +46,15 @@ sub list {
   my $self       = shift;
   my $project_id = shift;
   my $until      = shift;
-  my $resultset        = $self->schema->resultset('Vps');
+  my $resultset  = $self->schema->resultset('Vps');
 
   my $query_hash_ref = +{ state => { "!=" => "0" } };
 
   $until and
     $query_hash_ref->{'me.update_time'} = { '>' => $until };
-  my $rs = $resultset ->search( {
-                                 'vps_define_rel.project_id' => $project_id, 
+  my $rs = $resultset->search(
+                               {
+                                'vps_define_rel.project_id' => $project_id,
                                }
                              )
                      ->search(
@@ -61,7 +62,7 @@ sub list {
                                {
                                  prefetch => [ 'vps_define_rel', ],
                                }
-                            );
+                             );
 
   my @vpses;
 
