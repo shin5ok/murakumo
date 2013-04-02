@@ -341,33 +341,20 @@ sub vps_define_list {
 
 }
 
-sub vps_clone {
-  my $uri   = _create_uri( "/$project_id/vps/define/clone/$uuid/" );
-  my %param = (
-    vlan_id      => $vlan_id,
-    storage_uuid => $storage_uuid,
-  );
-
-  defined $assign_ip and
-    $param{assign_ip}   = 1;
-
-  defined $set_network and
-    $param{set_network} = $set_network;
-
-  defined $name and
-    $param{name}        = $name;
-
-  defined $tag and
-    $param{tag}         = $tag;
-
-  my $response = _www_json_post( $uri, \%param );
-
-  return _r($response);
-}
-
-
 sub vps_template_clone {
   my $uri   = _create_uri( "/$project_id/template/clone/$uuid/" );
+  _clone($uri);
+}
+
+
+sub vps_define_clone {
+  my $uri   = _create_uri( "/$project_id/vps/define/clone/$uuid/" );
+  _clone($uri);
+}
+
+
+sub _clone {
+  my $uri = shift;
   my %param = (
     vlan_id      => $vlan_id,
     storage_uuid => $storage_uuid,
@@ -388,7 +375,9 @@ sub vps_template_clone {
   my $response = _www_json_post( $uri, \%param );
 
   return _r($response);
+
 }
+
 
 
 sub vps_boot {
@@ -537,11 +526,6 @@ sub vps_define_remove {
   my $response = _www_json_post( $uri );
 
   return _r($response);
-}
-
-
-sub vps_define_clone {
-  goto &vps_clone;
 }
 
 
