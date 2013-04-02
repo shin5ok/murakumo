@@ -62,6 +62,10 @@ if (! defined $project_id
   $project_id = $ENV{MURAKUMO_PROJECT_ID};
 }
 
+if (not defined $project_id) {
+  croak "*** project_id is undefined";
+}
+
 # 引数を優先
 if (! defined $admin_key
       and exists $ENV{MURAKUMO_ADMIN_KEY}) {
