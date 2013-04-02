@@ -606,10 +606,11 @@ sub record_cloning {
   my $now = $utils->now;
   my $txn = $self->schema->txn_scope_guard;
 
-  my ($uuid, $storage_uuid);
+  my ($uuid, $storage_uuid, $tag);
   {
     no strict 'refs';
     $uuid         = $args_ref->{uuid};
+    $tag          = $opt_args_ref->{tag} // $org_info->{tag};
     $storage_uuid = $opt_args_ref->{storage_uuid};
 
     # storage_uuid が指定されていれば
@@ -619,20 +620,20 @@ sub record_cloning {
       Murakumo::CLI::Storage->new->info( $storage_uuid );
     }
 
-    $project_id = $args_ref->{project_id} || $org_info->{project_id};
+    $project_id = $args_ref->{project_id} // $org_info->{project_id};
 
     my %param = (
       memory          => $org_info->{memory},
       cpu_number      => $org_info->{cpu_number},
       uuid            => $uuid,
-      tag             => $org_info->{tag},
+      tag             => $tag,
       name            => $uuid,
       project_id      => $project_id,
       clock           => $org_info->{clock},
       public_template => 0,
       ready           => 0,
       regist_time     => $now,
-    );  
+    );
 
     %param = (%param, %$args_ref);
     if (is_debug) {
@@ -758,7 +759,7 @@ sub record_cloning {
         }
       }
     }
-   
+
   }
 
   # 最初のmacアドレスを設定
@@ -779,8 +780,8 @@ sub commit_define {
   my $txn = $self->schema->txn_scope_guard;
   local $@;
   eval {
-    $vps_define_rs  ->search({ uuid     => $uuid })->update({ ready => 1 }); 
-    $disk_define_rs ->search({ vps_uuid => $uuid })->update({ ready => 1 });  
+    $vps_define_rs  ->search({ uuid     => $uuid })->update({ ready => 1 });
+    $disk_define_rs ->search({ vps_uuid => $uuid })->update({ ready => 1 });
     $iface_define_rs->search({ vps_uuid => $uuid })->update({ ready => 1 });
   };
   if ($@) {

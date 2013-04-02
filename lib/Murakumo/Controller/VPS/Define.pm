@@ -138,6 +138,7 @@ sub clone :Private {
                : $dst_uuid;
 
   my $storage_uuid = $params->{storage_uuid};
+  my $tag          = $params->{tag};
 
   my $r;
   local $@;
@@ -147,15 +148,16 @@ sub clone :Private {
     my $vlan_id  = $params->{vlan_id};
 
     $r = $define_model->record_cloning( $src_uuid, {
-                                                     uuid            => $dst_uuid,
-                                                     name            => $dst_name,
-                                                     instance_status => undef,
-                                                     project_id      => $project_id,
-                                                    },
-                                                    {
+                                                      uuid            => $dst_uuid,
+                                                      name            => $dst_name,
+                                                      instance_status => undef,
+                                                      project_id      => $project_id,
+                                                   },
+                                                   {
+                                                      tag          => $tag,
                                                       vlan_id      => $vlan_id,
                                                       storage_uuid => $storage_uuid,
-                                                    },
+                                                   },
                                       );
   };
 
