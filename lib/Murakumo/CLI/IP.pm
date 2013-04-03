@@ -371,6 +371,7 @@ sub ip_with_name {
                ip         => $x->ip,
                mask       => $x->mask,
                gw         => $x->gw,
+               secondary  => $x->secondary ? 1 : 0,
              }
 
   }
