@@ -474,7 +474,7 @@ sub create_or_modify {
       }
     }
 
-    $vps_spec->{regist_time} = $now;
+    $vps_spec->{regist_time} = $now if not $is_vps_exists;
 
     $vps_spec->{project_id}  = $project_id;
     $vps_spec->{ready}       = $is_vps_exists
