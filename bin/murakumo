@@ -178,7 +178,7 @@ sub vps_define_info {
     push @rows, [ $param_name, $value ];
 
   }
-  
+
   my $disk_number = 1;
   for my $disk ( @{$info->{disks}} ) {
     my $string = "";
@@ -197,7 +197,7 @@ sub vps_define_info {
   my $iface_number = 1;
   for my $iface ( @{$info->{interfaces}} ) {
     my $string = "";
-    for my $name ( qw( mac driver vlan_id ip ) ) {
+    for my $name ( qw( mac driver vlan_id org_vlan_id ip ) ) {
 
       if (exists $iface->{$name}) {
         if ($name eq 'ip') {
@@ -222,8 +222,8 @@ sub vps_define_info {
     $iface_number++;
 
   }
-   
-  return (\@cols, \@rows); 
+
+  return (\@cols, \@rows);
 
 }
 

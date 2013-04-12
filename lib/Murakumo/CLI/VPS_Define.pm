@@ -114,11 +114,14 @@ sub info {
                    : undef;
 
       my $x = {
-        vlan_id      => $iface_r->proxy_vlan_id // $vlan_id,
-        org_vlan_id => $iface_r->proxy_vlan_id,
-        mac          => $iface_r->mac,
-        driver       => $iface_r->driver,
+        vlan_id => $iface_r->proxy_vlan_id // $vlan_id,
+        mac     => $iface_r->mac,
+        driver  => $iface_r->driver,
       };
+
+      if ($x->{vlan_id} ne $vlan_id) {
+        $x->{org_vlan_id} = $vlan_id;
+      }
 
       $ENV{DEBUG} and
         $x->{sequence} = $iface_r->seq;
