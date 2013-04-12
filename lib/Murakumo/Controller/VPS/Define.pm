@@ -584,6 +584,43 @@ sub add_ip :Private {
 
   $c->stash->{result} = 1;
 
+}
+
+sub proxy_vlan_id :Private {
+  my ($self, $c) = @_;
+
+  my $body   = $c->request->body;
+  my $params = decode_json <$body>;
+
+  my $uuid       = $c->stash->{uuid};
+  my $project_id = $c->stash->{project_id};
+
+  if (! $project_id) {
+    $c->detach("/stop_error", ["project_id is empty"]);
+  }
+
+  local $@;
+  eval {
+    my $proxy_vlan_id    = $params->{proxy_vlan_id};
+    my $vps_define_model = $c->model('VPS_Define');
+
+    no strict 'refs';
+    my $vlan_id       = $params->{vlan_id};
+    my $proxy_vlan_id = $params->{proxy_vlan_id};
+
+    $vps_define_model->set_proxy_vlan_id(
+                                           $uuid,
+                                           {
+                                             vlan_id       => $vlan_id,
+                                             proxy_vlan_id => $proxy_vlan_id,
+                                           }
+                                         );
+  };
+  if ($@) {
+    $c->log->warn( "eval error: $@" );
+  } else {
+    $c->stash->{result} = 1;
+  }
 
 }
 

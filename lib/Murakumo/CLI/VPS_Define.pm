@@ -115,7 +115,7 @@ sub info {
 
       my $x = {
         vlan_id      => $iface_r->proxy_vlan_id // $vlan_id,
-        real_vlan_id => $iface_r->proxy_vlan_id,
+        org_vlan_id => $iface_r->proxy_vlan_id,
         mac          => $iface_r->mac,
         driver       => $iface_r->driver,
       };
@@ -809,7 +809,7 @@ sub cancel_define {
   local $@;
   eval {
     $vps_define_rs  ->search({ uuid     => $uuid, ready => 0 })->delete;
-    $disk_define_rs ->search({ vps_uuid => $uuid, ready => 0 })->delete;  
+    $disk_define_rs ->search({ vps_uuid => $uuid, ready => 0 })->delete;
     $iface_define_rs->search({ vps_uuid => $uuid, ready => 0 })->delete;
   };
   $@ or $txn->commit;
@@ -837,7 +837,7 @@ sub is_valid_vps_for_project {
 
 sub is_template_uuid {
   my ($self, $uuid) = @_;
-  
+
   if (! $uuid) {
     croak "*** uuid is empty";
 
@@ -854,6 +854,22 @@ sub is_template_uuid {
   }
 
   return 1;
+
+}
+
+sub set_proxy_vlan_id {
+  my ($self, $uuid, $params) = @_;
+
+  my $iface_define_rs = $self->schema->resultset('InterfaceDefine');
+
+  no strict 'refs';
+  $iface_define_rs->search({
+                             vps_uuid => $uuid,
+                             vlan_id  => $params->{vlan_id},
+                           })
+                  ->update({
+                             proxy_vlan_id => $params->{proxy_vlan_id},
+                           });
 
 }
 
