@@ -108,16 +108,19 @@ sub info {
     my @iface_results;
     for my $iface_r ( @iface_rs ) {
       my $vlan_id = $iface_r->vlan_id;
+
       my $ip_param = exists $ips{$vlan_id}
                    ? $ips{$vlan_id}
                    : undef;
 
       my $x = {
-        vlan_id  => $vlan_id,
-        mac      => $iface_r->mac,
-        driver   => $iface_r->driver,
+        vlan_id      => $iface_r->proxy_vlan_id // $vlan_id,
+        real_vlan_id => $iface_r->proxy_vlan_id,
+        mac          => $iface_r->mac,
+        driver       => $iface_r->driver,
       };
-      $ENV{DEBUG} and 
+
+      $ENV{DEBUG} and
         $x->{sequence} = $iface_r->seq;
 
       $ip_param and $x->{ip} = $ip_param;

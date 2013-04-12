@@ -41,7 +41,7 @@ CREATE TABLE `disk_define` (
   `vps_uuid` varchar(48) CHARACTER SET latin1 DEFAULT NULL,
   `project_id` varchar(8) DEFAULT NULL,
   `image_path` varchar(255) NOT NULL DEFAULT '',
-  `size` int(32) DEFAULT NULL,
+  `size` bigint(20) DEFAULT NULL,
   `driver` varchar(16) CHARACTER SET latin1 DEFAULT NULL,
   `ready` tinyint(4) DEFAULT NULL,
   `try_remove` tinyint(1) DEFAULT NULL,
@@ -63,6 +63,7 @@ CREATE TABLE `interface_define` (
   `project_id` varchar(8) DEFAULT NULL,
   `mac` varchar(17) CHARACTER SET latin1 NOT NULL DEFAULT '',
   `vlan_id` int(4) DEFAULT NULL,
+  `proxy_vlan_id` int(4) DEFAULT NULL,
   `driver` varchar(16) CHARACTER SET latin1 DEFAULT NULL,
   `ip` varchar(15) CHARACTER SET latin1 DEFAULT NULL,
   `seq` int(4) DEFAULT '0',
@@ -100,7 +101,7 @@ CREATE TABLE `ip` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `vlan_id` (`vlan_id`,`ip`),
   UNIQUE KEY `vlan_id_2` (`vlan_id`,`ip`)
-) ENGINE=InnoDB AUTO_INCREMENT=5574 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=6084 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -120,7 +121,7 @@ CREATE TABLE `job` (
   `lock_target` varchar(64) CHARACTER SET latin1 DEFAULT NULL,
   `project_id` varchar(8) CHARACTER SET latin1 DEFAULT NULL,
   PRIMARY KEY (`job_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10245 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=10776 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -311,4 +312,4 @@ CREATE TABLE `vps_template` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2012-11-02 13:10:14
+-- Dump completed on 2013-04-13  0:05:03
