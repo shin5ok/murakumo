@@ -91,11 +91,13 @@ sub auto :Private {
 
   my $project_id = $args[0] || q{};
 
+  my $src_ip = $c->request->address;
   if ( $c->request->path =~ m{^admin/?}i ) {
 
     if ( $admin_api_key ) {
 
-      if ($admin_model->is_admin_access( $admin_api_key, $c->request ) ) {
+      $c->log->debug("admin api from $src_ip");
+      if ($admin_model->is_admin_access( $admin_api_key, { src_ip => $src_ip } ) ) {
         $c->stash->{authed}   = 1;
         $c->stash->{is_admin} = 1;
 
@@ -109,7 +111,7 @@ sub auto :Private {
 
     if ( $admin_api_key ) {
 
-      if ($admin_model->is_admin_access( $admin_api_key, $c->request ) ) {
+      if ($admin_model->is_admin_access( $admin_api_key, { src_ip => $src_ip } ) ) {
         $c->stash->{authed}   = 1;
         $c->stash->{is_admin} = 1;
 

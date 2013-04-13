@@ -192,7 +192,7 @@ sub job :Local {
   my $utils     = Murakumo::CLI::Utils->new;
   my @hostnames = $utils->my_hostname;
 
-  $params->{callback_host} = $hostnames[1];
+  # $params->{callback_host} = $hostnames[1];
   my $response_json = $node_model->api_json_post($uri, $params);
 
   if (! $response_json) {

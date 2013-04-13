@@ -82,7 +82,7 @@ my $method = shift @args || qq{};
 $method =~ s/\-/_/g;
 
 my $wwwua = LWP::UserAgent->new;
-$wwwua->ssl_opts( verify_hostname => 0, SSL_verify_mode => q{SSL_VERIFY_NONE});
+$wwwua->ssl_opts( verify_hostname => 0, SSL_verify_mode => q{SSL_VERIFY_NONE} );
 $wwwua->timeout( 10 );
 
 my @results = __PACKAGE__->$method( @args );

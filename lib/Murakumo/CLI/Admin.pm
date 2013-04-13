@@ -13,12 +13,17 @@ package Murakumo::CLI::Admin 0.01 {
   use base q(Murakumo::CLI::DB);
 
   sub is_admin_access {
-    my ($self, $admin_api_key, $request_object) = @_;
+    my ($self, $admin_api_key, $params) = @_;
 
     my $resultset = $self->schema->resultset('Admin');
     my @rs = $resultset->search;
 
-    my $src_ip = $request_object->address;
+    my $src_ip = $params->{src_ip};
+    if ( ! defined $src_ip ) {
+      croak "*** source ip address is empty";
+    }
+
+    logger('debug', "try admin api from $src_ip");
 
     my $is_ok = 0;
     _RS_: for my $r ( @rs ) {
