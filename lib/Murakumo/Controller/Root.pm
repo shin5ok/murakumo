@@ -61,9 +61,7 @@ sub auto :Private {
                        ? @$forbidden_api
                        : ($forbidden_api);
 
-    warn Dumper \@forbidden_apis;
     for my $api ( @forbidden_apis ) {
-    warn "$request_path : $api";
       if ($request_path =~ m{$api}) {
         $c->response->body( 'forbidden' );
         $c->response->status( 403 );
@@ -102,7 +100,6 @@ sub auto :Private {
         $c->stash->{is_admin} = 1;
 
       }
-
     }
 
   }
@@ -159,7 +156,7 @@ sub end : ActionClass('RenderView') {
       $c->stash->{result}  = "0";
       # defaut error
       if (! exists $c->stash->{message}) {
-        warn "--- default error -------------";
+        warn "--- default error -------------" if is_debug;
         $c->stash->{message} = $@;
       }
 

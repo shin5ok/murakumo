@@ -81,6 +81,10 @@ my $method = shift @args || qq{};
 # - は _ に変換する
 $method =~ s/\-/_/g;
 
+my $wwwua = LWP::UserAgent->new;
+$wwwua->ssl_opts( verify_hostname => 0, SSL_verify_mode => q{SSL_VERIFY_NONE});
+$wwwua->timeout( 10 );
+
 my @results = __PACKAGE__->$method( @args );
 
 if (@results > 1) {
@@ -801,8 +805,6 @@ sub AUTOLOAD {
 }
 
 sub _www_get {
-  my $wwwua = LWP::UserAgent->new;
-  $wwwua->timeout( 10 );
   my ($uri_string, %param) = @_;
   my $uri = URI->new( $uri_string );
   %param and $uri->query_form( \%param );
@@ -816,6 +818,9 @@ sub _www_get {
   }
 
   my $response = $wwwua->get( $uri );
+  if (! $response->is_success) {
+    croak sprintf "response error code: %s\n", $response->code;
+  }
 
   if ($debug >= 2) {
 
@@ -827,20 +832,6 @@ sub _www_get {
   return $response;
 }
 
-sub _www_post {
-  my $uri   = shift;
-  my $param = shift;
-
-  # POSTには、nodeの指定は強制的に
-  defined $node
-    and $param->{node} = $node;
-
-  my $wwwua = LWP::UserAgent->new;
-  $wwwua->timeout( 10 );
-  my $request = POST $uri, [ $param ];
-  return $wwwua->request( $request );
-}
-
 sub _www_json_post {
   my $uri   = shift;
   my $params = shift || {};
@@ -848,9 +839,6 @@ sub _www_json_post {
   # POSTには、nodeの指定は強制的に
   defined $node
     and $params->{node} = $node;
-
-  my $wwwua = LWP::UserAgent->new;
-  $wwwua->timeout( 10 );
 
   my $request = HTTP::Request->new( 'POST', $uri );
   $request->header('Content-Type' => 'application/json');
@@ -870,6 +858,9 @@ sub _www_json_post {
   }
 
   my $response = $wwwua->request( $request );
+  if (! $response->is_success) {
+    croak sprintf "response error code: %s\n", $response->code;
+  }
 
   if ($debug >= 2) {
 
