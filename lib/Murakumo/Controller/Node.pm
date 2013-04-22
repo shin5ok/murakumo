@@ -227,7 +227,7 @@ sub register :Local {
   my $node_r = $node_model->register(
                                      $params->{node}->{name},
                                      $params->{node},
-                                     $params->{node_uuid},
+                                     # $params->{node_uuid},
                                     );
 
   if ( $vps_r and $node_r ) {
@@ -255,7 +255,7 @@ sub list :Local {
   if (! $verbose) {
     $time_until = DateTime->now(time_zone => 'Asia/Tokyo');
     $time_until->subtract( seconds => $c->config->{node_list_expire_second} );
-    warn "time_until apply";
+
   }
 
   $c->stash->{result} = 0;

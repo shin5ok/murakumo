@@ -601,7 +601,7 @@ sub proxy_vlan_id :Private {
 
   local $@;
   eval {
-    my $proxy_vlan_id    = $params->{proxy_vlan_id};
+
     my $vps_define_model = $c->model('VPS_Define');
 
     no strict 'refs';

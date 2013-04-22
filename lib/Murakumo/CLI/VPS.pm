@@ -13,6 +13,8 @@ use base q(Murakumo::CLI::DB);
 
 sub vps_register {
   my ($self, $node, $update_key, $vpses_ref) = @_;
+
+  my $txn = $self->schema->txn_scope_guard;
   my $resultset = $self->schema->resultset('Vps');
 
   my $update_ok = 0;
@@ -21,6 +23,7 @@ sub vps_register {
   for my $vps (@vpses) {
     $vps->{state} == 1 or next;
     $vps->{update_key} = $update_key;
+
     local $@;
     eval {
       $vps->{node} = $node;
@@ -32,8 +35,16 @@ sub vps_register {
       $update_ok++;
     }
   }
+
   $resultset->search_literal(q{node = ? and update_key != ? and state != 0}, $node, $update_key)->delete;
-  return $update_ok == @vpses;
+  if ($update_ok == @vpses) {
+    $txn->commit;
+
+  } else {
+    croak "*** vps register error";
+
+  }
+
 }
 
 # エイリアス
@@ -52,6 +63,7 @@ sub list {
 
   $until and
     $query_hash_ref->{'me.update_time'} = { '>' => $until };
+
   my $rs = $resultset->search(
                                {
                                 'vps_define_rel.project_id' => $project_id,

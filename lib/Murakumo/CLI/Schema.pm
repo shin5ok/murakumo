@@ -13,5 +13,4 @@ __PACKAGE__->loader_options(
   relationships => 1
 );
 
-
 1;
