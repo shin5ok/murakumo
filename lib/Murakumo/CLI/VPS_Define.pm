@@ -871,7 +871,7 @@ sub set_proxy_vlan_id {
                              vlan_id  => $params->{vlan_id},
                            })
                   ->update({
-                             proxy_vlan_id => $params->{proxy_vlan_id},
+                             proxy_vlan_id => $params->{proxy_vlan_id} || undef,
                            });
 
 }

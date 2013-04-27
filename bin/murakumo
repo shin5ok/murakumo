@@ -46,6 +46,7 @@ opts my $name            => 'Str',
      my $public_template => 'Int',
      my $cdrom_boot      => 'Bool',
      my $new_project_id  => 'Str',
+     my $proxy_vlan_id   => 'Str',
      my $node            => 'Str';
 
 our $debug = exists $ENV{DEBUG}
@@ -383,7 +384,6 @@ sub _clone {
 }
 
 
-
 sub vps_boot {
   goto &vps_boot_by_uuid;
 }
@@ -719,6 +719,16 @@ sub job_list {
   $cols[$#cols] = q(request_job|30);
 
   return (\@cols, \@rows);
+
+}
+
+
+sub vps_define_proxy_vlan {
+
+  my $uri = _create_uri( "/$project_id/vps/define/proxy_vlan_id/$uuid" );
+  my $response = _www_json_post( $uri, { proxy_vlan_id => $proxy_vlan_id, vlan_id => $vlan_id } );
+
+  return _r( $response );
 
 }
 
