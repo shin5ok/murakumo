@@ -56,7 +56,16 @@ sub now_string {
 }
 
 sub now {
-  my $now = DateTime->now( time_zone => 'Asia/Tokyo' );
+  my $self = shift;
+
+  my $time_zone;
+  eval {
+    no strict 'refs';
+    $time_zone = $self->config->{time_zone};
+  };
+  $time_zone //= qq{Asia/Tokyo};
+
+  my $now = DateTime->now( time_zone => $time_zone );
   return $now;
 }
 

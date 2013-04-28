@@ -64,7 +64,7 @@ sub vps_list_all :Local {
     no strict 'refs';
     my $verbose = $params->{'verbose'};
     if (! $verbose) {
-      $time_until = DateTime->now(time_zone => 'Asia/Tokyo');
+      $time_until = Murakumo::CLI::Utils->now;
       $time_until->subtract( seconds => $c->config->{vps_list_expire_second} );
     }
   }

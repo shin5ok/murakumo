@@ -418,7 +418,7 @@ sub create_or_modify {
   local $@;
   eval {
     # できれば mysqlの日付型に自動変換
-    my $now = DateTime->now(time_zone => 'Asia/Tokyo');
+    my $now = Murakumo::CLI::Utils->now;
 
     my ($is_vps_exists) = $vps_define_rs->search({ uuid => $uuid, project_id => $project_id });
 

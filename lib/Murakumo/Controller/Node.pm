@@ -253,7 +253,7 @@ sub list :Local {
 
   my $time_until;
   if (! $verbose) {
-    $time_until = DateTime->now(time_zone => 'Asia/Tokyo');
+    $time_until = Murakumo::CLI::Utils->now;
     $time_until->subtract( seconds => $c->config->{node_list_expire_second} );
 
   }

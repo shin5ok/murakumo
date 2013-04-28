@@ -53,7 +53,7 @@ sub select {
   my $resultset = $self->schema->resultset('Node');
   my %auto_select_node = map { $_ => 1 } $self->get_auto_select_nodes;
 
-  my $until = DateTime->now(time_zone => 'Asia/Tokyo');
+  my $until = Murakumo::CLI::Utils->now;
      $until->subtract( seconds => $config->{node_list_expire_second} );
 
   my $query = {
