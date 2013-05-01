@@ -17,6 +17,26 @@ requires 'Moose';
 requires 'namespace::autoclean';
 requires 'Config::General'; # This should reflect the config file format you've chosen
                  # See Catalyst::Plugin::ConfigLoader for supported formats
+
+requires 'Config::General';
+requires 'DBIx::Class';
+requires 'DBIx::Class::Schema::Loader';
+requires 'Data::UUID';
+requires 'DateTime';
+requires 'FindBin';
+requires 'JSON';
+requires 'JSON::XS';
+requires 'LWP::UserAgent';
+requires 'Log::Log4perl';
+requires 'Log::Log4perl::Catalyst';
+requires 'Module::Install::Catalyst';
+requires 'Moose';
+requires 'Path::Class';
+requires 'URI';
+requires 'URI::Escape';
+requires 'XML::TreePP';
+requires 'YAML';
+
 test_requires 'Test::More' => '0.88';
 catalyst;
 
