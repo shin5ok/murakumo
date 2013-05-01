@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Murakumo::CLI::Schema;
+package Murakumo::CLI::Schema 0.01;
 use DBIx::Class::Schema::Loader;
 use base q(DBIx::Class::Schema::Loader);
 

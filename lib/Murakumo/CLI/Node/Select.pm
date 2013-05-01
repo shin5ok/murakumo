@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Murakumo::CLI::Node::Select;
+package Murakumo::CLI::Node::Select 0.08;
 use Data::Dumper;
 use Carp;
 use List::Util qw(shuffle);
@@ -10,8 +10,6 @@ use lib qq{$FindBin::Bin/../lib};
 use Murakumo::CLI::Utils;
 use Murakumo::CLI::DB;
 use base qw( Murakumo::CLI::DB );
-
-our $VERSION          = q(0.0.8);
 
 our $default_api_port = 3000;
 

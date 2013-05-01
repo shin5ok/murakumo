@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+
 package Murakumo::CLI::Node 0.03;
 use URI;
 use JSON;

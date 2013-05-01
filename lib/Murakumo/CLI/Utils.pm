@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Murakumo::CLI::Utils;
+package Murakumo::CLI::Utils 0.03;
 use URI;
 use JSON;
 use Carp;
@@ -14,8 +14,6 @@ use IPC::Open2;
 use Sys::Hostname;
 use FindBin;
 use Log::Log4perl;
-
-our $VERSION = q(0.0.3);
 
 our $config_path     = qq{$FindBin::Bin/../murakumo.conf};
 our $log_config_path = qq{$FindBin::Bin/../log4perl.conf};
