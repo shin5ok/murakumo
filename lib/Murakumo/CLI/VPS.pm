@@ -36,9 +36,17 @@ sub vps_register {
     }
   }
 
-  $resultset->search_literal(q{node = ? and update_key != ? and state != 0}, $node, $update_key)->delete;
+  my $no_current_rs = $resultset->search({
+                                           node       => $node,
+                                           update_key => { '!=' => $update_key },
+                                           state      => { '!=' => 0 },
+                                         });
+  if ($no_current_rs->count > 0) {
+    $no_current_rs->delete;
+  }
+
   if ($update_ok == @vpses) {
-    $txn->commit;
+    return $txn->commit;
 
   } else {
     croak "*** vps register error";
