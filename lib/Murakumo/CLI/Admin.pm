@@ -68,38 +68,38 @@ package Murakumo::CLI::Admin 0.01 {
   }
 
   sub vps_list {
-    my ($self, $query, $until) = @_;
+    my ($self, $query_hash_ref, $until) = @_;
 
-    my $resultset        = $self->schema->resultset('Vps');
-    my $define_resultset = $self->schema->resultset('VpsDefine');
+    my $resultset = $self->schema->resultset('Vps');
 
-    $query ||= {};
-    my %uuid_map_project = map { $_->uuid => $_->project_id }
-                               $define_resultset
-                               ->search( $query );
+    $query_hash_ref //= +{};
 
-    my $query_hash_ref = +{ state => { "!=" => "0" } };
+    $query_hash_ref->{state} = +{ "!=" => "0" };
+
     $until and
-      $query_hash_ref->{update_time} = { '>' => $until };
-    my $rs = $resultset->search( $query_hash_ref );
+      $query_hash_ref->{'me.update_time'} = { '>' => $until };
+
+    my $rs = $resultset->search(
+                                 $query_hash_ref,
+                                 {
+                                   prefetch => [ 'vps_define_rel', ],
+                                 }
+                               );
+
     my @vpses;
 
     no strict 'refs';
     while (my $x = $rs->next) {
-      my $uuid = $x->uuid;
-
-      $uuid_map_project{$uuid} or next;
-
       push @vpses, {
-                     project_id  => $uuid_map_project{$uuid},
                      name        => $x->name,
-                     uuid        => $uuid,
+                     uuid        => $x->uuid,
                      node        => $x->node,
                      memory      => $x->memory,
                      cpu         => $x->cpu,
                      state       => $x->state,
                      update_time => $x->update_time,
                      vnc_port    => $x->vnc_port,
+                     project_id  => $x->vps_define_rel->project_id,
                    };
     }
 
@@ -148,4 +148,3 @@ package Murakumo::CLI::Admin 0.01 {
 
 1;
 
-__END__
