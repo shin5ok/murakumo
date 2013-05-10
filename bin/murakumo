@@ -815,9 +815,9 @@ sub AUTOLOAD {
 }
 
 sub _www_get {
-  my ($uri_string, %param) = @_;
+  my ($uri_string, $param) = @_;
   my $uri = URI->new( $uri_string );
-  %param and $uri->query_form( \%param );
+  $param and $uri->query_form( %$param );
 
   if ($debug) {
     local $Data::Dumper::Terse = 1;
