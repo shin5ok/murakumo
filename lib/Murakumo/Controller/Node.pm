@@ -219,16 +219,17 @@ sub register :Local {
   my $vps_model  = $c->model('VPS');
   my $node_model = $c->model('Node');
 
-  my $vps_r  = $vps_model->register(
-                                     $params->{node}->{name},
-                                     $params->{update_key},
-                                     $params->{vpses},
-                                   );
   my $node_r = $node_model->register(
                                      $params->{node}->{name},
                                      $params->{node},
                                      # $params->{node_uuid},
                                     );
+
+  my $vps_r  = $vps_model->register(
+                                     $params->{node}->{name},
+                                     $params->{update_key},
+                                     $params->{vpses},
+                                   );
 
   if ( $vps_r and $node_r ) {
     $c->stash->{result} = 1;
