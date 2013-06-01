@@ -398,8 +398,7 @@ sub vps_boot_by_uuid {
                : "";
   my $response = _www_json_post(
                                  $uri, {
-                                         node          => $set_node, 
-                                         uuid          => $uuid, 
+                                         node          => $set_node,
                                          clean_traffic => $clean_traffic || 0,
                                          cdrom_boot    => $cdrom_boot,
                                          disk_cache    => $disk_cache,
