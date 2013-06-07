@@ -133,6 +133,10 @@ package Murakumo::CLI::Admin 0.01 {
     my $key = Murakumo::CLI::Utils::create_uuid();
        $key =~ s/\-//g;
 
+    if ( lc $project_id eq 'admin' ) {
+      croak "*** project_id 'admin' cannot use";
+    }
+
     my %project_args = (
                          project_id => $project_id,
                          api_key    => $key,
