@@ -10,6 +10,7 @@ use opts;
 
 opts my $export_path => 'Str',
      my $host        => 'Str',
+     my $tag         => 'Str',
      my $type        => 'Str',
      my $priority    => 'Int';
 
@@ -21,7 +22,7 @@ my $mode = shift || "";
 
 $priority ||= 100;
 $type     ||= "nfs";
-if ($mode eq 'add') { 
+if ($mode eq 'add') {
   if ( ! $host or ! $export_path ) {
     usage();
     exit 255;
@@ -31,13 +32,14 @@ if ($mode eq 'add') {
   exit 0;
 }
 
-my $db = Murakumo::CLI::DB->new->schema; 
+my $db = Murakumo::CLI::DB->new->schema;
 my $rs = $db->resultset('Storage');
 
 # +-------------+--------------+------+-----+-------------------+-----------------------------+
 # | Field       | Type         | Null | Key | Default           | Extra                       |
 # +-------------+--------------+------+-----+-------------------+-----------------------------+
 # | uuid        | varchar(48)  | NO   | PRI |                   |                             |
+# | tag         | varchar(32)  | YES  |     | NULL              |                             |
 # | export_path | varchar(255) | YES  |     | NULL              |                             |
 # | mount_path  | varchar(255) | YES  |     | NULL              |                             |
 # | host        | varchar(64)  | YES  |     | NULL              |                             |
@@ -56,6 +58,7 @@ my $params = {
   type        => $type,
   available   => 1,
   priority    => $priority,
+  tag         => $tag,
 };
 
 $rs->create( $params );
@@ -78,10 +81,10 @@ sub make_mount_path {
 
 sub usage {
   print << "__USAGE__";
-(root)# $0 add --export_path string --host string [ --type string --priority int ]
+(root)# $0 add --export_path string --host string [ --type string --priority int --tag ]
         (attention: --type support for 'nfs' only)
   ex:
-  (root)# $0 add --export_path /nfs/vm --host 192.168.1.24
+  (root)# $0 add --export_path /nfs/vm --host 192.168.1.24 --tag FOR_BACKUP
 
 
 __USAGE__

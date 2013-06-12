@@ -32,10 +32,10 @@ sub info {
 }
 
 sub select {
-  my ($self) = @_;
-  my $resultset = $self->schema->resultset('Storage');
-  my ($storage_obj) = $resultset->search({}, { order_by => { -desc => [ 'priority' ] } });
-  return $storage_obj->uuid;
+  my ($self, $query_args) = @_;
+
+  require Murakumo::CLI::Storage::Select;
+  return  Murakumo::CLI::Storage::Select->new->select( $query_args );
 }
 
 sub list {
@@ -46,6 +46,7 @@ sub list {
   my @lists;
   for my $storage ( @storages ) {
     my $x = {
+      tag         => $storage->tag,
       uuid        => $storage->uuid,
       mount_path  => $storage->mount_path,
       regist_time => $storage->regist_time,
