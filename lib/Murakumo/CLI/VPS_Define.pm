@@ -303,12 +303,20 @@ sub create_disk_param_array {
   my $storage_uuid = $argv->{storage_uuid};
 
   if (! $storage_uuid) {
-    $storage_uuid = Murakumo::CLI::Storage->new->select;
+    my $query = {};
+    if (exists $argv->{tag}) {
+      $query->{tag} = $argv->{tag};
+    }
+
+    # 今回要求したディスクの合計値
+    # つまり、1回の要求で複数のディスクを要求しても、それらは同じストレージに置かれる
+    my $total_size = 0;
+    $total_size += $_ for @$array_ref;
+    warn Dumper $array_ref;
+
+    $storage_uuid = Murakumo::CLI::Storage->new->select( $total_size, $query );
 
   }
-
-  $storage_uuid
-    or croak "*** storage uuid get error...";
 
   my $vm_root = $config->{vm_root};
   $vm_root    =~ s{^/+}{};
@@ -388,7 +396,7 @@ sub create_or_modify {
   }
 
   my @disk_args_refs;
-  if (exists $vps_params->{disk}) {
+  if (exists $vps_params->{disk} and @{$vps_params->{disk}} > 0) {
     my @current_disks = $disk_define_rs->search({ vps_uuid => $uuid });
 
     my $storage_uuid;

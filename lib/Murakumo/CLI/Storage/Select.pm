@@ -11,18 +11,25 @@ use Murakumo::CLI::Utils;
 use Murakumo::CLI::DB;
 use base qw( Murakumo::CLI::DB );
 
-my $config = Murakumo::CLI::Utils->config;
+# my $config = Murakumo::CLI::Utils->config;
 
 sub select {
-  my ($self, $query_args) = @_;
+  my ($self, $size, $query_args) = @_;
   my $resultset = $self->schema->resultset('Storage');
 
-  # tag が入ってくることを想定
-  my $query_args //= +{};
+  $query_args //= +{};
+  $query_args->{avail_size} = +{ '>' => $size };
 
-  my ($storage_obj) = $resultset->search($query_args, { order_by => { -desc => [ 'priority' ] } });
+  warn Dumper $query_args;
 
-  return $storage_obj->uuid;
+  my @rs = $resultset->search($query_args, { order_by => { -desc => [ 'priority' ] } });
+  @rs = sort { $a->iowait <=> $b->iowait } @rs;
+
+  if (@rs == 0) {
+    croak "*** no storage available";
+  }
+
+  return $rs[0]->uuid;
 
 }
 

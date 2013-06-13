@@ -32,10 +32,10 @@ sub info {
 }
 
 sub select {
-  my ($self, $query_args) = @_;
+  my ($self, @args ) = @_;
 
   require Murakumo::CLI::Storage::Select;
-  return  Murakumo::CLI::Storage::Select->new->select( $query_args );
+  return  Murakumo::CLI::Storage::Select->new->select( @args );
 }
 
 sub list {
@@ -54,6 +54,8 @@ sub list {
       type        => $storage->type,
       priority    => $storage->priority,
       export_path => $storage->export_path,
+      iowait      => $storage->iowait,
+      avail_size  => $storage->avail_size,
     };
     push @lists, $x;
   }

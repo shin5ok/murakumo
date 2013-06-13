@@ -762,7 +762,7 @@ sub storage_list {
 
   my $data = decode_json $response->content;
 
-  my @cols = qw( uuid type export_path host mount_path priority regist_time );
+  my @cols = qw( uuid type export_path host mount_path priority avail_size iowait regist_time );
 
   my @rows;
   for my $x ( @{$data->{data}} ) {
