@@ -140,6 +140,25 @@ sub auto :Private {
 }
 
 
+sub storage_register_status :Local {
+  my ($self, $c, $uuid) = @_;
+
+  my $body   = $c->request->body;
+  my $params;
+  eval {
+    $params = decode_json <$body>;
+    warn Dumper $params;
+  };
+
+  my $model = $c->model('Storage');
+
+  if ($model->register_status( $uuid, $params )) {
+    $c->stash->{result} = 1;
+  }
+
+}
+
+
 
 =head1 AUTHOR
 

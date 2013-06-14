@@ -63,6 +63,12 @@ sub list {
   return @lists;
 }
 
+sub register_status {
+  my ($self, $uuid, $status) = @_;
+  require Murakumo::CLI::Storage::Status;
+  Murakumo::CLI::Storage::Status->new->regist( $uuid, $status );
+}
+
 1;
 __END__
 

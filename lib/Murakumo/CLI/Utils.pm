@@ -29,8 +29,15 @@ sub import {
 sub new {
   my $class = shift;
   bless {
-    wwwua => LWP::UserAgent->new,
+    wwwua => user_agent(),
   }, $class;
+}
+
+sub user_agent {
+  my $ua = LWP::UserAgent->new;
+  $ua->ssl_opts( verify_hostname => 0, SSL_verify_mode => q{SSL_VERIFY_NONE} );
+  $ua->timeout( 30 );
+  return $ua;
 }
 
 sub dumper {

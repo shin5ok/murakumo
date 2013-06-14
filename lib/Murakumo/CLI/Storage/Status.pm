@@ -14,13 +14,7 @@ sub regist {
   my ($self, $uuid, $params) = @_;
   my $resultset = $self->schema->resultset('Storage');
 
-  my $query = {
-    uuid => $uuid,
-  };
-
-  %$query = (%$query, %$params);
-
-  $resultset->update_or_create( $query );
+  $resultset->search({ uuid => $uuid })->update( $params );
 
 }
 

@@ -36,6 +36,7 @@ requires 'URI';
 requires 'URI::Escape';
 requires 'XML::TreePP';
 requires 'YAML';
+requires 'Net::SNMP';
 
 test_requires 'Test::More' => '0.88';
 catalyst;

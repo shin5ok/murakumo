@@ -21,6 +21,8 @@ Catalyst Controller.
 
 =cut
 
+use JSON;
+
 sub info :Local {
 
   my ($self, $c) = @_;
