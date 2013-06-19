@@ -25,8 +25,9 @@ opts my $name            => 'Str',
      my $cpu_number      => 'Int',
      my $memory          => 'Int',
      my $set_network     => 'Str',
-     my $no_virtio       => 'Bool',
+     my $storage_tag     => 'Str',
      my $storage_uuid    => 'Str',
+     my $no_virtio       => 'Bool',
      my $assign_ip       => 'Bool',
      my $clock           => 'Str',
      my $verbose         => 'Bool',
@@ -363,6 +364,7 @@ sub _clone {
   my %param = (
     vlan_id      => $vlan_id,
     storage_uuid => $storage_uuid,
+    storage_tag  => $storage_tag,
   );
 
   defined $assign_ip and
@@ -504,6 +506,7 @@ sub _vps_define_create_or_modify {
      disk         => \@disks,
      interface    => \@interfaces,
      storage_uuid => $storage_uuid,
+     storage_tag  => $storage_tag,
   };
 
   my $request_uri = qq{/$project_id/vps/define/$mode_uri/};
@@ -762,7 +765,7 @@ sub storage_list {
 
   my $data = decode_json $response->content;
 
-  my @cols = qw( uuid type export_path host mount_path priority avail_size iowait regist_time );
+  my @cols = qw( uuid storage_tag type export_path host mount_path priority avail_size iowait regist_time );
 
   my @rows;
   for my $x ( @{$data->{data}} ) {

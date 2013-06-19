@@ -138,6 +138,7 @@ sub clone :Private {
                : $dst_uuid;
 
   my $storage_uuid = $params->{storage_uuid};
+  my $storage_tag  = $params->{storage_tag};
   my $tag          = $params->{tag};
 
   my $r;
@@ -157,6 +158,7 @@ sub clone :Private {
                                                       tag          => $tag,
                                                       vlan_id      => $vlan_id,
                                                       storage_uuid => $storage_uuid,
+                                                      storage_tag  => $storage_tag,
                                                    },
                                       );
   };

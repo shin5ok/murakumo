@@ -274,8 +274,8 @@ sub delete {
 sub create_disk_param_array {
   my ($self, $array_ref, $argv) = @_;
 
-  if (exists $ENV{DEBUG}) {
-    warn "--- _create_disk_param_array ---";
+  if (is_debug) {
+    warn "--- create_disk_param_array ---";
     warn Dumper $argv;
   }
 
@@ -304,15 +304,14 @@ sub create_disk_param_array {
 
   if (! $storage_uuid) {
     my $query = {};
-    if (exists $argv->{tag}) {
-      $query->{tag} = $argv->{tag};
+    if (exists $argv->{storage_tag}) {
+      $query->{storage_tag} = $argv->{storage_tag};
     }
 
     # 今回要求したディスクの合計値
     # つまり、1回の要求で複数のディスクを要求しても、それらは同じストレージに置かれる
     my $total_size = 0;
     $total_size += $_ for @$array_ref;
-    warn Dumper $array_ref;
 
     $storage_uuid = Murakumo::CLI::Storage->new->select( $total_size, $query );
 
@@ -400,8 +399,10 @@ sub create_or_modify {
     my @current_disks = $disk_define_rs->search({ vps_uuid => $uuid });
 
     my $storage_uuid;
+    my $storage_tag;
     my $driver;
     {
+      $storage_tag  = $vps_params->{storage_tag};
       $storage_uuid = $vps_params->{storage_uuid};
       $driver       = $options->{driver} || "virtio";
     }
@@ -412,6 +413,7 @@ sub create_or_modify {
                                                        uuid         => $uuid,
                                                        number       => $current_disk_number,
                                                        storage_uuid => $storage_uuid,
+                                                       storage_tag  => $storage_tag,
                                                        driver       => $driver,
                                                      }
                                                     );

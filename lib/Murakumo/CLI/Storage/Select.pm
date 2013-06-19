@@ -27,12 +27,23 @@ sub select {
   }
 
   my @rs = $resultset->search($query_args, { order_by => { -desc => [ 'priority' ] } });
-  @rs = sort { $a->iowait <=> $b->iowait } @rs;
-
   if (@rs == 0) {
-    croak "*** no storage available";
+    croak "*** no storage is available";
   }
 
+  my $priority = $rs[0]->priority;
+
+  @rs = sort { $a->iowait <=> $b->iowait }
+        grep { $_->priority == $priority }
+        @rs;
+
+  if (is_debug) {
+    warn sprintf "uuid %s: iowait %s",
+                 $_->uuid,
+                 $_->iowait
+         for @rs;
+    warn "auto select uuid ", $rs[0]->uuid if is_debug;
+  }
   return $rs[0]->uuid;
 
 }

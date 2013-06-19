@@ -46,7 +46,7 @@ sub list {
   my @lists;
   for my $storage ( @storages ) {
     my $x = {
-      tag         => $storage->tag,
+      storage_tag => $storage->storage_tag,
       uuid        => $storage->uuid,
       mount_path  => $storage->mount_path,
       regist_time => $storage->regist_time,

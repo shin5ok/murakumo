@@ -58,7 +58,7 @@ my $params = {
   type        => $type,
   available   => 1,
   priority    => $priority,
-  tag         => $tag,
+  tag         => $tag // qq{},
 };
 
 $rs->create( $params );
