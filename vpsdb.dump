@@ -101,7 +101,7 @@ CREATE TABLE `ip` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `vlan_id` (`vlan_id`,`ip`),
   UNIQUE KEY `vlan_id_2` (`vlan_id`,`ip`)
-) ENGINE=InnoDB AUTO_INCREMENT=6091 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=6094 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -121,7 +121,7 @@ CREATE TABLE `job` (
   `lock_target` varchar(64) CHARACTER SET latin1 DEFAULT NULL,
   `project_id` varchar(16) DEFAULT NULL,
   PRIMARY KEY (`job_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11079 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=11174 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -190,13 +190,15 @@ DROP TABLE IF EXISTS `storage`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `storage` (
   `uuid` varchar(48) NOT NULL DEFAULT '',
-  `tag` varchar(32) DEFAULT NULL,
+  `storage_tag` varchar(32) DEFAULT NULL,
   `export_path` varchar(255) DEFAULT NULL,
   `mount_path` varchar(255) DEFAULT NULL,
   `host` varchar(64) DEFAULT NULL,
   `type` varchar(8) DEFAULT NULL,
   `available` int(128) DEFAULT NULL,
   `priority` int(8) DEFAULT '0',
+  `avail_size` bigint(20) unsigned DEFAULT '0',
+  `iowait` bigint(20) unsigned DEFAULT NULL,
   `regist_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`uuid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
@@ -313,4 +315,4 @@ CREATE TABLE `vps_template` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-06-12 12:28:34
+-- Dump completed on 2013-06-19 16:39:02
