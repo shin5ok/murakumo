@@ -43,6 +43,34 @@ sub info :Local {
 
 }
 
+sub select :Local {
+  my ($self, $c) = @_;
+
+  my $q = $c->request->query_params;
+
+  my $size = $q->{size};
+  if (! defined $size) {
+    $c->detach('/stop_error', ["size is required"]);
+
+  }
+
+  my $query_args = +{};
+  exists $q->{tag}
+    and $query_args->{storage_tag} = $q->{tag};
+
+  local $@;
+  eval {
+    my $storage_model = $c->model('Storage');
+
+    my $uuid = $storage_model->select( $size, $query_args );
+
+    $c->stash->{data}   = { uuid => $uuid };
+    $c->stash->{result} = 1;
+  };
+  warn $@ if $@;
+
+}
+
 sub list :Local {
   my ($self, $c) = @_;
 
