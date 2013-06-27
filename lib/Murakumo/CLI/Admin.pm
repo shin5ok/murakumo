@@ -23,7 +23,7 @@ package Murakumo::CLI::Admin 0.01 {
       croak "*** source ip address is empty";
     }
 
-    logger('debug', "try admin api from $src_ip");
+    logging 'debug', "try admin api from $src_ip";
 
     my $is_ok = 0;
     _RS_: for my $r ( @rs ) {
@@ -37,7 +37,7 @@ package Murakumo::CLI::Admin 0.01 {
       }
     }
 
-    logger('debug', "admin auth $is_ok");
+    logging 'debug', "admin auth $is_ok";
     return $is_ok;
 
   }

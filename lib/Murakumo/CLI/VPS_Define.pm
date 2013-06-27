@@ -303,8 +303,9 @@ sub create_disk_param_array {
   my $storage_uuid = $argv->{storage_uuid};
 
   if (! $storage_uuid) {
+    no strict 'refs';
     my $query = {};
-    if (exists $argv->{storage_tag}) {
+    if (defined $argv->{storage_tag}) {
       $query->{storage_tag} = $argv->{storage_tag};
     }
 
@@ -602,7 +603,7 @@ sub tag_list {
 sub record_cloning {
   my ( $self, $src_uuid, $args_ref, $opt_args_ref ) = @_;
 
-  logger "debug", "call record_cloning";
+  logging "debug", "call record_cloning";
 
   my $vps_define_rs   = $self->schema->resultset('VpsDefine');
   my $disk_define_rs  = $self->schema->resultset('DiskDefine');

@@ -67,6 +67,9 @@ sub reserve_ip {
   $txn->commit;
 
   my ($x) = $resultset->search({ reserve_uuid => $reserve_uuid });
+  if (! $x) {
+    croak "no ip in vlan_id $param_ref->{vlan_id}";
+  }
 
   return ($x->ip, $x->mask, $x->gw);
 

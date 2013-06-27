@@ -23,7 +23,7 @@ sub import {
   no strict 'refs';
   *{"${caller}::dumper"}   = \&dumper;
   *{"${caller}::is_debug"} = \&is_debug;
-  *{"${caller}::logger"}   = \&logger;
+  *{"${caller}::logging"}  = \&logging;
 }
 
 sub new {
@@ -190,11 +190,17 @@ sub is_debug {
 }
 
 sub logger {
+  goto \&logging;
+
+}
+
+sub logging {
   Log::Log4perl->init( $log_config_path );
   my $log = Log::Log4perl->get_logger;
   my $level      = shift;
   my $log_string = shift;
   $log->$level( $log_string );
+  warn $log_string if is_debug;
 }
 
 

@@ -26,6 +26,8 @@ sub select {
     }
   }
 
+  logging 'info', Dumper $query_args;
+
   my @rs = $resultset->search($query_args, { order_by => { -desc => [ 'priority' ] } });
   if (@rs == 0) {
     croak "*** no storage is available";
