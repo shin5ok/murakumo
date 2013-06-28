@@ -363,9 +363,13 @@ sub _clone {
   my $uri = shift;
   my %param = (
     vlan_id      => $vlan_id,
-    storage_uuid => $storage_uuid,
-    storage_tag  => $storage_tag,
   );
+
+  defined $storage_uuid and
+    $param{storage_uuid} = $storage_uuid;
+
+  defined $storage_tag and
+    $param{storage_tag} = $storage_tag;
 
   defined $assign_ip and
     $param{assign_ip}   = 1;
@@ -505,9 +509,14 @@ sub _vps_define_create_or_modify {
      spec         => $vps,
      disk         => \@disks,
      interface    => \@interfaces,
-     storage_uuid => $storage_uuid,
-     storage_tag  => $storage_tag,
   };
+
+  defined $storage_uuid and
+    $vps_params->{storage_uuid} = $storage_uuid;
+
+  defined $storage_tag and
+    $vps_params->{storage_tag}  = $storage_tag;
+
 
   my $request_uri = qq{/$project_id/vps/define/$mode_uri/};
   $uuid and $request_uri .= "$uuid/";
