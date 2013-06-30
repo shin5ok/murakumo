@@ -1,5 +1,7 @@
 use strict;
 use warnings;
+use 5.014;
+
 package Murakumo::CLI::Admin 0.01 {
 
   use Carp;

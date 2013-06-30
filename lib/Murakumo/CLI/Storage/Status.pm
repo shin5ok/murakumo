@@ -1,5 +1,7 @@
 use strict;
 use warnings;
+use 5.014;
+
 package Murakumo::CLI::Storage::Status 0.01;
 use Data::Dumper;
 use Carp;

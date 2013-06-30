@@ -1,5 +1,7 @@
 use strict;
 use warnings;
+use 5.014;
+
 package Murakumo::CLI::Project 0.01;
 use JSON;
 use Carp;

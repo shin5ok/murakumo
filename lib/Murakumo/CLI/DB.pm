@@ -1,5 +1,7 @@
 use strict;
 use warnings;
+use 5.014;
+
 package Murakumo::CLI::DB 0.03 {
   use Carp;
   use FindBin;

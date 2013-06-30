@@ -1,5 +1,7 @@
 use strict;
 use warnings;
+use 5.014;
+
 package Murakumo::CLI::Job 0.01;
 
 use JSON;
@@ -7,6 +9,7 @@ use Carp;
 use Data::Dumper;
 use FindBin;
 use lib qq{$FindBin::Bin/../lib};
+use Murakumo::CLI::Utils;
 use Murakumo::CLI::DB;
 use base q(Murakumo::CLI::DB);
 
@@ -111,7 +114,7 @@ sub is_locked_by_uuid {
   };
   if ($@) {
     warn $@;
-    return 0; 
+    return 0;
   }
   # ロックされていたら
   return @rs >= 1;
@@ -145,7 +148,7 @@ sub create {
   $txn->commit;
 
   if ($@ and @created == 0) {
-    warn Dumper $param_ref;
+    warn Dumper $param_ref if is_debug;
     warn "uuid create error $uuid" . $@ if $@;
     return "uuid create error $uuid $@";
 

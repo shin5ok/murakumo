@@ -1,5 +1,7 @@
 use strict;
 use warnings;
+use 5.014;
+
 package Murakumo::CLI::Node::Select 0.08;
 use Data::Dumper;
 use Carp;
@@ -114,4 +116,3 @@ sub get_auto_select_nodes {
 
 
 1;
-

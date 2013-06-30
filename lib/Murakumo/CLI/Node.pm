@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use 5.014;
 
 package Murakumo::CLI::Node 0.03;
 use URI;
@@ -193,7 +194,7 @@ sub is_available {
   my $r = $self->wwwua->get( $uri );
 
   return $r->is_success;
-   
+
 }
 
 1;
