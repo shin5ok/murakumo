@@ -268,6 +268,23 @@ sub list :Local {
 
 }
 
+sub select :Local {
+  my ($self, $c) = @_;
+
+  my $node_model = $c->model('Node');
+
+  my $request = $c->request->query_params;
+
+  my %params = (
+    cpu_number => $request->{cpu_number},
+    memory     => $request->{memory},
+  );
+
+  $c->stash->{data}   = $node_model->select( %params );
+  $c->stash->{result} = 1;
+
+}
+
 =head1 AUTHOR
 
 shingo

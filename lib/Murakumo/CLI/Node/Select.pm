@@ -39,8 +39,6 @@ sub select {
     $require_cpu_number = $require_params{cpu_number};
     $require_memory     = $require_params{memory};
 
-    warn Dumper \%require_params if is_debug;
-
     defined $require_cpu_for_node
       and $require_cpu_number += $require_cpu_number;
 
