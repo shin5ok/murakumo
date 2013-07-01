@@ -23,7 +23,7 @@ sub vps_register {
   my @vpses     = @$vpses_ref;
   no strict 'refs';
   for my $vps (@vpses) {
-    $vps->{state} == 1 or next;
+#    $vps->{state} == 1 or next;
     $vps->{update_key} = $update_key;
 
     local $@;
