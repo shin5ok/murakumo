@@ -201,6 +201,7 @@ sub logging {
   my $log = Log::Log4perl->get_logger;
   my $level      = shift;
   my $log_string = shift;
+  $log_string =~ s/\n/ /g;
   $log->$level( $log_string );
   warn $log_string if is_debug;
 }
