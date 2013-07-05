@@ -40,6 +40,13 @@ sub select {
   return  Murakumo::CLI::Storage::Select->new->select( @args );
 }
 
+sub sorted {
+  my ($self, @args ) = @_;
+
+  require Murakumo::CLI::Storage::Select;
+  return  Murakumo::CLI::Storage::Select->new->sorted( @args );
+}
+
 sub list {
   my ($self) = @_;
   my $resultset = $self->schema->resultset('Storage');

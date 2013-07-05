@@ -14,6 +14,15 @@ use base qw( Murakumo::CLI::DB );
 my $config = Murakumo::CLI::Utils->config;
 
 sub select {
+  my ($self, @args) = @_;
+
+  my $sorted_uuids_array_ref = $self->sorted( @args );
+
+  return $sorted_uuids_array_ref->[0];
+
+}
+
+sub sorted {
   my ($self, $size, $query_args) = @_;
   my $resultset = $self->schema->resultset('Storage');
 
@@ -40,13 +49,16 @@ sub select {
         @rs;
 
   if (is_debug) {
+    warn "----- sorted storage below ---------------------------------";
     warn sprintf "uuid %s: iowait %s",
                  $_->uuid,
                  $_->iowait
          for @rs;
-    warn "auto select uuid ", $rs[0]->uuid if is_debug;
   }
-  return $rs[0]->uuid;
+
+  my @sorted_uuids = map { $_->uuid } @rs;
+
+  return \@sorted_uuids;
 
 }
 

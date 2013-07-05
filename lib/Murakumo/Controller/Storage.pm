@@ -48,6 +48,8 @@ sub select :Local {
 
   my $q = $c->request->query_params;
 
+  use Data::Dumper; warn Dumper $q;
+
   my $size = $q->{size};
   if (! defined $size) {
     $c->detach('/stop_error', ["size is required"]);
@@ -62,9 +64,14 @@ sub select :Local {
   eval {
     my $storage_model = $c->model('Storage');
 
-    my $uuid = $storage_model->select( $size, $query_args );
+    my $uuid_array_ref = $storage_model->sorted( $size, $query_args );
 
-    $c->stash->{data}   = { uuid => $uuid };
+    no strict 'refs';
+    if ( ! $q->{list} ) {
+      $c->stash->{data} = { uuid => $uuid_array_ref->[0] };
+    } else {
+      $c->stash->{data} = { uuid => $uuid_array_ref      };
+    }
     $c->stash->{result} = 1;
   };
   warn $@ if $@;
