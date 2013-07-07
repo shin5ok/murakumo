@@ -142,6 +142,7 @@ sub config {
 
 sub create_random_mac {
   my ($self) = @_;
+  local $SIG{CHLD} = 'IGNORE';
   # python の virtinstモジュールが入っている必要があります
   my $pid = open2 my $r, my $w, "/usr/bin/python";
   my $python_code = << '__PYTHON__';
@@ -161,6 +162,7 @@ __PYTHON__
               [0-9a-f]{2}
            $/xms or croak "mac address create failure...";
   close $r;
+  waitpid( $pid, 0 );
   return $mac;
 }
 
