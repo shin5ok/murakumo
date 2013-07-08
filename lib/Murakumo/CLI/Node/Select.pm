@@ -13,9 +13,9 @@ use Murakumo::CLI::Utils;
 use Murakumo::CLI::DB;
 use base qw( Murakumo::CLI::DB );
 
-our $default_api_port = 3000;
-
 my $config = Murakumo::CLI::Utils->config;
+
+our $default_api_port = $config->{api_port} // 3000;
 
 sub select {
   my ($self, %require_params) = @_;
