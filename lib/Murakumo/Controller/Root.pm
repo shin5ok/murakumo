@@ -128,7 +128,8 @@ sub auto :Private {
   } else {
 
     if ($node_model->is_valid_node( $node_name, $node_uuid, $api_key ) ) {
-      $c->stash->{authed} = 1;
+      $c->stash->{authed}     = 1;
+      $c->stash->{valid_node} = 1;
     }
 
   }

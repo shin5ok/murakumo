@@ -217,15 +217,22 @@ sub migration :Private {
 sub auto :Private {
   my ($self, $c) = @_;
 
+  no strict 'refs';
+  if ($c->stash->{valid_node}) {
+    return 1;
+  }
+
   if (exists $c->stash->{uuid} and exists $c->stash->{project_id}) {
     my $vps_define_model = $c->model('VPS_Define');
 
     # だめなら例外
-    $vps_define_model->is_valid_vps_for_project( $c->stash->{project_id}, $c->stash->{uuid} );
+    my $valid = $vps_define_model->is_valid_vps_for_project( $c->stash->{project_id}, $c->stash->{uuid} );
+
+    return $valid;
 
   }
 
-  return 1;
+  return 0;
 
 }
 
