@@ -39,7 +39,7 @@ sub is_valid_project :Private {
 
 =head1 AUTHOR
 
-shingo
+shin5ok
 
 =head1 LICENSE
 

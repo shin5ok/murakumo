@@ -146,7 +146,7 @@ sub vps_define_info {
   defined $uuid
     or croak "*** uuid parameter is not found";
 
-  my %option = @_ > 0 ? @_ : ();
+  my %option = @_ >= 2 ? @_ : ();
 
   my $uri = _create_uri( "/$project_id/vps/define/info/$uuid/" );
   if (exists $option{template} and $option{template}) {
