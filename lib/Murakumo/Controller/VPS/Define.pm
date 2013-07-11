@@ -641,9 +641,15 @@ sub auto :Private {
     # だめなら例外
     my $valid = $vps_define_model->is_valid_vps_for_project( $c->stash->{project_id}, $c->stash->{uuid} );
 
-    return $valid;
+    return 1 if $valid;
 
   }
+  elsif ( not exists $c->stash->{uuid} and $c->stash->{project_id} ) {
+    return 1;
+
+  }
+
+  warn "auth failed";
 
   return 0;
 

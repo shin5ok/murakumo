@@ -30,7 +30,7 @@ sub run :Local {
   my ($self, $c, @args) = @_;
 
   my $request_arg = @args >= 2
-                  ? join '/', grep { warn $_;defined $_ } @args # なぜかundef が入っているので
+                  ? join '/', grep { defined $_ } @args
                   : $args[0];
 
   my $body   = $c->request->body;

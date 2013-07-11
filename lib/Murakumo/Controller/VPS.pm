@@ -231,6 +231,12 @@ sub auto :Private {
     return $valid;
 
   }
+  elsif ( not exists $c->stash->{uuid} and $c->stash->{project_id} ) {
+    return 1;
+
+  }
+
+  warn "auth failed";
 
   return 0;
 

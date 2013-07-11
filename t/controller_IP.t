@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 use Test::More;
+use JSON;
+use URI;
 
 
 use Catalyst::Test 'Murakumo';
@@ -10,41 +12,94 @@ my $api_key    = $ENV{MURAKUMO_API_KEY};
 my $admin_key  = $ENV{MURAKUMO_ADMIN_KEY};
 my $api_uri    = $ENV{MURAKUMO_API_URI};
 my $project_id = $ENV{MURAKUMO_PROJECT_ID};
+$admin_key   //= qq{};
 
-my @gets = qw(
-  list
-  list_count
-);
 
-# adminユーザでのアクセス
-for my $uri_path ( @gets ) {
-  my $path = qq{/$project_id/$uri_path};
-  $path .= "?admin_key=$admin_key";
-  my ($r, $c) = ctx_request($path);
+subtest "api /string-of-project/ip/list" => sub {
+  my $path = URI->new( qq{/admin/ip/list} );
+  my $data;
+  {
+    $path->query_form( admin_key => $admin_key );
 
-  ok($r->is_success);
+    my ($r, $c) = ctx_request( $path );
 
-  eval {
-    my $ref = to_json $r->content;
+    ok($r->is_success);
+
+    my $ref;
+    eval {
+      $ref = decode_json $r->content;
+    };
     is(ref $ref, 'HASH');
+    is(ref $ref->{data}, 'HASH');
     is($ref->{result}, 1);
-  };
-}
 
-# 一般ユーザでのアクセス
-for my $uri_path ( @gets ) {
-  my $path = qq{/$project_id/$uri_path};
-  $path .= "?api_key=$api_key";
-  my ($r, $c) = ctx_request($path);
+    $data = $ref->{data};
+  }
 
-  ok($r->is_success);
+  {
+    my $path = URI->new( qq{/$project_id/ip/list} );
+    $path->query_form( key => $api_key );
 
-  eval {
-    my $ref = to_json $r->content;
+    my ($r, $c) = ctx_request( $path );
+
+    ok($r->is_success);
+
+    my $ref;
+    eval {
+      $ref = decode_json $r->content;
+    };
     is(ref $ref, 'HASH');
+    is(ref $ref->{data}, 'HASH');
     is($ref->{result}, 1);
-  };
-}
 
+    is_deeply( $ref->{data}, $data );
+
+  }
+
+};
+
+subtest "api /string-of-project/ip/list_count" => sub {
+  my $path = URI->new( qq{/admin/ip/list_count} );
+  my $data;
+  {
+    $path->query_form( admin_key => $admin_key );
+
+    my ($r, $c) = ctx_request( $path );
+
+    ok($r->is_success);
+
+    my $ref;
+    eval {
+      $ref = decode_json $r->content;
+    };
+    is(ref $ref, 'HASH');
+    is(ref $ref->{data}, 'HASH');
+    is($ref->{result}, 1);
+
+    $data = $ref->{data};
+  }
+
+  {
+    my $path = URI->new( qq{/$project_id/ip/list_count} );
+    $path->query_form( key => $api_key );
+
+    my ($r, $c) = ctx_request( $path );
+
+    ok($r->is_success);
+
+    my $ref;
+    eval {
+      $ref = decode_json $r->content;
+    };
+    is(ref $ref, 'HASH');
+    is(ref $ref->{data}, 'HASH');
+    is($ref->{result}, 1);
+
+    is_deeply( $ref->{data}, $data );
+
+  }
+
+};
 
 done_testing();
+

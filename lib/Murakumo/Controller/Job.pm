@@ -25,12 +25,6 @@ use Carp;
 use JSON;
 use Data::Dumper;
 
-sub index :Path :Args(0) {
-    my ( $self, $c ) = @_;
-
-    $c->response->body('Matched Murakumo::Controller::Job in Job.');
-}
-
 sub update :Local {
   my ($self, $c) = @_;
   my $model = $c->model('Job');
@@ -103,7 +97,9 @@ sub result :Local {
   no strict 'refs';
   if ($job_ref) {
     $c->stash->{result}     = 1;
-    $c->stash->{job_status} = { uuid => $job_uuid, result => $job_ref->[0]->{result} + 0 };
+    $c->stash->{data}       = { uuid => $job_uuid, result => $job_ref->[0]->{result} + 0 };
+    # とりあえず互換性のために
+    $c->stash->{job_result} = $c->stash->{data};
 
   } else {
     $c->stash->{result}   = 0; 

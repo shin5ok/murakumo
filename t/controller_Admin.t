@@ -2,49 +2,104 @@ use strict;
 use warnings;
 use Test::More;
 
+use URI;
 use JSON;
 
 use Catalyst::Test 'Murakumo';
 use Murakumo::Controller::Admin;
 
-my $api_key   = $ENV{MURAKUMO_API_KEY};
-my $admin_key = $ENV{MURAKUMO_ADMIN_KEY};
-my $api_uri   = $ENV{MURAKUMO_API_URI};
+my $api_key    = $ENV{MURAKUMO_API_KEY};
+my $admin_key  = $ENV{MURAKUMO_ADMIN_KEY};
+my $api_uri    = $ENV{MURAKUMO_API_URI};
+$admin_key   //= qq{};
 
-my @gets = qw(
-  vps_define_list_all
-  vps_list_all
-  project_list
-  ip_with_name
-);
+subtest "api /admin/vps_define_list_all" => sub {
+  my $path = URI->new( qq{/admin/vps_define_list_all} );
+  {
+    $path->query_form( admin_key => $admin_key );
 
-for my $uri_path ( @gets ) {
-  my $path = qq{/admin/$uri_path};
-  $path .= "?admin_key=$admin_key";
-  my ($r, $c) = ctx_request($path);
+    my ($r, $c) = ctx_request( $path );
+
+    ok($r->is_success);
+
+    my $ref;
+    eval {
+      $ref = decode_json $r->content;
+    };
+    is(ref $ref, 'HASH');
+    is(ref $ref->{data}, 'ARRAY');
+    is($ref->{result}, 1);
+  }
+
+  {
+    $path->query_form( key => $api_key );
+
+    my ($r, $c) = ctx_request( $path );
+
+    ok(! $r->is_success);
+    is($r->code, 403);
+  }
+
+};
+
+subtest "api /admin/vps_list_all" => sub {
+  my $path = URI->new( qq{/admin/vps_list_all} );
+  $path->query_form( admin_key => $admin_key );
+
+  my ($r, $c) = ctx_request( $path );
 
   ok($r->is_success);
 
+  my $ref;
   eval {
-    my $ref = to_json $r->content;
-    is(ref $ref, 'HASH');
-    is($ref->{result}, 1);
+    $ref = decode_json $r->content;
+  };
+  is(ref $ref, 'HASH');
+  is(ref $ref->{data}, 'ARRAY');
+  is($ref->{result}, 1);
+
+  {
+    $path->query_form( key => $api_key );
+
+    my ($r, $c) = ctx_request( $path );
+
+    ok(! $r->is_success);
+    is($r->code, 403);
+  }
+
+};
+
+subtest "api /admin/project_list" => sub {
+  my $path = URI->new( qq{/admin/project_list} );
+  $path->query_form( admin_key => $admin_key );
+
+  my ($r, $c) = ctx_request( $path );
+
+  ok($r->is_success);
+
+  my $ref;
+  eval {
+    $ref = decode_json $r->content;
+  };
+  is(ref $ref, 'HASH');
+  is(ref $ref->{data}, 'ARRAY');
+  is($ref->{result}, 1);
+
+  {
+    $path->query_form( key => $api_key );
+
+    my ($r, $c) = ctx_request( $path );
+
+    ok(! $r->is_success);
+    is($r->code, 403);
+  }
+
+};
+
+SKIP: {
+  subtest "api /admin/project_register" => sub {
+    ok 1;
   };
 }
-
-for my $uri_path ( @gets ) {
-  my $path = qq{/admin/$uri_path};
-  $path .= "?api_key=$api_key";
-  my ($r, $c) = ctx_request($path);
-
-  ok(! $r->is_success);
-
-  eval {
-    my $ref = to_json $r->content;
-    is(ref $ref, 'HASH');
-    is($ref->{result}, 0);
-  };
-}
-
 
 done_testing();
