@@ -74,9 +74,8 @@ sub select {
   # コア数 を vpsで使っているcpu数を超えていないノードのみ対象
   # 使っているコア数が少ない順に並び替え
   @rses = sort { $a->cpu_vps_used <=> $b->cpu_vps_used }
-          grep { $_->cpu_vps_used <= $_->cpu_total }
-          grep { exists $auto_select_node{$_->uuid} }
-          # grep { my $uuid = $_->uuid; exists $auto_select_node{$uuid} }
+          grep { $_->cpu_vps_used <=  $_->cpu_total    }
+          grep { exists $auto_select_node{$_->uuid}    }
           @rses;
 
   if (@rses == 0) {
@@ -101,7 +100,8 @@ sub select {
              ? $config->{api_port}
              : $default_api_port;
 
-  return sprintf "%s:%d", $selected_node->name, $port;
+  return $selected_node->name;
+  # return sprintf "%s:%d", $selected_node->name, $port;
 
 }
 
