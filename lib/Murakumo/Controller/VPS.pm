@@ -21,6 +21,7 @@ Catalyst Controller.
 
 =cut
 
+use Socket;
 use JSON;
 use Carp;
 use DateTime;
@@ -68,11 +69,44 @@ sub list :Private {
   $c->stash->{data}   = $vpses_ref;
   $c->stash->{result} = 1;
 
+  return $vpses_ref;
+
 }
 
 sub console_list :Private {
   my ($self, $c) = @_;
-  $c->detach("list", [ "console_list" ]);
+  # $c->detach("list", [ "console_list" ]);
+
+  my $vpses_ref = $c->forward('list');
+  $c->stash->{result} = 0;
+
+  my $protocol = 'vnc'; # spice をサポートするまでは固定でvnc
+
+  my @vps_consoles;
+  for my $v ( @$vpses_ref ) {
+    my $ip;
+    local $@;
+    eval {
+      my $packed = gethostbyname( $v->{node} );
+      $ip = inet_ntoa( $packed );
+    };
+
+    $ip //= $v->{node};
+    my $console = sprintf "%s://%s:%d",
+                          $protocol,
+                          $ip,
+                          $v->{vnc_port};
+
+    push @vps_consoles, {
+                          name    => $v->{name},
+                          uuid    => $v->{uuid},
+                          console => $console,
+                        };
+
+  }
+
+  $c->stash->{result} = 1;
+  $c->stash->{data}   = \@vps_consoles;
 
 }
 
