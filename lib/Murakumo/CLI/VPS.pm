@@ -8,6 +8,7 @@ use JSON;
 use Carp;
 use Data::Dumper;
 use FindBin;
+use Socket;
 use lib qq{$FindBin::Bin/../lib};
 use Murakumo::CLI::Utils;
 use Murakumo::CLI::DB;
@@ -102,6 +103,38 @@ sub list {
   }
 
   return \@vpses;
+
+}
+
+sub console_list {
+  my ($self, @args) = @_;
+  my $vps_list_ref = $self->list( @args );
+
+  my $protocol = 'vnc'; # spice をサポートするまでは固定でvnc
+
+  my @vps_consoles;
+  for my $v ( @$vps_list_ref ) {
+    my $ip;
+    eval {
+      my $packed = gethostbyname( $v->{node} );
+      $ip = inet_ntoa( $packed );
+    };
+
+    $ip //= $v->{node};
+    my $console = sprintf "%s://%s:%d",
+                          $protocol,
+                          $ip,
+                          $v->{vnc_port};
+
+    push @vps_consoles, {
+                          name    => $v->{name},
+                          uuid    => $v->{uuid},
+                          console => $console,
+                        };
+
+  }
+
+  return \@vps_consoles;
 
 }
 

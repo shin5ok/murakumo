@@ -274,6 +274,31 @@ sub vps_list {
 }
 
 
+sub vps_console_list {
+
+  my $uri = _create_uri( "/$project_id/vps/console_list/" );
+
+  my %param_hash;
+
+  my $response = _www_get( $uri );
+  my $data = decode_json $response->content;
+
+  my @cols = ('name','uuid','console', );
+  my @rows;
+  for my $x ( @{$data->{data}} ) {
+    my @p;
+
+    push @p, $x->{$_} for ( @cols );
+    push @rows, \@p;
+
+  }
+
+  # 列名、行の配列リファレンス
+  return ( \@cols, \@rows );
+
+}
+
+
 sub vps_list_all {
 
   _is_has_admin_key();

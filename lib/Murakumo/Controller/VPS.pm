@@ -38,7 +38,7 @@ sub default :Path {
 }
 
 sub list :Private {
-  my ($self, $c) = @_;
+  my ($self, $c, $args) = @_;
   my $params     = $c->request->query_params;
   my $project_id = $c->stash->{project_id};
   if (! $project_id) {
@@ -59,9 +59,20 @@ sub list :Private {
     }
   }
 
-  my $vpses_ref       = $vps_model->list( $project_id, $time_until );
+  my $method = qq{list};
+  if (defined $args) {
+    $method = $args;
+  }
+
+  my $vpses_ref       = $vps_model->$method( $project_id, $time_until );
   $c->stash->{data}   = $vpses_ref;
   $c->stash->{result} = 1;
+
+}
+
+sub console_list :Private {
+  my ($self, $c) = @_;
+  $c->detach("list", [ "console_list" ]);
 
 }
 
