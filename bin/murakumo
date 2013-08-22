@@ -103,7 +103,7 @@ if (@results > 1) {
   }
 
   $t->setColWidth('message', 30, 1);
-  for my $row (@{$results[1]}) {
+  for my $row ( @{$results[1]} ) {
     $t->addRow($row);
   }
   print $t;
@@ -270,6 +270,26 @@ sub vps_list {
 
   # 列名、行の配列リファレンス
   return ( \@cols, \@rows );
+
+}
+
+sub env {
+  my @param_names = (
+                      'MURAKUMO_PROJECT_ID',
+                      'MURAKUMO_API_URI',
+                      'MURAKUMO_API_KEY',
+                      'MURAKUMO_ADMIN_KEY',
+                      'DEBUG',
+                    );
+
+  my @rows;
+  no strict 'refs';
+  for my $key ( @param_names ) {
+    push @rows, [ $key, $ENV{$key} // qq{} ];
+
+  }
+
+  return ( [qw(name value)], \@rows );
 
 }
 
