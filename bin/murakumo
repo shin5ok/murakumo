@@ -233,10 +233,11 @@ sub vps_define_info {
 }
 
 sub vps_cdrom {
-  my $uri = _create_uri( "/$project_id/node/run/vps/cdrom/" );
 
   defined $uuid
     or croak "*** uuid parameter is not found";
+
+  my $uri = _create_uri( "/$project_id/node/run/vps/cdrom/" );
 
   my %param = (
     cdrom_path => $cdrom,
