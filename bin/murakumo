@@ -235,6 +235,9 @@ sub vps_define_info {
 sub vps_cdrom {
   my $uri = _create_uri( "/$project_id/node/run/vps/cdrom/" );
 
+  defined $uuid
+    or croak "*** uuid parameter is not found";
+
   my %param = (
     cdrom_path => $cdrom,
     uuid       => $uuid,
@@ -439,6 +442,10 @@ sub vps_boot {
 }
 
 sub vps_boot_by_uuid {
+
+  defined $uuid
+    or croak "*** uuid parameter is not found";
+
   my $url  = sprintf "/%s/vps/boot/%s/", $project_id, $uuid;
   # my $url  = sprintf "/%s/vps/boot", $project_id;
   my $uri  = _create_uri( $url );
@@ -459,6 +466,9 @@ sub vps_boot_by_uuid {
 }
 
 sub vps_shutdown {
+
+  defined $uuid
+    or croak "*** uuid parameter is not found";
   my $uri = _create_uri( "/$project_id/vps/shutdown/$uuid/" );
   my %param = ();
 
@@ -469,6 +479,9 @@ sub vps_shutdown {
 }
 
 sub vps_terminate {
+
+  defined $uuid
+    or croak "*** uuid parameter is not found";
   my $uri = _create_uri( "/$project_id/vps/terminate/$uuid/" );
   my %param = ();
 
@@ -483,9 +496,9 @@ sub vps_define_create {
 }
 
 sub vps_define_modify {
-  if (! $uuid) {
-    croak "*** uuid is not specified...";
-  }
+
+  defined $uuid
+    or croak "*** uuid parameter is not found";
 
   _vps_define_create_or_modify("modify");
 }
@@ -581,6 +594,10 @@ sub _vps_define_create_or_modify {
 
 
 sub vps_define_remove {
+
+  defined $uuid
+    or croak "*** uuid parameter is not found";
+
   my $uri = _create_uri( "/$project_id/vps/define/remove/$uuid/" );
   my $response = _www_json_post( $uri );
 
@@ -589,6 +606,10 @@ sub vps_define_remove {
 
 
 sub vps_migration {
+
+  defined $uuid
+    or croak "*** uuid parameter is not found";
+
   my $uri = _create_uri( "/$project_id/vps/migration/$uuid/" );
   $dst_node
     or croak "dst node is error";
@@ -599,6 +620,9 @@ sub vps_migration {
 }
 
 sub vps_boot_cleanup {
+
+  defined $uuid
+    or croak "*** uuid parameter is not found";
   my $uri = _create_uri( "/$project_id/vps/boot_tmp_cleanup/$uuid/" );
   my $response = _www_json_post( $uri, {} );
   return _r($response);
@@ -607,6 +631,9 @@ sub vps_boot_cleanup {
 
 
 sub vps_add_ip {
+
+  defined $uuid
+    or croak "*** uuid parameter is not found";
   my $uri    = _create_uri( "/$project_id/vps/define/add_ip/$uuid/" );
   my $number = $add_ip || 1;
 
@@ -803,6 +830,9 @@ sub job_list {
 
 
 sub vps_define_proxy_vlan {
+
+  defined $uuid
+    or croak "*** uuid parameter is not found";
 
   my $uri = _create_uri( "/$project_id/vps/define/proxy_vlan_id/$uuid" );
   my $response = _www_json_post( $uri, { proxy_vlan_id => $proxy_vlan_id, vlan_id => $vlan_id } );
