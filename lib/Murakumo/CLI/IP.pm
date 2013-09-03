@@ -368,14 +368,15 @@ sub ip_with_name {
   while ( my $x = $join_rs->next ) {
 
     push @lists, {
-               vps_uuid   => $x->used_vps_uuid,
-               name       => $x->vps_define_rel->name,
-               tag        => $x->vps_define_rel->tag,
-               project_id => $x->vps_define_rel->project_id,
-               ip         => $x->ip,
-               mask       => $x->mask,
-               gw         => $x->gw,
-               secondary  => $x->secondary ? 1 : 0,
+               vps_uuid    => $x->used_vps_uuid,
+               name        => $x->vps_define_rel->name,
+               tag         => $x->vps_define_rel->tag,
+               project_id  => $x->vps_define_rel->project_id,
+               ip          => $x->ip,
+               mask        => $x->mask,
+               gw          => $x->gw,
+               secondary   => $x->secondary ? 1 : 0,
+               update_time => $x->update_time,
              }
 
   }
