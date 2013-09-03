@@ -751,7 +751,7 @@ sub vps_template_list {
 }
 
 
-sub vlan_ip_list {
+sub ip_list {
   _is_has_admin_key();
 
   my @cols = ('ip', 'project_id', 'name', 'vps_uuid', 'secondary', 'update_time');
