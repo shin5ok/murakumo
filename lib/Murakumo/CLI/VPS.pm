@@ -23,6 +23,17 @@ sub vps_register {
   my @vpses     = @$vpses_ref;
   no strict 'refs';
   for my $vps (@vpses) {
+
+    # {
+    #   'update_key' => '3eba982d-bcfd-4eb3-b9f0-91a0802adcda',
+    #   'cpu' => 1,
+    #   'name' => 'cloned-vps002@COMMON',
+    #   'uuid' => '757eecb6-0b28-11e3-86bb-93dc1983f31c',
+    #   'state' => 1,
+    #   'vnc_port' => '5903',
+    #   'disks' => '/nfs/f9586432-aee0-437f-bbc4-894615e40f97/COMMON/757eecb6-0b28-11e3-86bb-93dc1983f31c-01.img',
+    #   'memory' => 1024000
+    # };
     $vps->{update_key} = $update_key;
 
     local $@;
@@ -31,7 +42,7 @@ sub vps_register {
       $resultset->update_or_create( $vps );
     };
     if ($@) {
-      warn $@;
+      logging $@;
     } else {
       $update_ok++;
     }
