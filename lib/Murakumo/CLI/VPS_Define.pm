@@ -289,6 +289,7 @@ sub create_disk_param_array {
 
   my $project_id = $argv->{project_id};
   my $uuid       = $argv->{uuid};
+  my $disk_path  = $argv->{disk_path};
 
   if (! $project_id or ! $uuid) {
     croak "*** project_id or uuid has no value";
@@ -302,8 +303,12 @@ sub create_disk_param_array {
 
   $array_ref ||= [ "0" ];
 
+  my $vm_root = $config->{vm_root};
+  $vm_root    =~ s{^/+}{};
+
   my $storage_uuid = $argv->{storage_uuid};
 
+  my $disk_dir_path;
   if (! $storage_uuid) {
     no strict 'refs';
     my $query = {};
@@ -318,10 +323,12 @@ sub create_disk_param_array {
 
     $storage_uuid = Murakumo::CLI::Storage->new->select( $total_size, $query );
 
-  }
+    $disk_dir_path = sprintf "%s/%s/%s", $vm_root, $storage_uuid, $project_id;
 
-  my $vm_root = $config->{vm_root};
-  $vm_root    =~ s{^/+}{};
+  } elsif (defined $disk_path) {
+    $disk_dir_path = $disk_path;
+
+  }
 
   for my $size ( @$array_ref ) {
     my $suffix = sprintf "-%02d", $number;
@@ -404,10 +411,12 @@ sub create_or_modify {
     my $storage_uuid;
     my $storage_tag;
     my $driver;
+    my $disk_path;
     {
       $storage_tag  = $vps_params->{storage_tag};
       $storage_uuid = $vps_params->{storage_uuid};
       $driver       = $options->{driver} || "virtio";
+      $disk_path    = $vps_params->{disk_path};
     }
     my $current_disk_number = @current_disks + 1;
     @disk_args_refs = $self->create_disk_param_array( $vps_params->{disk},
@@ -418,6 +427,7 @@ sub create_or_modify {
                                                        storage_uuid => $storage_uuid,
                                                        storage_tag  => $storage_tag,
                                                        driver       => $driver,
+                                                       disk_path    => $disk_path,
                                                      }
                                                     );
   }
