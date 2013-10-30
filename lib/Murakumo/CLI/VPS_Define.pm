@@ -305,7 +305,7 @@ sub create_disk_param_array {
   $array_ref ||= [ "0" ];
 
   my $vm_root = $config->{vm_root};
-  $vm_root    =~ s{^/+}{};
+  # $vm_root    =~ s{^/+}{};
 
   my $storage_uuid = $argv->{storage_uuid};
 
@@ -644,12 +644,15 @@ sub record_cloning {
   my $now = $utils->now;
   my $txn = $self->schema->txn_scope_guard;
 
-  my ($uuid, $storage_uuid, $tag);
+  my ($uuid, $storage_uuid, $tag, $boot_node, $disk_path);
   {
     no strict 'refs';
+    $boot_node    = $args_ref->{boot_node};
     $uuid         = $args_ref->{uuid};
     $tag          = $opt_args_ref->{tag} // $org_info->{tag};
     $storage_uuid = $opt_args_ref->{storage_uuid};
+    $disk_path    = $opt_args_ref->{disk_path};
+
 
     # storage_uuid が指定されていれば
     # storage_uuid が登録されているかチェック
@@ -665,6 +668,7 @@ sub record_cloning {
       cpu_number      => $org_info->{cpu_number},
       uuid            => $uuid,
       tag             => $tag,
+      boot_node       => $boot_node,
       name            => $uuid,
       project_id      => $project_id,
       clock           => $org_info->{clock},
@@ -709,12 +713,13 @@ sub record_cloning {
                                                          project_id   => $project_id,
                                                          uuid         => $uuid,
                                                          storage_uuid => $storage_uuid,
+                                                         disk_path    => $disk_path,
                                                        },
                                                       );
 
         # clone をするノードに伝える dst_diskパス名
         $param_ref->{dst_image_path} = $dst_image->{image_path};
-        # clone をするノードに伝える src_diskパス名
+        #e# clone をするノードに伝える src_diskパス名
         $param_ref->{src_image_path} = $disk->{image_path};
 
         my %param = (

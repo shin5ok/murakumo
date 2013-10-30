@@ -436,6 +436,9 @@ sub _clone {
   defined $disk_path and
     $param{disk_path}   = $disk_path;
 
+  defined $boot_node and
+    $param{boot_node}   = $boot_node;
+
   my $response = _www_json_post( $uri, \%param );
 
   return _r($response);

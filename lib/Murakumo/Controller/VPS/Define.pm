@@ -140,6 +140,8 @@ sub clone :Private {
   my $storage_uuid = $params->{storage_uuid};
   my $storage_tag  = $params->{storage_tag};
   my $tag          = $params->{tag};
+  my $disk_path    = $params->{disk_path};
+  my $boot_node    = $params->{boot_node};
 
   my $r;
   local $@;
@@ -153,12 +155,14 @@ sub clone :Private {
                                                       name            => $dst_name,
                                                       instance_status => undef,
                                                       project_id      => $project_id,
+                                                      boot_node       => $boot_node,
                                                    },
                                                    {
                                                       tag          => $tag,
                                                       vlan_id      => $vlan_id,
                                                       storage_uuid => $storage_uuid,
                                                       storage_tag  => $storage_tag,
+                                                      disk_path    => $disk_path,
                                                    },
                                       );
   };
