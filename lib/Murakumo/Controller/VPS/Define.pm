@@ -508,8 +508,9 @@ sub remove :Private {
 
   }
 
-  my $info = $define_model->info( $uuid );
   my @paths;
+
+  my $info = $define_model->info( $uuid );
   for my $disk_info ( @{$info->{disks}} ) {
     push @paths, $disk_info->{image_path};
 
@@ -519,7 +520,8 @@ sub remove :Private {
                                   disks      => \@paths,
                                   uuid       => $uuid,
                                   project_id => $project_id,
-                                };
+                                  node       => $info->{boot_node},
+                               };
 
   my $delete_result = $define_model->delete($uuid);
 
