@@ -124,14 +124,9 @@ sub boot :Private {
     $c->detach( "/stop_error", ["project_id or uuid is empty"]);
   }
 
-  if ($params->{node}) {
-    my $node_model = $c->model('Node');
-    $node_model->is_available($params->{node})
-      or croak "*** $params->{node} is not available";
-  }
-
   my $vps_model    = $c->model('VPS');
   my $define_model = $c->model('VPS_Define');
+  my $node_model   = $c->model('Node');
 
   if (! $vps_model->set_tmp_active_vps( $uuid ) ) {
     $c->detach( "/stop_error", ["$uuid is already active or booting processing..."]);
@@ -140,6 +135,15 @@ sub boot :Private {
   my $info_for_boot = $define_model->info( $uuid );
   $params->{vps_params}  = $info_for_boot;
   $info_for_boot->{name} = sprintf "%s@%s", $info_for_boot->{name}, $project_id;
+
+  if (! $params->{node} and $info_for_boot->{boot_node}) {
+    $params->{node} = $info_for_boot->{boot_node};
+  }
+
+  if ($params->{node}) {
+    $node_model->is_available($params->{node})
+      or croak "*** $params->{node} is not available";
+  }
 
   $c->stash->{__callback_for_error} = sub {
     $vps_model->unset_tmp_active_vps( $uuid );

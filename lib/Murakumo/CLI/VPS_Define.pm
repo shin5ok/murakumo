@@ -70,7 +70,8 @@ sub info {
       cdrom_path      => $vps_r->cdrom_path,
       project_id      => $vps_r->project_id,
       vnc_password    => $vps_r->vnc_password,
-      tag             => $vps_r->tag  || qq{},
+      boot_node       => $vps_r->boot_node  || qq{},
+      tag             => $vps_r->tag        || qq{},
       extra_info      => $vps_r->extra_info || qq{},
       public_template => $vps_r->public_template,
     };
