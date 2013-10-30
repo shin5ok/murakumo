@@ -102,6 +102,10 @@ sub clone :Private {
   my $vps_model    = $c->model('VPS');
   my $ip_model     = $c->model('IP');
 
+  if (! $params->{node} and $params->{boot_node}) {
+    $params->{node} = $params->{boot_node};
+  }
+
   my $src_uuid     = $params->{src_uuid} = $c->stash->{uuid};
 
   if ($vps_model->is_active_vps( $src_uuid )) {
@@ -312,6 +316,10 @@ sub create_or_modify: Private {
   my $project_id = $c->stash->{project_id};
   if (! $project_id) {
     $c->detach("/stop_error", ["project_id is empty"]);
+  }
+
+  if (! $params->{node} and $params->{boot_node}) {
+    $params->{node} = $params->{boot_node};
   }
 
   my $vps_params = $params->{vps};
