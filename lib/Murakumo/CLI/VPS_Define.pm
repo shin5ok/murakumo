@@ -333,11 +333,9 @@ sub create_disk_param_array {
   for my $size ( @$array_ref ) {
     my $suffix = sprintf "-%02d", $number;
 
-    my $path    = sprintf "/%s/%s/%s/%s%s.img", $vm_root,
-                                                  $storage_uuid,
-                                                  $project_id,
-                                                  $uuid,
-                                                  $suffix;
+    my $path    = sprintf "%s/%s%s.img", $disk_path,
+                                         $uuid,
+                                         $suffix;
     my %param = (
       size        => $size,
       image_path  => $path,
