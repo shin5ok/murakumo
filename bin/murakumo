@@ -49,6 +49,7 @@ opts my $name            => 'Str',
      my $new_project_id  => 'Str',
      my $proxy_vlan_id   => 'Str',
      my $disk_path       => 'Str',
+     my $boot_node       => 'Str',
      my $node            => 'Str';
 
 our $debug = exists $ENV{DEBUG}
@@ -566,6 +567,8 @@ sub _vps_define_create_or_modify {
     and $vps->{extra_info}      = uri_escape $extra_info;
   defined $public_template
     and $vps->{public_template} = $public_template;
+  defined $boot_node
+    and $vps->{boot_node}       = $boot_node;
 
   my $vps_params = {
      spec         => $vps,
@@ -579,7 +582,6 @@ sub _vps_define_create_or_modify {
 
   defined $storage_tag and
     $vps_params->{storage_tag}  = $storage_tag;
-
 
   my $request_uri = qq{/$project_id/vps/define/$mode_uri/};
   $uuid and $request_uri .= "$uuid/";

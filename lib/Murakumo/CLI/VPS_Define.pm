@@ -408,6 +408,10 @@ sub create_or_modify {
     $vps_spec->{uuid} = $uuid;
   }
 
+  if (exists $options->{boot_node}) {
+    $vps_spec->{boot_node} = $options->{boot_node};
+  }
+
   my @disk_args_refs;
   if (exists $vps_params->{disk} and @{$vps_params->{disk}} > 0) {
     my @current_disks = $disk_define_rs->search({ vps_uuid => $uuid });

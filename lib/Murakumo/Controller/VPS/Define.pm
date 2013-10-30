@@ -338,7 +338,6 @@ sub create_or_modify: Private {
     defined $vps_params->{spec}->{name}
       or $vps_params->{spec}->{name} = $uuid;
 
-
   } else {
     $c->detach('/stop_error', ["mode: $mode is error"]);
 
