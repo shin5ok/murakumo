@@ -309,33 +309,39 @@ sub create_disk_param_array {
   my $storage_uuid = $argv->{storage_uuid};
 
   my $disk_dir_path;
-  if (! $storage_uuid) {
-    no strict 'refs';
-    my $query = {};
-    if (defined $argv->{storage_tag}) {
-      $query->{storage_tag} = $argv->{storage_tag};
+  if (defined $disk_path) {
+    $disk_dir_path = $disk_path;
+
+  } else {
+
+    # ストレージの指定がなかったら
+    if (! $storage_uuid) {
+
+      # 自動で選択
+      no strict 'refs';
+      my $query = {};
+      if (defined $argv->{storage_tag}) {
+        $query->{storage_tag} = $argv->{storage_tag};
+      }
+
+      # 今回要求したディスクの合計値
+      # つまり、1回の要求で複数のディスクを要求しても、それらは同じストレージに置かれる
+      my $total_size = 0;
+      $total_size += $_ for @$array_ref;
+
+      $storage_uuid = Murakumo::CLI::Storage->new->select( $total_size, $query );
     }
 
-    # 今回要求したディスクの合計値
-    # つまり、1回の要求で複数のディスクを要求しても、それらは同じストレージに置かれる
-    my $total_size = 0;
-    $total_size += $_ for @$array_ref;
-
-    $storage_uuid = Murakumo::CLI::Storage->new->select( $total_size, $query );
-
     $disk_dir_path = sprintf "%s/%s/%s", $vm_root, $storage_uuid, $project_id;
-
-  } elsif (defined $disk_path) {
-    $disk_dir_path = $disk_path;
 
   }
 
   for my $size ( @$array_ref ) {
     my $suffix = sprintf "-%02d", $number;
 
-    my $path    = sprintf "%s/%s%s.img", $disk_path,
-                                         $uuid,
-                                         $suffix;
+    my $path = sprintf "%s/%s%s.img", $disk_dir_path,
+                                      $uuid,
+                                      $suffix;
     my %param = (
       size        => $size,
       image_path  => $path,

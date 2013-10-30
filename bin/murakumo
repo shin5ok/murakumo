@@ -48,6 +48,7 @@ opts my $name            => 'Str',
      my $cdrom_boot      => 'Bool',
      my $new_project_id  => 'Str',
      my $proxy_vlan_id   => 'Str',
+     my $disk_path       => 'Str',
      my $node            => 'Str';
 
 our $debug = exists $ENV{DEBUG}
@@ -431,6 +432,9 @@ sub _clone {
   defined $tag and
     $param{tag}         = $tag;
 
+  defined $disk_path and
+    $param{disk_path}   = $disk_path;
+
   my $response = _www_json_post( $uri, \%param );
 
   return _r($response);
@@ -567,6 +571,7 @@ sub _vps_define_create_or_modify {
      spec         => $vps,
      disk         => \@disks,
      interface    => \@interfaces,
+     disk_path    => $disk_path,
   };
 
   defined $storage_uuid and
