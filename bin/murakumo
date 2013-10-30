@@ -570,8 +570,6 @@ sub _vps_define_create_or_modify {
     and $vps->{extra_info}      = uri_escape $extra_info;
   defined $public_template
     and $vps->{public_template} = $public_template;
-  defined $boot_node
-    and $vps->{boot_node}       = $boot_node;
 
   my $vps_params = {
      spec         => $vps,
@@ -593,6 +591,7 @@ sub _vps_define_create_or_modify {
 
   my $params_all = {
                      vps          => $vps_params,
+                     boot_node    => $boot_node,
                      assign_ip    => $assign_ip,
                      vlan_id      => $vlan_id,
                      driver       => $no_virtio ? "ide" : "virtio",

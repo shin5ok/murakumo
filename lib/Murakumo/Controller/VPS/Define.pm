@@ -318,10 +318,6 @@ sub create_or_modify: Private {
     $c->detach("/stop_error", ["project_id is empty"]);
   }
 
-  if (! $params->{node} and $params->{boot_node}) {
-    $params->{node} = $params->{boot_node};
-  }
-
   my $vps_params = $params->{vps};
 
   my $utils = Murakumo::CLI::Utils->new;
@@ -358,15 +354,19 @@ sub create_or_modify: Private {
   my $ip_model = $c->model('IP');
   my $reserve_uuid;
 
+  my $options = {};
   my $to_params;
+
   local $@;
   eval {
 
-    dumper($vps_params);
-
-    my $options = {};
     exists $params->{driver} and
       $options->{driver} = $params->{driver};
+
+    if (! $params->{node} and $params->{boot_node}) {
+      $options->{boot_node} = $params->{boot_node};
+    }
+
 
     $options->{mode} = $mode;
 
@@ -424,6 +424,7 @@ sub create_or_modify: Private {
 
    if (! $@) {
 
+      $to_params->{node}     = $params->{boot_node};
       $to_params->{vps_uuid} = $uuid;
 
       $c->log->info("vps define $mode...");
