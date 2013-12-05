@@ -74,7 +74,7 @@ sub info {
       tag             => $vps_r->tag        || qq{},
       extra_info      => $vps_r->extra_info || qq{},
       public_template => $vps_r->public_template,
-      use_spice       => $vps_r->use_spice,
+      use_spice       => $vps_r->use_spice  || qq{},
     };
 
     my %ips;

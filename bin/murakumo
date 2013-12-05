@@ -49,6 +49,7 @@ opts my $name            => 'Str',
      my $new_project_id  => 'Str',
      my $proxy_vlan_id   => 'Str',
      my $disk_path       => 'Str',
+     my $use_spice       => 'Int',
      my $boot_node       => 'Str',
      my $node            => 'Str';
 
@@ -176,6 +177,10 @@ sub vps_define_info {
 
     if ($param_name eq 'vnc_password' and ! $verbose) {
       $value = '**********';
+    }
+
+    if ($param_name eq 'use_spice') {
+      $value = $info->{$param_name} ? "yes" : "no";
     }
 
     if ($param_name eq 'extra_info') {
@@ -570,6 +575,8 @@ sub _vps_define_create_or_modify {
     and $vps->{extra_info}      = uri_escape $extra_info;
   defined $public_template
     and $vps->{public_template} = $public_template;
+  defined $use_spice
+    and $vps->{use_spice}       = $use_spice ? 1 : 0;
 
   my $vps_params = {
      spec         => $vps,
