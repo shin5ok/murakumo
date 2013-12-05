@@ -167,7 +167,7 @@ sub vps_define_info {
   my @rows;
   my @param_names = qw(
                         project_id uuid name tag cpu_number memory clock
-                        cdrom_path vnc_password boot_node extra_info
+                        cdrom_path vnc_password use_spice boot_node extra_info
                       );
 
   for my $param_name ( @param_names ) {
