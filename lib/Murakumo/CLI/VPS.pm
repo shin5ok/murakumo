@@ -109,6 +109,7 @@ sub list {
                    state       => $x->state,
                    update_time => $x->update_time,
                    vnc_port    => $x->vnc_port,
+                   use_spice   => $x->use_spice,
                  };
   }
 

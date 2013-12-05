@@ -80,8 +80,6 @@ sub console_list :Private {
   my $vpses_ref = $c->forward('list');
   $c->stash->{result} = 0;
 
-  my $protocol = 'vnc'; # spice をサポートするまでは固定でvnc
-
   my @vps_consoles;
   for my $v ( @$vpses_ref ) {
     my $ip;
@@ -90,6 +88,12 @@ sub console_list :Private {
       my $packed = gethostbyname( $v->{node} );
       $ip = inet_ntoa( $packed );
     };
+
+    warn Dumper $v;
+
+    my $protocol = $v->{use_spice} == 1
+                 ? 'spice'
+                 : 'vnc';
 
     $ip //= $v->{node};
     my $console = sprintf "%s://%s:%d",
