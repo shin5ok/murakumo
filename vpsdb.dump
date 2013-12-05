@@ -250,7 +250,7 @@ CREATE TABLE `vps` (
   `state` varchar(32) DEFAULT NULL,
   `node` varchar(255) DEFAULT NULL,
   `vnc_port` int(11) DEFAULT NULL,
-  `use_spice` int(11) DEFAULT '0',
+  `use_spice` tinyint(4) DEFAULT '0',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `update_key` varchar(48) DEFAULT NULL,
   PRIMARY KEY (`uuid`)
@@ -273,7 +273,7 @@ CREATE TABLE `vps_define` (
   `cpu_number` int(8) NOT NULL DEFAULT '1',
   `clock` varchar(32) DEFAULT 'localtime',
   `vnc_password` varchar(64) DEFAULT 'smc00',
-  `use_spice` int(11) DEFAULT '0',
+  `use_spice` tinyint(4) DEFAULT '0',
   `instance_status` varchar(32) DEFAULT NULL,
   `cdrom_path` varchar(255) DEFAULT '',
   `boot_node` varchar(64) DEFAULT NULL,
@@ -318,4 +318,4 @@ CREATE TABLE `vps_template` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-12-05 14:51:38
+-- Dump completed on 2013-12-05 14:58:29
