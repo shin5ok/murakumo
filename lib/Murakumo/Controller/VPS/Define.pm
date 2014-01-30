@@ -367,7 +367,6 @@ sub create_or_modify: Private {
       $options->{boot_node} = $params->{boot_node};
     }
 
-
     $options->{mode} = $mode;
 
     if ( $vps_define_model->create_or_modify($project_id, $uuid, $vps_params, $options) ) {
