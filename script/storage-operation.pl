@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/env murakumo-perl
 use strict;
 use warnings;
 use JSON;
@@ -14,12 +14,13 @@ opts my $export_path => 'Str',
      my $type        => 'Str',
      my $priority    => 'Int';
 
+my @storage_types = qw( nfs glusterfs );
+
 if ($> != 0) {
   croak "*** $0 must be run by super user";
 }
 
 my $mode = shift || "";
-
 $priority ||= 100;
 $type     ||= "nfs";
 if ($mode eq 'add') {
@@ -30,6 +31,11 @@ if ($mode eq 'add') {
 } else {
   usage();
   exit 0;
+}
+
+if (! grep { $_ eq $type } @storage_types) {
+  usage();
+  exit 255;
 }
 
 my $db = Murakumo::CLI::DB->new->schema;
@@ -80,9 +86,11 @@ sub make_mount_path {
 }
 
 sub usage {
+  my $storage_type_string = join " / ",@storage_types;
+
   print << "__USAGE__";
 (root)# $0 add --export_path string --host string [ --type string --priority int --tag ]
-        (attention: --type support for 'nfs' only)
+        (attention: --type support $storage_type_string)
   ex:
   (root)# $0 add --export_path /nfs/vm --host 192.168.1.24 --tag FOR_BACKUP
 
