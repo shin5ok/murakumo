@@ -2,4 +2,5 @@ murakumo
 ========
 Simple Cloud Controller and web API for KVM
 
-[slideshare](http://www.slideshare.net/shin5ok/murakumo)
+
+[SpeakerDeck](https://speakerdeck.com/shin5ok/murakumo-cloud-controller)
